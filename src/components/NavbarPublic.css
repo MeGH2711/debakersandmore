@@ -1,0 +1,77 @@
+.public-navbar {
+  background: rgba(15, 15, 15, 0.95);
+  border-bottom: 1px solid rgba(247, 183, 49, 0.25);
+  padding: 0.8rem 1.2rem;
+  backdrop-filter: blur(8px);
+  position: sticky;
+  top: 0;
+  z-index: 1000;
+}
+
+.brand-logo {
+  height: 90px;
+  width: auto;
+  transition: transform 0.3s ease, filter 0.3s ease;
+  filter: drop-shadow(0 0 5px rgba(247, 183, 49, 0.2));
+}
+
+.brand-logo:hover {
+  transform: scale(1.05);
+  filter: drop-shadow(0 0 8px rgba(247, 183, 49, 0.5));
+}
+
+.nav-links {
+  display: flex;
+  gap: 25px;
+}
+
+.nav-link-custom {
+  font-family: "Montserrat", sans-serif;
+  color: #f5f5f5 !important;
+  font-weight: 500;
+  text-decoration: none;
+  position: relative;
+  transition: all 0.3s ease;
+}
+
+.nav-link-custom:hover {
+  color: #f7b731 !important;
+}
+
+.nav-link-custom.active {
+  color: #f7b731 !important;
+}
+
+.nav-link-custom::after {
+  content: "";
+  display: block;
+  height: 2px;
+  width: 0%;
+  background: linear-gradient(90deg, #f7b731, #f5a623);
+  transition: width 0.3s ease;
+  border-radius: 2px;
+  margin-top: 2px;
+}
+
+.nav-link-custom:hover::after,
+.nav-link-custom.active::after {
+  width: 100%;
+}
+
+.nav-toggle {
+  background-color: #f7b731 !important;
+  border: none;
+  outline: none;
+}
+
+@media (max-width: 768px) {
+  .brand-logo {
+    height: 90px;
+  }
+
+  .nav-links {
+    gap: 15px;
+    text-align: center;
+    padding: 10px 0;
+  }
+}

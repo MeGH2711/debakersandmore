@@ -1,0 +1,130 @@
+.contact-page {
+  color: #f0f0f0;
+  background-color: #121212;
+  padding: 60px 20px;
+  min-height: 100vh;
+}
+
+.contact-hero {
+  margin-bottom: 50px;
+}
+
+.contact-heading {
+  font-size: 2.5rem;
+  color: #f7b731;
+  font-weight: 700;
+  margin-bottom: 10px;
+}
+
+.contact-subtext {
+  color: #cfcfcf;
+  font-size: 1.1rem;
+  max-width: 700px;
+  margin: 0 auto;
+}
+
+.contact-details {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 25px;
+  margin-bottom: 50px;
+}
+
+.contact-card {
+  background: #1c1c1c;
+  border-radius: 12px;
+  padding: 25px;
+  width: 25%;
+  text-align: center;
+  box-shadow: 0 0 10px rgba(247, 183, 49, 0.2);
+  transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+
+.contact-card:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 0 18px rgba(247, 183, 49, 0.35);
+}
+
+.contact-card h3 {
+  color: #f7b731;
+  margin-bottom: 10px;
+  font-weight: 600;
+}
+
+.contact-card p {
+  color: #ffffff;
+}
+
+.section-heading {
+  color: #f7b731;
+  font-weight: 600;
+  margin-bottom: 15px;
+}
+
+.customSectionHeading{
+  color: #ffffff;
+  font-size: 1.8rem;
+  font-weight: 600;
+  margin-bottom: 20px;
+}
+
+.customSectionHeading::after {
+    content: "";
+    display: block;
+    width: 90px;
+    height: 3px;
+    background: #f7b731;
+    margin: 12px auto 0;
+    border-radius: 2px;
+}
+
+.timing-section,
+.message-section {
+  margin-top: 40px;
+  max-width: 700px;
+  margin-left: auto;
+  margin-right: auto;
+}
+
+.message-section p {
+  color: #d0d0d0;
+  line-height: 1.6;
+}
+
+.map-section {
+  margin-top: 50px;
+}
+
+.map-container {
+  width: 100%;
+  max-width: 900px;
+  height: 400px;
+  margin: 0 auto;
+  border-radius: 15px;
+  overflow: hidden;
+  box-shadow: 0 0 18px rgba(247, 183, 49, 0.25);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.map-container iframe {
+  width: 100%;
+  height: 100%;
+  border: none;
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+  .contact-heading {
+    font-size: 2rem;
+  }
+
+  .contact-card {
+    width: 100%;
+    max-width: 340px;
+  }
+
+  .map-container {
+    height: 300px;
+  }
+}
