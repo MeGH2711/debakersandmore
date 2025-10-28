@@ -48,6 +48,7 @@ function ProductList() {
                           <p>
                             <strong>Weight:</strong> {p.weight} gm
                           </p>
+
                           {p.ingredients &&
                             p.ingredients.length > 0 &&
                             (Array.isArray(p.ingredients)
@@ -60,6 +61,16 @@ function ProductList() {
                                   : p.ingredients}
                               </p>
                             )}
+
+                          {/* Availability Info */}
+                          <p>
+                            <strong>Status:</strong>{" "}
+                            {p.available ? (
+                              <span className="text-success fw-semibold">Available</span>
+                            ) : (
+                              <span className="text-danger fw-semibold">Unavailable</span>
+                            )}
+                          </p>
                         </Card.Text>
                       </div>
                     </Card.Body>
@@ -68,12 +79,21 @@ function ProductList() {
               ))}
             </Row>
 
+            {/* Mobile View */}
             <div className="mobile-view">
               {productsByCategory[category].map((p, i) => (
                 <div key={i} className="mobile-product-row">
-                  <span className="mobile-product-name">
-                    {p.name} ({p.weight} gm)
-                  </span>
+                  <div className="d-flex flex-column">
+                    <span className="mobile-product-name">
+                      {p.name} ({p.weight} gm)
+                    </span>
+                    <small
+                      className={`${p.available ? "text-success" : "text-danger"
+                        } fw-semibold mt-1`}
+                    >
+                      {p.available ? "Available" : "Unavailable"}
+                    </small>
+                  </div>
                   <span className="mobile-product-price">₹ {p.price}</span>
                 </div>
               ))}

@@ -11,6 +11,7 @@ import { db } from "../firebase";
 import { Modal, Button, Form, Table, Badge } from "react-bootstrap";
 import AppNavbar from "./Navbar";
 import "bootstrap/dist/css/bootstrap.min.css";
+import "./AdminDashboard.css";
 import { getAuth, onAuthStateChanged } from "firebase/auth";
 import { useNavigate } from "react-router-dom";
 
@@ -79,6 +80,7 @@ const AdminDashboard = () => {
     await addDoc(collection(db, "products"), {
       ...newProduct,
       ingredients: ingredientsArray,
+      available: true,
     });
 
     setShowAddModal(false);
@@ -95,6 +97,7 @@ const AdminDashboard = () => {
     await updateDoc(productRef, {
       ...selectedProduct,
       ingredients: ingredientsArray,
+      available: selectedProduct.available,
     });
     setShowEditModal(false);
     fetchProducts();
@@ -156,6 +159,7 @@ const AdminDashboard = () => {
                   <th className="text-center">Weight</th>
                   <th className="text-center">Ingredients</th>
                   <th className="text-center">Price</th>
+                  <th className="text-center">Availability</th>
                   <th className="text-center">Actions</th>
                 </tr>
               </thead>
@@ -200,6 +204,25 @@ const AdminDashboard = () => {
                       ) : (
                         <span className="text-muted">—</span>
                       )}
+                    </td>
+                    <td className="text-center">
+                      <Form.Check
+                        type="checkbox"
+                        checked={prod.available}
+                        onChange={async () => {
+                          const productRef = doc(db, "products", prod.id);
+                          await updateDoc(productRef, { available: !prod.available });
+                          fetchProducts();
+                        }}
+                        label={
+                          prod.available ? (
+                            <span className="text-success fw-semibold">Available</span>
+                          ) : (
+                            <span className="text-danger fw-semibold">Unavailable</span>
+                          )
+                        }
+                        className=""
+                      />
                     </td>
                     <td className="text-center">
                       <Button
@@ -357,7 +380,7 @@ const AdminDashboard = () => {
             <Modal.Title>Add New Category</Modal.Title>
           </Modal.Header>
           <Modal.Body className="bg-dark text-light">
-            <Form.Group>
+            <Form.Group className="mb-3">
               <Form.Label className="text-warning fw-semibold">Category Name</Form.Label>
               <Form.Control
                 type="text"
@@ -367,6 +390,27 @@ const AdminDashboard = () => {
                 onChange={(e) => setNewCategory(e.target.value)}
               />
             </Form.Group>
+
+            {/* Existing Categories List */}
+            <div className="mt-3">
+              <h6 className="text-warning fw-semibold mb-2">Existing Categories</h6>
+              {categories.length > 0 ? (
+                <div className="d-flex flex-wrap gap-2">
+                  {categories.map((cat) => (
+                    <Badge
+                      key={cat.id}
+                      bg="warning"
+                      text="dark"
+                      className="rounded-pill px-3 py-2"
+                    >
+                      {cat.name}
+                    </Badge>
+                  ))}
+                </div>
+              ) : (
+                <p className="text-muted mb-0">No categories added yet.</p>
+              )}
+            </div>
           </Modal.Body>
           <Modal.Footer className="bg-dark border-top d-flex justify-content-between">
             <Button variant="outline-light" onClick={() => setShowAddCategoryModal(false)}>
@@ -451,6 +495,24 @@ const AdminDashboard = () => {
                           setSelectedProduct({ ...selectedProduct, price: e.target.value })
                         }
                       />
+                    </Form.Group>
+                  </div>
+                  <div className="col-md-6">
+                    <Form.Group>
+                      <Form.Label className="text-info fw-semibold">Availability</Form.Label>
+                      <Form.Select
+                        className="bg-dark text-light border-info"
+                        value={selectedProduct.available ? "true" : "false"}
+                        onChange={(e) =>
+                          setSelectedProduct({
+                            ...selectedProduct,
+                            available: e.target.value === "true"
+                          })
+                        }
+                      >
+                        <option value="true">Available</option>
+                        <option value="false">Unavailable</option>
+                      </Form.Select>
                     </Form.Group>
                   </div>
                   <div className="col-12">

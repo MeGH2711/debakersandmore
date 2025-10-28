@@ -25,7 +25,7 @@ function PublicFooter() {
             rel="noopener noreferrer"
             className="footer-link"
           >
-            Megh
+            Megh Patel
           </a>
         </p>
       </div>
