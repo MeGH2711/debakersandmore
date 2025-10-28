@@ -70,8 +70,7 @@ function ContactUs() {
             <p>debakersandmore@gmail.com</p>
           </div>
         </section>
-
-        {/* 🔸 Contact Form Section */}
+        
         <section className="contact-form-section text-center">
           <h2 className="customSectionHeading">Send Us a Message</h2>
           <form className="contact-form" onSubmit={handleSubmit}>
