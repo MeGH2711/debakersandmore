@@ -1,7 +1,45 @@
+import React, { useState } from "react";
 import "./ContactUs.css";
 import PublicFooter from "../components/PublicFooter";
+import { db } from "../firebase";
+import { collection, addDoc, serverTimestamp } from "firebase/firestore";
 
 function ContactUs() {
+  const [formData, setFormData] = useState({
+    name: "",
+    phone: "",
+    email: "",
+    message: "",
+  });
+
+  const [status, setStatus] = useState("");
+
+  const handleChange = (e) => {
+    setFormData({ ...formData, [e.target.name]: e.target.value });
+  };
+
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+    setStatus("Submitting...");
+
+    if (!formData.name || !formData.phone || !formData.message) {
+      setStatus("Please fill in all required fields.");
+      return;
+    }
+
+    try {
+      await addDoc(collection(db, "feedback"), {
+        ...formData,
+        timestamp: serverTimestamp(),
+      });
+      setStatus("Thank you! Your message has been submitted successfully.");
+      setFormData({ name: "", phone: "", email: "", message: "" });
+    } catch (error) {
+      console.error("Error submitting feedback:", error);
+      setStatus("Something went wrong. Please try again.");
+    }
+  };
+
   return (
     <>
       <div className="contact-page">
@@ -15,7 +53,11 @@ function ContactUs() {
         <section className="contact-details">
           <div className="contact-card">
             <h3>Visit Us</h3>
-            <p>De Baker’s & More<br />Ahmedabad, Gujarat, India</p>
+            <p>
+              De Baker’s & More
+              <br />
+              Ahmedabad, Gujarat, India
+            </p>
           </div>
 
           <div className="contact-card">
@@ -27,6 +69,61 @@ function ContactUs() {
             <h3>Email Us</h3>
             <p>debakersandmore@gmail.com</p>
           </div>
+        </section>
+
+        {/* 🔸 Contact Form Section */}
+        <section className="contact-form-section text-center">
+          <h2 className="customSectionHeading">Send Us a Message</h2>
+          <form className="contact-form" onSubmit={handleSubmit}>
+            <div className="form-group">
+              <input
+                type="text"
+                name="name"
+                placeholder="Full Name *"
+                value={formData.name}
+                onChange={handleChange}
+                required
+              />
+            </div>
+
+            <div className="form-group">
+              <input
+                type="tel"
+                name="phone"
+                placeholder="Phone Number *"
+                value={formData.phone}
+                onChange={handleChange}
+                required
+              />
+            </div>
+
+            <div className="form-group">
+              <input
+                type="email"
+                name="email"
+                placeholder="Email ID (Optional)"
+                value={formData.email}
+                onChange={handleChange}
+              />
+            </div>
+
+            <div className="form-group">
+              <textarea
+                name="message"
+                placeholder="Your Message *"
+                rows="4"
+                value={formData.message}
+                onChange={handleChange}
+                required
+              ></textarea>
+            </div>
+
+            <button type="submit" className="submit-btn">
+              Send Message
+            </button>
+          </form>
+
+          {status && <p className="form-status">{status}</p>}
         </section>
 
         <section className="timing-section text-center">
@@ -55,7 +152,6 @@ function ContactUs() {
             We’d be delighted to bake something just for you! Drop us a message or visit our store — every creation starts with a sweet conversation.
           </p>
         </section>
-
       </div>
       <PublicFooter />
     </>

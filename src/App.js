@@ -1,8 +1,9 @@
-import React, { useEffect, useState } from "react";
+import { useEffect, useState } from "react";
 import { BrowserRouter as Router, Routes, Route, Navigate, useLocation } from "react-router-dom";
 import { getAuth, onAuthStateChanged } from "firebase/auth";
-import PublicPage from "./pages/MenuPage";
+import MenuPage from "./pages/MenuPage";
 import AdminDashboard from "./components/AdminDashboard";
+import AdminResponses from "./components/AdminResponses";
 import Login from "./components/Login";
 import NavbarPublic from "./components/NavbarPublic";
 import OurStory from "./pages/OurStory";
@@ -40,12 +41,16 @@ function App() {
       <PageTitle />
       <ConditionalNavbar />
       <Routes>
-        <Route path="/menu" element={<PublicPage />} />
         <Route path="/" element={<OurStory />} />
+        <Route path="/menu" element={<MenuPage />} />
         <Route path="/contact" element={<ContactUs />} />
         <Route
           path="/admin"
           element={isLoggedIn ? <AdminDashboard /> : <Navigate to="/login" replace />}
+        />
+        <Route
+          path="/responses"
+          element={isLoggedIn ? <AdminResponses /> : <Navigate to="/login" replace />}
         />
         <Route
           path="/login"
@@ -57,10 +62,10 @@ function App() {
   );
 }
 
-// ✅ Hide Navbar on admin and login routes
+// Hide Navbar on admin and login routes
 function ConditionalNavbar() {
   const location = useLocation();
-  const hideNavbar = location.pathname.startsWith("/admin") || location.pathname === "/login";
+  const hideNavbar = location.pathname.startsWith("/admin") || location.pathname.startsWith("/responses") || location.pathname === "/login";
   return !hideNavbar ? <NavbarPublic /> : null;
 }
 
@@ -81,6 +86,9 @@ function PageTitle() {
         break;
       case "/contact":
         document.title = "Contact Us | De Baker’s & More";
+        break;
+      case "/responses":
+        document.title = "Customer Responses | De Baker’s & More";
         break;
       default:
         document.title = "Menu | De Baker’s & More";

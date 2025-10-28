@@ -1,12 +1,34 @@
-import React from "react";
+import React, { useEffect, useState } from "react";
 import { Navbar, Container, Nav } from "react-bootstrap";
 import { NavLink } from "react-router-dom";
 import "./NavbarPublic.css";
 import logo from "../assets/images/logo.png";
 
 function NavbarPublic() {
+  const [showNavbar, setShowNavbar] = useState(true);
+  const [lastScrollY, setLastScrollY] = useState(0);
+
+  useEffect(() => {
+    const handleScroll = () => {
+      if (window.scrollY > lastScrollY && window.scrollY > 100) {
+        // scrolling down
+        setShowNavbar(false);
+      } else {
+        // scrolling up
+        setShowNavbar(true);
+      }
+      setLastScrollY(window.scrollY);
+    };
+
+    window.addEventListener("scroll", handleScroll);
+    return () => window.removeEventListener("scroll", handleScroll);
+  }, [lastScrollY]);
+
   return (
-    <Navbar expand="lg" className="public-navbar shadow-sm">
+    <Navbar
+      expand="lg"
+      className={`public-navbar shadow-sm ${showNavbar ? "slide-down" : "slide-up"}`}
+    >
       <Container>
         <Navbar.Brand className="d-flex align-items-center">
           <img src={logo} alt="De Baker’s & More Logo" className="brand-logo" />
