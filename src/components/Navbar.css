@@ -1,11 +1,17 @@
-/* --- Navbar Styling --- */
 .app-navbar {
-  background: rgba(15, 15, 15, 0.95);
-  border-bottom: 1px solid rgba(247, 183, 49, 0.25);
-  padding: 0.8rem 1.2rem;
-  backdrop-filter: blur(8px);
+  position: sticky;
   top: 0;
-  z-index: 1000;
+  z-index: 1050;
+  background: rgba(15, 15, 15, 0.92);
+  border-bottom: 1px solid rgba(247, 183, 49, 0.25);
+  padding: 0.6rem 1rem;
+  backdrop-filter: blur(10px);
+  transition: background 0.3s ease, box-shadow 0.3s ease;
+}
+
+.app-navbar.scrolled {
+  background: rgba(15, 15, 15, 0.98);
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.4);
 }
 
 .nav-container {
@@ -14,22 +20,34 @@
   align-items: center;
 }
 
-/* --- Brand Section --- */
 .brand-section {
   display: flex;
   align-items: center;
   gap: 10px;
   cursor: pointer;
   user-select: none;
-  transition: opacity 0.2s ease;
+  transition: opacity 0.3s ease, transform 0.3s ease;
+}
+
+.brand-section:hover {
+  opacity: 0.9;
+  transform: scale(1.02);
 }
 
 .brand-logo {
-  height: 90px;
+  height: 60px;
   width: auto;
+  object-fit: contain;
+  transition: transform 0.3s ease;
 }
 
-/* --- Navigation Links --- */
+.brand-name {
+  font-size: 1.15rem;
+  font-weight: 600;
+  color: #f7b731;
+  letter-spacing: 0.5px;
+}
+
 .nav-links {
   display: flex;
   align-items: center;
@@ -40,23 +58,48 @@
   color: #f8f9fa !important;
   font-weight: 500;
   font-size: 0.95rem;
+  letter-spacing: 0.3px;
   transition: color 0.2s ease, transform 0.2s ease;
 }
 
 .nav-item:hover {
   color: #ffc107 !important;
-  transform: translateY(-1px);
+  transform: translateY(-2px);
 }
 
 .logout {
   color: #ff4d4d !important;
+  font-weight: 600;
 }
 
 .logout:hover {
-  color: #ff7575 !important;
+  color: #ff6b6b !important;
+  transform: translateY(-2px);
 }
 
-/* --- Logout Modal --- */
+@media (max-width: 992px) {
+  .nav-links {
+    flex-direction: column;
+    align-items: center;
+    gap: 10px;
+    margin-top: 0.5rem;
+    padding-bottom: 0.8rem;
+    border-top: 1px solid rgba(255, 193, 7, 0.1);
+  }
+
+  .brand-logo {
+    height: 55px;
+  }
+
+  .brand-name {
+    font-size: 1rem;
+  }
+
+  .nav-item {
+    font-size: 0.9rem;
+  }
+}
+
 .logout-modal-header,
 .logout-modal-body,
 .logout-modal-footer {
@@ -68,4 +111,5 @@
 .logout-modal-header .modal-title {
   color: #ffc107;
   font-weight: 600;
+  letter-spacing: 0.5px;
 }

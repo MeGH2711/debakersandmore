@@ -141,67 +141,65 @@ const AdminDashboard = () => {
         className="min-vh-100 bg-dark text-light py-5 px-4"
         style={{ fontFamily: "Poppins, sans-serif" }}
       >
-        <div className="container">
+        <div className="container-fluid">
           {/* Header */}
-          <div className="d-flex justify-content-between align-items-center mb-4">
-            <h2 className="fw-bold text-warning">De Bakers & More - Menu Admin Dashboard</h2>
-            <div className="d-flex gap-2">
+          <div className="header-controls mb-4">
+            <div className="filters-section d-flex flex-wrap gap-3 align-items-center">
+              {/* Search Input */}
+              <Form.Control
+                type="text"
+                placeholder="Search by product name..."
+                className="bg-dark text-light border-warning custom-input flex-grow-1"
+                value={searchTerm}
+                onChange={(e) => setSearchTerm(e.target.value)}
+              />
+
+              {/* Category Filter */}
+              <Form.Select
+                className="bg-dark text-light border-warning custom-select flex-grow-1"
+                value={filterCategory}
+                onChange={(e) => setFilterCategory(e.target.value)}
+              >
+                <option value="">All Categories</option>
+                {categories.map((cat) => (
+                  <option key={cat.id} value={cat.name}>
+                    {cat.name}
+                  </option>
+                ))}
+              </Form.Select>
+
+              {/* Reset Button */}
+              {(searchTerm || filterCategory) && (
+                <Button
+                  variant="outline-light"
+                  size="sm"
+                  className="reset-btn fw-semibold"
+                  onClick={() => {
+                    setSearchTerm("");
+                    setFilterCategory("");
+                  }}
+                >
+                  Reset
+                </Button>
+              )}
+            </div>
+
+            <div className="action-buttons d-flex flex-wrap gap-2 mt-3 mt-md-0">
               <Button
                 variant="outline-warning"
-                className="fw-semibold shadow-sm"
+                className="fw-semibold shadow-sm w-100 w-auto"
                 onClick={() => setShowAddCategoryModal(true)}
               >
                 + Add Category
               </Button>
               <Button
                 variant="warning"
-                className="fw-semibold shadow-sm"
+                className="fw-semibold shadow-sm w-100 w-auto"
                 onClick={() => setShowAddModal(true)}
               >
                 + Add Product
               </Button>
             </div>
-          </div>
-          <div className="d-flex justify-content-end flex-wrap gap-3 my-3">
-            {/* Search Input */}
-            <Form.Control
-              type="text"
-              placeholder="Search by product name..."
-              className="bg-dark text-light border-warning custom-input"
-              style={{ width: "220px" }}
-              value={searchTerm}
-              onChange={(e) => setSearchTerm(e.target.value)}
-            />
-
-            {/* Category Filter */}
-            <Form.Select
-              className="bg-dark text-light border-warning"
-              style={{ width: "200px" }}
-              value={filterCategory}
-              onChange={(e) => setFilterCategory(e.target.value)}
-            >
-              <option value="">All Categories</option>
-              {categories.map((cat) => (
-                <option key={cat.id} value={cat.name}>
-                  {cat.name}
-                </option>
-              ))}
-            </Form.Select>
-
-            {/* Reset Button */}
-            {(searchTerm || filterCategory) && (
-              <Button
-                variant="outline-light"
-                style={{ width: "100px" }}
-                size="sm"
-                onClick={() => {
-                  setSearchTerm("");
-                  setFilterCategory("");
-                }}
-              >
-                Reset
-              </Button>
-            )}
           </div>
 
           {/* Product Table */}

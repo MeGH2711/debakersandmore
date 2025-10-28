@@ -10,6 +10,7 @@ const AppNavbar = () => {
   const navigate = useNavigate();
   const auth = getAuth();
   const [showModal, setShowModal] = useState(false);
+  const [expanded, setExpanded] = useState(false); // <-- for collapse toggle
 
   const handleLogout = async () => {
     try {
@@ -23,25 +24,70 @@ const AppNavbar = () => {
 
   return (
     <>
-      <Navbar expand="lg" className="app-navbar">
+      <Navbar
+        expand="lg"
+        bg="dark"
+        variant="dark"
+        expanded={expanded}
+        className="app-navbar px-3"
+      >
         <Container fluid className="nav-container">
           {/* Logo + Brand */}
-          <div className="brand-section" onClick={() => navigate("/admin")}>
-            <Image src={logo} alt="Bakery Logo" roundedCircle className="brand-logo" />
-          </div>
+          <Navbar.Brand
+            onClick={() => {
+              navigate("/admin");
+              setExpanded(false);
+            }}
+            className="d-flex align-items-center brand-section"
+          >
+            <Image
+              src={logo}
+              alt="Bakery Logo"
+              roundedCircle
+              className="brand-logo me-2"
+            />
+          </Navbar.Brand>
 
-          {/* Navigation Links */}
-          <Nav className="nav-links">
-            <Nav.Link onClick={() => navigate("/admin")} className="nav-item">
-              Products
-            </Nav.Link>
-            <Nav.Link onClick={() => navigate("/responses")} className="nav-item">
-              Responses
-            </Nav.Link>
-            <Nav.Link onClick={() => setShowModal(true)} className="nav-item logout">
-              Logout
-            </Nav.Link>
-          </Nav>
+          {/* Toggler */}
+          <Navbar.Toggle
+            aria-controls="navbar-nav"
+            onClick={() => setExpanded(expanded ? false : "expanded")}
+          />
+
+          {/* Collapsible Nav Links */}
+          <Navbar.Collapse id="navbar-nav">
+            <Nav className="ms-auto align-items-center nav-links">
+              <Nav.Link
+                onClick={() => {
+                  navigate("/admin");
+                  setExpanded(false);
+                }}
+                className="nav-item"
+              >
+                Products
+              </Nav.Link>
+
+              <Nav.Link
+                onClick={() => {
+                  navigate("/responses");
+                  setExpanded(false);
+                }}
+                className="nav-item"
+              >
+                Responses
+              </Nav.Link>
+
+              <Nav.Link
+                onClick={() => {
+                  setShowModal(true);
+                  setExpanded(false);
+                }}
+                className="nav-item logout text-danger fw-semibold"
+              >
+                Logout
+              </Nav.Link>
+            </Nav>
+          </Navbar.Collapse>
         </Container>
       </Navbar>
 

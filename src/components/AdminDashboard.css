@@ -11,3 +11,49 @@
   color: #b0b0b0;
   opacity: 1;
 }
+
+.header-controls {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 1rem;
+}
+
+.filters-section {
+  flex: 1;
+  min-width: 280px;
+}
+
+.custom-input,
+.custom-select {
+  min-width: 180px;
+  max-width: 250px;
+}
+
+.reset-btn {
+  min-width: 90px;
+}
+
+/* Responsive adjustments */
+@media (max-width: 768px) {
+  .header-controls {
+    flex-direction: column;
+    align-items: stretch;
+  }
+
+  .filters-section {
+    flex-direction: column;
+    width: 100%;
+  }
+
+  .custom-input,
+  .custom-select {
+    width: 100%;
+  }
+
+  .action-buttons {
+    width: 100%;
+    justify-content: space-between;
+  }
+}
