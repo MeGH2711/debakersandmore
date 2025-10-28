@@ -46,6 +46,9 @@ const AdminDashboard = () => {
     ingredients: "",
   });
 
+  const [searchTerm, setSearchTerm] = useState("");
+  const [filterCategory, setFilterCategory] = useState("");
+
   // Fetch Products
   const fetchProducts = async () => {
     const querySnapshot = await getDocs(collection(db, "products"));
@@ -57,6 +60,17 @@ const AdminDashboard = () => {
     const querySnapshot = await getDocs(collection(db, "categories"));
     setCategories(querySnapshot.docs.map((doc) => ({ id: doc.id, ...doc.data() })));
   };
+
+  const filteredProducts = products.filter((prod) => {
+    const matchesSearch = prod.name
+      .toLowerCase()
+      .includes(searchTerm.toLowerCase());
+
+    const matchesCategory =
+      filterCategory === "" || prod.category === filterCategory;
+
+    return matchesSearch && matchesCategory;
+  });
 
   useEffect(() => {
     fetchProducts();
@@ -147,6 +161,47 @@ const AdminDashboard = () => {
               </Button>
             </div>
           </div>
+          <div className="d-flex justify-content-end flex-wrap gap-3 my-3">
+            {/* Search Input */}
+            <Form.Control
+              type="text"
+              placeholder="Search by product name..."
+              className="bg-dark text-light border-warning"
+              style={{ width: "220px" }}
+              value={searchTerm}
+              onChange={(e) => setSearchTerm(e.target.value)}
+            />
+
+            {/* Category Filter */}
+            <Form.Select
+              className="bg-dark text-light border-warning"
+              style={{ width: "200px" }}
+              value={filterCategory}
+              onChange={(e) => setFilterCategory(e.target.value)}
+            >
+              <option value="">All Categories</option>
+              {categories.map((cat) => (
+                <option key={cat.id} value={cat.name}>
+                  {cat.name}
+                </option>
+              ))}
+            </Form.Select>
+
+            {/* Reset Button */}
+            {(searchTerm || filterCategory) && (
+              <Button
+                variant="outline-light"
+                style={{ width: "100px" }}
+                size="sm"
+                onClick={() => {
+                  setSearchTerm("");
+                  setFilterCategory("");
+                }}
+              >
+                Reset
+              </Button>
+            )}
+          </div>
 
           {/* Product Table */}
           <div className="card bg-secondary bg-opacity-25 border-0 shadow p-3 rounded-4">
@@ -164,7 +219,7 @@ const AdminDashboard = () => {
                 </tr>
               </thead>
               <tbody>
-                {products.map((prod, index) => (
+                {filteredProducts.map((prod, index) => (
                   <tr key={prod.id} className="align-middle">
                     <td className="text-center">{index + 1}</td>
                     <td className="text-center">{prod.name}</td>
@@ -253,7 +308,7 @@ const AdminDashboard = () => {
                     </td>
                   </tr>
                 ))}
-                {products.length === 0 && (
+                {filteredProducts.length === 0 && (
                   <tr>
                     <td colSpan={7} className="text-center py-4">
                       No products added yet.
