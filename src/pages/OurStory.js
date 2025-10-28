@@ -1,6 +1,7 @@
 import React, { useEffect, useState, useMemo } from "react";
 import "./OurStory.css";
 import PublicFooter from "../components/PublicFooter";
+import OpeningImage from "../assets/images/landingpageimage.jpeg"; // ✅ import your image
 
 function OurStory() {
   const startDate = useMemo(() => new Date("2023-06-04T00:00:00"), []);
@@ -18,7 +19,6 @@ function OurStory() {
       const now = new Date();
       const diff = now - startDate;
 
-      // Calculate elapsed time
       const years = now.getFullYear() - startDate.getFullYear();
       const months =
         years * 12 +
@@ -81,6 +81,12 @@ function OurStory() {
             food. What began as a single oven and a passion for perfection soon
             turned into a journey of love, flavors, and endless creativity.
           </p>
+        </div>
+
+        {/* ✅ Add the image here */}
+        <div className="story-image-container">
+          <img src={OpeningImage} alt="De Baker’s & More Opening Day" className="story-image" />
+          <p className="image-caption">Our Grand Opening Day — the start of something sweet!</p>
         </div>
       </section>
 

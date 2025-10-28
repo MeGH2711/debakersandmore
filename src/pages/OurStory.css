@@ -152,6 +152,30 @@ p {
   margin-top: 3px;
 }
 
+.story-image-container {
+  text-align: center;
+  margin-top: 40px;
+}
+
+.story-image {
+  width: 100%;
+  max-width: 700px;
+  border-radius: 16px;
+  box-shadow: 0 8px 25px rgba(0, 0, 0, 0.3);
+  transition: transform 0.4s ease;
+}
+
+.story-image:hover {
+  transform: scale(1.01);
+}
+
+.image-caption {
+  font-size: 0.95rem;
+  color: #f7b731;
+  margin-top: 10px;
+  font-style: italic;
+}
+
 /* Responsive */
 @media (max-width: 768px) {
   .counter-box {
