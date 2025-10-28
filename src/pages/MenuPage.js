@@ -46,7 +46,8 @@ function ProductList() {
 
                         <Card.Text as="div" className="product-info mt-3">
                           <p>
-                            <strong>Weight:</strong> {p.weight} gm
+                            <strong>{p.measurement === "piece" ? "Units:" : "Weight:"}</strong>{" "}
+                            {p.weight} {p.measurement === "piece" ? "piece" : "gm"}
                           </p>
 
                           {p.ingredients &&
@@ -85,7 +86,7 @@ function ProductList() {
                 <div key={i} className="mobile-product-row">
                   <div className="d-flex flex-column">
                     <span className="mobile-product-name">
-                      {p.name} ({p.weight} gm)
+                      {p.name} ({p.weight} {p.measurement === "piece" ? "piece" : "gm"})
                     </span>
                     <small
                       className={`${p.available ? "text-success" : "text-danger"

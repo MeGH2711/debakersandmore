@@ -44,6 +44,7 @@ const AdminDashboard = () => {
     category: "",
     weight: "",
     ingredients: "",
+    measurement: "gm",
   });
 
   const [searchTerm, setSearchTerm] = useState("");
@@ -166,7 +167,7 @@ const AdminDashboard = () => {
             <Form.Control
               type="text"
               placeholder="Search by product name..."
-              className="bg-dark text-light border-warning"
+              className="bg-dark text-light border-warning custom-input"
               style={{ width: "220px" }}
               value={searchTerm}
               onChange={(e) => setSearchTerm(e.target.value)}
@@ -228,7 +229,9 @@ const AdminDashboard = () => {
                       {prod.weight ? (
                         <>
                           {prod.weight}
-                          <span className="text-warning"> gm</span>
+                          <span className="text-warning">
+                            {" "}{prod.measurement === "piece" ? "piece" : "gm"}
+                          </span>
                         </>
                       ) : (
                         <span className="text-muted">—</span>
@@ -363,18 +366,34 @@ const AdminDashboard = () => {
                     </Form.Select>
                   </Form.Group>
                 </div>
-                <div className="col-md-6">
+                <div className="col-md-4">
                   <Form.Group>
-                    <Form.Label className="text-warning fw-semibold">Weight (grams)</Form.Label>
+                    <Form.Label className="text-warning fw-semibold">Quantity</Form.Label>
                     <Form.Control
                       type="number"
-                      placeholder="500"
+                      placeholder="e.g. 500 or 1"
                       className="bg-dark text-light border-warning"
                       value={newProduct.weight}
                       onChange={(e) =>
                         setNewProduct({ ...newProduct, weight: e.target.value })
                       }
                     />
+                  </Form.Group>
+                </div>
+
+                <div className="col-md-2">
+                  <Form.Group>
+                    <Form.Label className="text-warning fw-semibold">Measurement</Form.Label>
+                    <Form.Select
+                      className="bg-dark text-light border-warning"
+                      value={newProduct.measurement}
+                      onChange={(e) =>
+                        setNewProduct({ ...newProduct, measurement: e.target.value })
+                      }
+                    >
+                      <option value="gm">gm</option>
+                      <option value="piece">piece</option>
+                    </Form.Select>
                   </Form.Group>
                 </div>
                 <div className="col-md-6">
@@ -524,9 +543,9 @@ const AdminDashboard = () => {
                       </Form.Select>
                     </Form.Group>
                   </div>
-                  <div className="col-md-6">
+                  <div className="col-md-4">
                     <Form.Group>
-                      <Form.Label className="text-info fw-semibold">Weight (grams)</Form.Label>
+                      <Form.Label className="text-info fw-semibold">Quantity</Form.Label>
                       <Form.Control
                         type="number"
                         placeholder="500"
@@ -538,6 +557,23 @@ const AdminDashboard = () => {
                       />
                     </Form.Group>
                   </div>
+
+                  <div className="col-md-2">
+                    <Form.Group>
+                      <Form.Label className="text-info fw-semibold">Measurement</Form.Label>
+                      <Form.Select
+                        className="bg-dark text-light border-info"
+                        value={selectedProduct.measurement || "gm"}
+                        onChange={(e) =>
+                          setSelectedProduct({ ...selectedProduct, measurement: e.target.value })
+                        }
+                      >
+                        <option value="gm">gm</option>
+                        <option value="piece">piece</option>
+                      </Form.Select>
+                    </Form.Group>
+                  </div>
+
                   <div className="col-md-6">
                     <Form.Group>
                       <Form.Label className="text-info fw-semibold">Price (₹)</Form.Label>
