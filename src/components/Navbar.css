@@ -100,13 +100,6 @@
   }
 }
 
-.logout-modal-header,
-.logout-modal-body,
-.logout-modal-footer {
-  background-color: #111 !important;
-  color: #f8f9fa !important;
-}
-
 .logout-modal-header .modal-title {
   color: #ffc107;
   font-weight: 600;

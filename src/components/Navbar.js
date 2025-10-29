@@ -93,13 +93,13 @@ const AppNavbar = () => {
 
       {/* Logout Modal */}
       <Modal show={showModal} onHide={() => setShowModal(false)} centered>
-        <Modal.Header closeButton className="logout-modal-header">
+        <Modal.Header closeButton className="bg-dark logout-modal-header">
           <Modal.Title>Confirm Logout</Modal.Title>
         </Modal.Header>
-        <Modal.Body className="logout-modal-body">
+        <Modal.Body className="bg-dark text-light logout-modal-body">
           Are you sure you want to log out?
         </Modal.Body>
-        <Modal.Footer className="logout-modal-footer">
+        <Modal.Footer className="bg-dark logout-modal-footer">
           <Button variant="secondary" onClick={() => setShowModal(false)}>
             Cancel
           </Button>
