@@ -38,6 +38,9 @@ function NavbarPublic() {
         <Navbar.Collapse id="basic-navbar-nav" className="justify-content-end">
           <Nav className="nav-links">
             <NavLink to="/" className="nav-link-custom">
+              Home
+            </NavLink>
+            <NavLink to="/ourstory" className="nav-link-custom">
               Our Story
             </NavLink>
             <NavLink to="/menu" className="nav-link-custom">

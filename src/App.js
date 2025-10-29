@@ -6,6 +6,7 @@ import AdminDashboard from "./components/AdminDashboard";
 import AdminResponses from "./components/AdminResponses";
 import Login from "./components/Login";
 import NavbarPublic from "./components/NavbarPublic";
+import Home from "./pages/Home";
 import OurStory from "./pages/OurStory";
 import ContactUs from "./pages/ContactUs";
 
@@ -41,7 +42,8 @@ function App() {
       <PageTitle />
       <ConditionalNavbar />
       <Routes>
-        <Route path="/" element={<OurStory />} />
+        <Route path="/" element={<Home />} />
+        <Route path="/ourstory" element={<OurStory />} />
         <Route path="/menu" element={<MenuPage />} />
         <Route path="/contact" element={<ContactUs />} />
         <Route
@@ -91,7 +93,7 @@ function PageTitle() {
         document.title = "Customer Responses | De Baker’s & More";
         break;
       default:
-        document.title = "Menu | De Baker’s & More";
+        document.title = "De Baker’s & More";
     }
   }, [location]);
 
