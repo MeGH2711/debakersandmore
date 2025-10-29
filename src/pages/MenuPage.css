@@ -151,6 +151,7 @@ body {
 
   .mobile-product-row {
     display: flex;
+    flex-direction: column;
     justify-content: space-between;
     align-items: center;
     background: rgba(25, 25, 25, 0.9);
@@ -158,7 +159,11 @@ body {
     margin-bottom: 10px;
     border-radius: 10px;
     border: 1px solid rgba(255, 255, 255, 0.1);
-    transition: background 0.3s ease;
+    position: relative;
+    overflow: hidden;
+    cursor: pointer;
+    transition: all 0.3s ease;
+
   }
 
   .mobile-product-row:hover {
@@ -193,5 +198,34 @@ body {
 
   .product-page {
     padding: 40px 20px;
+  }
+}
+
+/* Mobile expanded ingredients section */
+.mobile-product-row.expanded {
+  background: rgba(247, 183, 49, 0.1);
+  border-color: rgba(247, 183, 49, 0.3);
+  padding-bottom: 16px;
+}
+
+.mobile-ingredients {
+  font-size: 0.9rem;
+  color: #d0d0d0;
+  line-height: 1.4;
+  margin-top: 8px;
+  border-top: 1px solid rgba(255, 255, 255, 0.1);
+  padding-top: 8px;
+  animation: expandFade 0.3s ease;
+}
+
+@keyframes expandFade {
+  from {
+    opacity: 0;
+    transform: translateY(-4px);
+  }
+
+  to {
+    opacity: 1;
+    transform: translateY(0);
   }
 }

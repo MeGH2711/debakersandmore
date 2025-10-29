@@ -7,6 +7,7 @@ import PublicFooter from "../components/PublicFooter";
 
 function ProductList() {
   const [productsByCategory, setProductsByCategory] = useState({});
+  const [expandedIndex, setExpandedIndex] = useState(null); // Track which card is expanded
 
   useEffect(() => {
     const fetchData = async () => {
@@ -24,6 +25,10 @@ function ProductList() {
     fetchData();
   }, []);
 
+  const toggleExpand = (key) => {
+    setExpandedIndex(expandedIndex === key ? null : key);
+  };
+
   return (
     <>
       <div className="product-page">
@@ -33,6 +38,7 @@ function ProductList() {
           <div key={index} className="category-section">
             <h3 className="category-title">{category}</h3>
 
+            {/* Desktop View */}
             <Row className="desktop-view">
               {productsByCategory[category].map((p, i) => (
                 <Col md={4} key={i} className="mb-4">
@@ -63,7 +69,6 @@ function ProductList() {
                               </p>
                             )}
 
-                          {/* Availability Info */}
                           <p>
                             <strong>Status:</strong>{" "}
                             {p.available ? (
@@ -82,22 +87,51 @@ function ProductList() {
 
             {/* Mobile View */}
             <div className="mobile-view">
-              {productsByCategory[category].map((p, i) => (
-                <div key={i} className="mobile-product-row">
-                  <div className="d-flex flex-column">
-                    <span className="mobile-product-name">
-                      {p.name} ({p.weight} {p.measurement === "piece" ? "piece" : "gm"})
-                    </span>
-                    <small
-                      className={`${p.available ? "text-success" : "text-danger"
-                        } fw-semibold mt-1`}
-                    >
-                      {p.available ? "Available" : "Unavailable"}
-                    </small>
+              {productsByCategory[category].map((p, i) => {
+                const key = `${category}-${i}`;
+                const hasIngredients =
+                  p.ingredients &&
+                  ((Array.isArray(p.ingredients) && p.ingredients.join("").trim() !== "") ||
+                    (typeof p.ingredients === "string" && p.ingredients.trim() !== ""));
+                const isExpanded = expandedIndex === key;
+
+                return (
+                  <div
+                    key={i}
+                    className={`mobile-product-row ${isExpanded ? "expanded" : ""}`}
+                    onClick={() => {
+                      if (hasIngredients) toggleExpand(key);
+                    }}
+                    style={{ cursor: hasIngredients ? "pointer" : "default" }}
+                  >
+                    {/* Top Row: Product Info and Price */}
+                    <div className="d-flex justify-content-between align-items-center w-100">
+                      <div className="d-flex flex-column">
+                        <span className="mobile-product-name">
+                          {p.name} ({p.weight} {p.measurement === "piece" ? "piece" : "gm"})
+                        </span>
+                        <small
+                          className={`${p.available ? "text-success" : "text-danger"} fw-semibold mt-1`}
+                        >
+                          {p.available ? "Available" : "Unavailable"}
+                        </small>
+                      </div>
+
+                      <span className="mobile-product-price">₹ {p.price}</span>
+                    </div>
+
+                    {/* Ingredients (only if available and expanded) */}
+                    {hasIngredients && isExpanded && (
+                      <div className="mobile-ingredients mt-3">
+                        <strong>Ingredients:</strong>{" "}
+                        {Array.isArray(p.ingredients)
+                          ? p.ingredients.join(", ")
+                          : p.ingredients}
+                      </div>
+                    )}
                   </div>
-                  <span className="mobile-product-price">₹ {p.price}</span>
-                </div>
-              ))}
+                );
+              })}
             </div>
           </div>
         ))}
