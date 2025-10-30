@@ -1,19 +1,47 @@
 .landing-section {
-    background: url("../assets/images/productimages/anarkalibiscuit.png") center/cover no-repeat !important;
-    height: 85vh;
     position: relative;
+    height: 85vh;
+    overflow: hidden;
 }
 
-.landing-section::before {
-    content: "";
+.landing-img {
+    height: 85vh;
+    object-fit: cover;
+    filter: brightness(60%);
+}
+
+.carousel-overlay {
     position: absolute;
     inset: 0;
-    background: rgba(0, 0, 0, 0.65);
+    background: rgba(0, 0, 0, 0.6);
+    z-index: 1;
 }
 
 .landing-content {
-    position: relative;
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
     z-index: 2;
+    color: #fff;
+}
+
+.carousel-fade .carousel-item {
+    transition: opacity 1.5s ease-in-out;
+}
+
+.carousel-item.active .landing-img {
+    animation: zoomIn 4s ease-in-out forwards;
+}
+
+@keyframes zoomIn {
+    0% {
+        transform: scale(1);
+    }
+
+    100% {
+        transform: scale(1.1);
+    }
 }
 
 /* --- About Section --- */
@@ -63,6 +91,24 @@
 /* Hover pause effect */
 .testimonial-carousel:hover .testimonial-track {
     animation-play-state: paused;
+}
+
+.google-review-logo {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+}
+
+.google-review-logo .google-logo {
+    width: 100px;
+    height: auto;
+    transition: transform 0.3s ease, filter 0.3s ease;
+}
+
+.google-review-logo .google-logo:hover {
+    transform: scale(1.1);
+    filter: drop-shadow(0 0 50px rgba(255, 200, 0, 0.6));
 }
 
 /* Responsive tweaks */
@@ -155,11 +201,65 @@
 /* Responsive layout */
 @media (max-width: 992px) {
     .bestseller-alt-grid {
-        grid-template-columns: 1fr;
-        grid-template-rows: auto;
+        display: flex;
+        flex-direction: column;
     }
 
     .bestseller-box {
-        height: 300px;
+        height: auto;
     }
+
+    .image-box img {
+        width: 100%;
+        height: auto;
+    }
+
+    .bestseller-alt-grid>*:nth-child(1) {
+        order: 1;
+    }
+
+    .bestseller-alt-grid>*:nth-child(2) {
+        order: 2;
+    }
+
+    .bestseller-alt-grid>*:nth-child(3) {
+        order: 3;
+    }
+
+    .bestseller-alt-grid>*:nth-child(4) {
+        order: 4;
+    }
+
+    .bestseller-alt-grid>*:nth-child(5) {
+        order: 6;
+    }
+
+    .bestseller-alt-grid>*:nth-child(6) {
+        order: 5;
+    }
+
+    .bestseller-alt-grid>*:nth-child(7) {
+        order: 8;
+    }
+
+    .bestseller-alt-grid>*:nth-child(8) {
+        order: 7;
+    }
+}
+
+.landingSectionHeading {
+  position: relative;
+  padding-bottom: 25px;
+}
+
+.landingSectionHeading::after {
+  content: "";
+  position: absolute;
+  left: 50%;
+  bottom: 0;
+  transform: translateX(-50%);
+  width: 80px;
+  height: 3px;
+  background-color: #fff;
+  border-radius: 2px;
 }

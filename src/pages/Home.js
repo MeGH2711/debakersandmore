@@ -1,28 +1,78 @@
 import React from "react";
 import { Button, Container, Row, Col } from "react-bootstrap";
 import { Link } from "react-router-dom";
+import { useEffect } from "react";
+import { Carousel } from "bootstrap";
 import "./Home.css";
 import PublicFooter from "../components/PublicFooter";
+
 import AnarkaliBiscuit from "../assets/images/productimages/anarkalibiscuit.png";
-import RajwadiBiscuit from "../assets/images/productimages/rajwadibiscuit.png";
 import BarleyBiscuit from "../assets/images/productimages/barleybiscuit.png";
+import ChocolateChipBiscuit from "../assets/images/productimages/chocolatechipbiscuit.png";
+import CoconutBadaamBiscuit from "../assets/images/productimages/coconutbadaambiscuit.png";
+import RajwadiBiscuit from "../assets/images/productimages/rajwadibiscuit.png";
+import JeeraBiscuit from "../assets/images/productimages/jeerabiscuit.png";
 import MixFruitBiscuit from "../assets/images/productimages/mixfruitbiscuit.png";
+import CoconutBesanBiscuit from "../assets/images/productimages/coconutbesanbiscuit.png";
+import NaankhataiSuji from "../assets/images/productimages/naankhataisuji.png";
 import OpeningImage from "../assets/images/landingpageimage.jpeg";
+import GoogleReviewsLogo from "../assets/images/googleReveiwLogo.png";
 
 const Home = () => {
+
+    useEffect(() => {
+        const carouselElement = document.querySelector("#carouselExampleAutoplaying");
+        if (carouselElement) {
+            new Carousel(carouselElement, {
+                interval: 4000,
+                ride: "carousel",
+            });
+        }
+    }, []);
+
     return (
         <>
-            {/* --- landing Section --- */}
-            <section className="landing-section text-center text-light d-flex flex-column justify-content-center align-items-center">
+            {/* --- Landing Section with Carousel --- */}
+            <section className="landing-section position-relative text-center text-light">
+                <div id="carouselExampleAutoplaying" className="carousel slide carousel-fade" data-bs-ride="carousel" data-bs-interval="4000">
+                    <div className="carousel-inner">
+                        <div className="carousel-item active">
+                            <img src={AnarkaliBiscuit} className="d-block w-100 landing-img" alt="Anarkali Biscuit" />
+                        </div>
+                        <div className="carousel-item">
+                            <img src={BarleyBiscuit} className="d-block w-100 landing-img" alt="Barley Biscuit" />
+                        </div>
+                        <div className="carousel-item">
+                            <img src={ChocolateChipBiscuit} className="d-block w-100 landing-img" alt="Chocolate Chip Biscuit" />
+                        </div>
+                        <div className="carousel-item">
+                            <img src={CoconutBadaamBiscuit} className="d-block w-100 landing-img" alt="Coconut Badaam Biscuit" />
+                        </div>
+                        <div className="carousel-item">
+                            <img src={NaankhataiSuji} className="d-block w-100 landing-img" alt="Naankhatai" />
+                        </div>
+                        <div className="carousel-item">
+                            <img src={RajwadiBiscuit} className="d-block w-100 landing-img" alt="Rajwadi Biscuit" />
+                        </div>
+                        <div className="carousel-item">
+                            <img src={JeeraBiscuit} className="d-block w-100 landing-img" alt="Jeera Biscuit" />
+                        </div>
+                        <div className="carousel-item">
+                            <img src={MixFruitBiscuit} className="d-block w-100 landing-img" alt="Mix Fruit Biscuit" />
+                        </div>
+                        <div className="carousel-item">
+                            <img src={CoconutBesanBiscuit} className="d-block w-100 landing-img" alt="Coconut Besan Biscuit" />
+                        </div>
+                    </div>
+                </div>
+
+                {/* Overlay and Text */}
+                <div className="carousel-overlay"></div>
                 <div className="landing-content">
                     <h1 className="display-4 fw-bold">De Bakers & More</h1>
-                    <p className="lead mt-3">
-                        Freshly baked happiness — cakes, pastries, and more made with love
-                    </p>
+                    <p className="lead mt-3">Freshly baked happiness — biscuits, cakes, and more made with love</p>
                     <Link to="/menu">
-                        <Button variant="warning" className="fw-semibold mt-3 px-4 py-2">
-                            Explore Menu
-                        </Button>
+                        <Button variant="warning" className="fw-semibold mt-3 px-4 py-2">Explore Menu</Button>
                     </Link>
                 </div>
             </section>
@@ -30,7 +80,7 @@ const Home = () => {
             {/* --- Featured Products --- */}
             <section className="bestsellers-alt py-5">
                 <Container fluid className="px-0">
-                    <h2 className="text-center text-warning fw-bold mb-5">Our Bestsellers</h2>
+                    <h2 className="text-center text-warning fw-bold mb-5 landingSectionHeading">Our Bestsellers</h2>
 
                     <div className="bestseller-alt-grid">
                         {/* Row 1 */}
@@ -95,16 +145,16 @@ const Home = () => {
                         </Col>
                         <Col md={6}>
                             <h2 className="text-warning fw-bold mb-3">About Us</h2>
-                            <p>
+                            <p className="text-justify">
                                 Welcome to <strong>De Bakers & More</strong> — your neighborhood bakery
-                                offering a delightful range of <strong>cakes, pastries, biscuits, breads, buns,</strong>
+                                offering a delightful range of <strong>cakes, biscuits, breads, buns, </strong>
                                 and other mouthwatering treats. Each product is crafted with passion,
                                 premium ingredients, and a sprinkle of joy to ensure every bite feels special.
                             </p>
-                            <p className="mb-4">
+                            <p className="mb-4 text-justify">
                                 From freshly baked breads for your breakfast to indulgent cakes for celebrations,
                                 we bring the perfect blend of taste, texture, and tradition. Whether it’s a
-                                <strong>birthday, anniversary, festive gathering,</strong> or just a sweet craving —
+                                <strong> birthday, anniversary, festive gathering,</strong> or just a sweet craving —
                                 we’ve got you covered!
                             </p>
                             <Link to="/menu">
@@ -120,7 +170,7 @@ const Home = () => {
             {/* --- Testimonials --- */}
             <section className="testimonials-section py-5">
                 <Container fluid>
-                    <h2 className="text-center text-warning fw-bold mb-5">What Our Customers Say</h2>
+                    <h2 className="text-center text-warning fw-bold mb-5 landingSectionHeading">What Our Customers Say</h2>
 
                     <div className="testimonial-carousel">
                         <div className="testimonial-track">
@@ -209,6 +259,17 @@ const Home = () => {
                                 </div>
                             ))}
                         </div>
+                    </div>
+                    {/* Google Review Logo */}
+                    <div className="google-review-logo text-center mt-5">
+                        <img
+                            src={GoogleReviewsLogo}
+                            alt="Google Reviews"
+                            className="google-logo"
+                        />
+                        <p className="text-light mt-2 mb-0">
+                            See more reviews on <a className="text-warning fw-semibold text-decoration-none" target="_blank" rel="noreferrer" href="https://www.google.com/search?sca_esv=0b1bbd70689b2a31&sxsrf=AE3TifNsSEuqU2MWoWo4REhoijvsUNpIaA:1761802463635&si=AMgyJEtREmoPL4P1I5IDCfuA8gybfVI2d5Uj7QMwYCZHKDZ-Ez-4Zf3hZHYVL0AvL4qRnu2Epwk7oYH8bxp0wDUx6ruutEzRsLdXWryFvcvckz7o1vKsheUd2ymL6BPY5G70TkebuUPxl8RWZ1sixntll9ZlvGPKSw%3D%3D&q=De+Baker%27s+%26+more+Reviews&sa=X&ved=2ahUKEwi1s4nQmcuQAxWOS2wGHeK-FYQQ0bkNegQINBAD&biw=1536&bih=695&dpr=1.25">Google</a>
+                        </p>
                     </div>
                 </Container>
             </section>
