@@ -209,10 +209,10 @@ body {
 }
 
 .mobile-ingredients {
+  text-align: center;
   font-size: 0.9rem;
   color: #d0d0d0;
   line-height: 1.4;
-  margin-top: 8px;
   border-top: 1px solid rgba(255, 255, 255, 0.1);
   padding-top: 8px;
   animation: expandFade 0.3s ease;
