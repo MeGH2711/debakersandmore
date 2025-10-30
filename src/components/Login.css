@@ -1,0 +1,8 @@
+.customLoginInput {
+    width: 100%;
+}
+
+.customLoginInput::placeholder {
+  color: #b0b0b0;
+  opacity: 1;
+}

@@ -3,7 +3,9 @@ import "../App.css";
 import { signInWithEmailAndPassword } from "firebase/auth";
 import { auth } from "../firebase";
 import { useNavigate } from "react-router-dom";
-import { Form, Button, Card } from "react-bootstrap";
+import { Form, Button, Card, InputGroup } from "react-bootstrap";
+import { FaEye, FaEyeSlash } from "react-icons/fa";
+import "./Login.css";
 
 const Login = () => {
   const [email, setEmail] = useState("");
@@ -25,6 +27,8 @@ const Login = () => {
       setError("Invalid email or password.");
     }
   };
+
+  const [showPassword, setShowPassword] = useState(false);
 
   return (
     <div
@@ -57,19 +61,28 @@ const Login = () => {
               placeholder="admin@gmail.com"
               value={email}
               onChange={(e) => setEmail(e.target.value)}
-              className="bg-dark text-light border border-warning border-opacity-50 rounded-3 shadow-sm custom-input"
+              className="bg-dark text-light border border-warning border-opacity-50 rounded-3 shadow-sm customLoginInput"
             />
           </Form.Group>
 
           <Form.Group className="mb-3">
             <Form.Label className="fw-semibold text-light">Password</Form.Label>
-            <Form.Control
-              type="password"
-              placeholder="Enter password"
-              value={password}
-              onChange={(e) => setPassword(e.target.value)}
-              className="bg-dark text-light border border-warning border-opacity-50 rounded-3 shadow-sm custom-input"
-            />
+            <InputGroup>
+              <Form.Control
+                type={showPassword ? "text" : "password"}
+                placeholder="Enter password"
+                value={password}
+                onChange={(e) => setPassword(e.target.value)}
+                className="bg-dark text-light border border-warning border-opacity-50 rounded-start-3 shadow-sm customLoginInput"
+              />
+              <InputGroup.Text
+                onClick={() => setShowPassword(!showPassword)}
+                className="bg-dark text-warning border border-warning border-opacity-50 rounded-end-3"
+                style={{ cursor: "pointer" }}
+              >
+                {showPassword ? <FaEyeSlash /> : <FaEye />}
+              </InputGroup.Text>
+            </InputGroup>
           </Form.Group>
 
           {error && (
