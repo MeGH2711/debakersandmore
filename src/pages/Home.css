@@ -56,18 +56,6 @@
     position: relative;
 }
 
-.testimonial-carousel {
-    overflow: hidden;
-    width: 100%;
-    position: relative;
-}
-
-.testimonial-track {
-    display: flex;
-    gap: 2rem;
-    animation: scrollTestimonials 20s linear infinite;
-}
-
 .testimonial-card {
     max-width: 320px;
     background: #222;
@@ -76,21 +64,6 @@
     padding: 1.5rem;
     flex-shrink: 0;
     text-align: center;
-}
-
-@keyframes scrollTestimonials {
-    0% {
-        transform: translateX(0);
-    }
-
-    100% {
-        transform: translateX(-50%);
-    }
-}
-
-/* Hover pause effect */
-.testimonial-carousel:hover .testimonial-track {
-    animation-play-state: paused;
 }
 
 .google-review-logo {
@@ -116,11 +89,6 @@
     .testimonial-card {
         min-width: 260px;
         padding: 1rem;
-    }
-
-    .testimonial-track {
-        gap: 1rem;
-        animation-duration: 20s;
     }
 }
 
@@ -248,18 +216,18 @@
 }
 
 .landingSectionHeading {
-  position: relative;
-  padding-bottom: 25px;
+    position: relative;
+    padding-bottom: 25px;
 }
 
 .landingSectionHeading::after {
-  content: "";
-  position: absolute;
-  left: 50%;
-  bottom: 0;
-  transform: translateX(-50%);
-  width: 80px;
-  height: 3px;
-  background-color: #fff;
-  border-radius: 2px;
+    content: "";
+    position: absolute;
+    left: 50%;
+    bottom: 0;
+    transform: translateX(-50%);
+    width: 80px;
+    height: 3px;
+    background-color: #fff;
+    border-radius: 2px;
 }

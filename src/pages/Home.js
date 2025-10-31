@@ -5,6 +5,9 @@ import { useEffect } from "react";
 import { Carousel } from "bootstrap";
 import "./Home.css";
 import PublicFooter from "../components/PublicFooter";
+import Slider from "react-slick";
+import "slick-carousel/slick/slick.css";
+import "slick-carousel/slick/slick-theme.css";
 
 import AnarkaliBiscuit from "../assets/images/productimages/anarkalibiscuit.png";
 import BarleyBiscuit from "../assets/images/productimages/barleybiscuit.png";
@@ -170,96 +173,84 @@ const Home = () => {
             {/* --- Testimonials --- */}
             <section className="testimonials-section py-5">
                 <Container fluid>
-                    <h2 className="text-center text-warning fw-bold mb-5 landingSectionHeading">What Our Customers Say</h2>
+                    <h2 className="text-center text-warning fw-bold mb-5 landingSectionHeading">
+                        What Our Customers Say
+                    </h2>
 
-                    <div className="testimonial-carousel">
-                        <div className="testimonial-track">
-                            {[
-                                {
-                                    name: "Megh",
-                                    review: "Amazing Experience, Especially the Puff, Cream Rolls & Biscuits taste awesome😋✨",
-                                },
-                                {
-                                    name: "Akshay Ramani",
-                                    review: "I regularly purchase bakery items from here, and I'm always impressed with the quality. The products are consistently fresh and delicious. I especially love the nutritional cookies, puffs, and bread — they taste great and feel healthy too. Highly recommended for anyone looking for quality baked goods",
-                                },
-                                {
-                                    name: "Pravesh Shah",
-                                    review: "Newly launched bakery shop in Gota area. All items are fresh and made on daily basis. Puff quality was outstanding. All other items are also good. Gujarati snacks items are also available. People stay near by Gota, Godrej garden city, vande mataram area. Good quality with reasonable prices only at De Baker's & More.",
-                                },
-                                {
-                                    name: "Devang Vora",
-                                    review: "Here puff is awesome. Rajwadi and healthy cookies are unbeatable. Nice bakery place in ahmedabad.",
-                                },
-                                {
-                                    name: "Sanjay Ramani",
-                                    review: "Good Quality Bakery items, Must go for Fresh and Healthy items. 👌",
-                                },
-                                {
-                                    name: "Vaidehi Patel",
-                                    review: "Me and my friends bought a puff and the puff was very fresh and the taste was amazing .love it❤️",
-                                },
-                                {
-                                    name: "M Patel",
-                                    review: "Amazing bakery!! The biscuits and puffs were fresh and delicious. Would definitely come back again and again.",
-                                },
-                                {
-                                    name: "Dharmdeep Chouhan",
-                                    review: "Excellent place and healthy product and owner is very nice person",
-                                },
-                            ].map((t, i) => (
-                                <div key={i} className="testimonial-card text-light d-flex justify-content-center align-items-center flex-column">
-                                    <div>
-                                        <p className="fst-italic">“{t.review}”</p>
-                                    </div>
-                                    <div>
-                                        <h6 className="text-warning mt-3 mb-0">{t.name}</h6>
-                                    </div>
-                                </div>
-                            ))}
+                    <Slider
+                        infinite={true}
+                        speed={5000}
+                        autoplay={true}
+                        autoplaySpeed={0}
+                        cssEase="linear"
+                        slidesToShow={4}
+                        slidesToScroll={1}
+                        arrows={false}
+                        pauseOnHover={true}
+                        responsive={[
+                            {
+                                breakpoint: 1200,
+                                settings: { slidesToShow: 3 },
+                            },
+                            {
+                                breakpoint: 992,
+                                settings: { slidesToShow: 2 },
+                            },
+                            {
+                                breakpoint: 576,
+                                settings: { slidesToShow: 1 },
+                            },
+                        ]}
+                    >
+                        {[
+                            {
+                                name: "Megh",
+                                review:
+                                    "Amazing Experience, Especially the Puff, Cream Rolls & Biscuits taste awesome😋✨",
+                            },
+                            {
+                                name: "Akshay Ramani",
+                                review:
+                                    "I regularly purchase bakery items from here, and I'm always impressed with the quality. The products are consistently fresh and delicious. Highly recommended!",
+                            },
+                            {
+                                name: "Pravesh Shah",
+                                review:
+                                    "Newly launched bakery shop in Gota. Puff quality was outstanding. Good quality with reasonable prices only at De Baker's & More.",
+                            },
+                            {
+                                name: "Devang Vora",
+                                review:
+                                    "Here puff is awesome. Rajwadi and healthy cookies are unbeatable. Nice bakery place in Ahmedabad.",
+                            },
+                            {
+                                name: "Sanjay Ramani",
+                                review:
+                                    "Good Quality Bakery items, Must go for Fresh and Healthy items. 👌",
+                            },
+                            {
+                                name: "Vaidehi Patel",
+                                review:
+                                    "Me and my friends bought a puff and the puff was very fresh and the taste was amazing ❤️",
+                            },
+                            {
+                                name: "M Patel",
+                                review:
+                                    "Amazing bakery!! The biscuits and puffs were fresh and delicious. Would definitely come back again.",
+                            },
+                            {
+                                name: "Dharmdeep Chouhan",
+                                review:
+                                    "Excellent place and healthy products, and the owner is very nice.",
+                            },
+                        ].map((t, i) => (
+                            <div key={i} className="testimonial-card text-light mx-3">
+                                <p className="fst-italic">“{t.review}”</p>
+                                <h6 className="text-warning mt-3 mb-0">{t.name}</h6>
+                            </div>
+                        ))}
+                    </Slider>
 
-                            {/* Duplicate the list for smooth infinite scrolling */}
-                            {[
-                                {
-                                    name: "Megh",
-                                    review: "Amazing Experience, Especially the Puff, Cream Rolls & Biscuits taste awesome😋✨",
-                                },
-                                {
-                                    name: "Akshay Ramani",
-                                    review: "I regularly purchase bakery items from here, and I'm always impressed with the quality. The products are consistently fresh and delicious. I especially love the nutritional cookies, puffs, and bread — they taste great and feel healthy too. Highly recommended for anyone looking for quality baked goods",
-                                },
-                                {
-                                    name: "Pravesh Shah",
-                                    review: "Newly launched bakery shop in Gota area. All items are fresh and made on daily basis. Puff quality was outstanding. All other items are also good. Gujarati snacks items are also available. People stay near by Gota, Godrej garden city, vande mataram area. Good quality with reasonable prices only at De Baker's & More.",
-                                },
-                                {
-                                    name: "Devang Vora",
-                                    review: "Here puff is awesome. Rajwadi and healthy cookies are unbeatable. Nice bakery place in ahmedabad.",
-                                },
-                                {
-                                    name: "Sanjay Ramani",
-                                    review: "Good Quality Bakery items, Must go for Fresh and Healthy items. 👌",
-                                },
-                                {
-                                    name: "Vaidehi Patel",
-                                    review: "Me and my friends bought a puff and the puff was very fresh and the taste was amazing .love it❤️",
-                                },
-                                {
-                                    name: "M Patel",
-                                    review: "Amazing bakery!! The biscuits and puffs were fresh and delicious. Would definitely come back again and again.",
-                                },
-                                {
-                                    name: "Dharmdeep Chouhan",
-                                    review: "Excellent place and healthy product and owner is very nice person",
-                                },
-                            ].map((t, i) => (
-                                <div key={`dup-${i}`} className="testimonial-card text-light">
-                                    <p className="fst-italic">“{t.review}”</p>
-                                    <h6 className="text-warning mt-3 mb-0">{t.name}</h6>
-                                </div>
-                            ))}
-                        </div>
-                    </div>
                     {/* Google Review Logo */}
                     <div className="google-review-logo text-center mt-5">
                         <img
@@ -268,7 +259,15 @@ const Home = () => {
                             className="google-logo"
                         />
                         <p className="text-light mt-2 mb-0">
-                            See more reviews on <a className="text-warning fw-semibold text-decoration-none" target="_blank" rel="noreferrer" href="https://www.google.com/search?sca_esv=0b1bbd70689b2a31&sxsrf=AE3TifNsSEuqU2MWoWo4REhoijvsUNpIaA:1761802463635&si=AMgyJEtREmoPL4P1I5IDCfuA8gybfVI2d5Uj7QMwYCZHKDZ-Ez-4Zf3hZHYVL0AvL4qRnu2Epwk7oYH8bxp0wDUx6ruutEzRsLdXWryFvcvckz7o1vKsheUd2ymL6BPY5G70TkebuUPxl8RWZ1sixntll9ZlvGPKSw%3D%3D&q=De+Baker%27s+%26+more+Reviews&sa=X&ved=2ahUKEwi1s4nQmcuQAxWOS2wGHeK-FYQQ0bkNegQINBAD&biw=1536&bih=695&dpr=1.25">Google</a>
+                            See more reviews on{" "}
+                            <a
+                                className="text-warning fw-semibold text-decoration-none"
+                                target="_blank"
+                                rel="noreferrer"
+                                href="https://www.google.com/search?q=De+Bakers+%26+More+Ahmedabad"
+                            >
+                                Google
+                            </a>
                         </p>
                     </div>
                 </Container>
