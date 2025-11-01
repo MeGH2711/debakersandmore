@@ -138,7 +138,7 @@ const AdminDashboard = () => {
     <>
       <AppNavbar />
       <div
-        className="min-vh-100 bg-dark text-light py-5 px-4"
+        className="min-vh-100 bg-dark text-light pt-4 pb-5 px-4"
         style={{ fontFamily: "Poppins, sans-serif" }}
       >
         <div className="container-fluid">

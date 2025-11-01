@@ -13,6 +13,7 @@ function ContactUs() {
   });
 
   const [status, setStatus] = useState("");
+  const [fadeOut, setFadeOut] = useState(false);
 
   const handleChange = (e) => {
     setFormData({ ...formData, [e.target.name]: e.target.value });
@@ -21,6 +22,7 @@ function ContactUs() {
   const handleSubmit = async (e) => {
     e.preventDefault();
     setStatus("Submitting...");
+    setFadeOut(false);
 
     if (!formData.name || !formData.phone || !formData.message) {
       setStatus("Please fill in all required fields.");
@@ -30,10 +32,21 @@ function ContactUs() {
     try {
       await addDoc(collection(db, "feedback"), {
         ...formData,
+        reviewed: false, // 👈 Add this hidden field
         timestamp: serverTimestamp(),
       });
       setStatus("Thank you! Your message has been submitted successfully.");
       setFormData({ name: "", phone: "", email: "", message: "" });
+
+      // Automatically fade out after 5 seconds
+      setTimeout(() => {
+        setFadeOut(true);
+      }, 4500);
+
+      // Remove message after 5 seconds
+      setTimeout(() => {
+        setStatus("");
+      }, 5000);
     } catch (error) {
       console.error("Error submitting feedback:", error);
       setStatus("Something went wrong. Please try again.");
@@ -53,24 +66,26 @@ function ContactUs() {
         <section className="contact-details">
           <div className="contact-card">
             <h3>Visit Us</h3>
-            <p>
-              De Baker’s & More
-              <br />
-              Ahmedabad, Gujarat, India
-            </p>
+            <a href="https://maps.app.goo.gl/XZTJqPGctiB9j5C88" className="text-decoration-none text-light" target="_blank" rel="noreferrer">
+              De Baker’s & More,<br /> Ahmedabad, Gujarat, India
+            </a>
           </div>
 
           <div className="contact-card">
             <h3>Call Us</h3>
-            <p>+91 98797 18228</p>
+            <a href="tel:+919879718228" className="text-decoration-none text-light">
+              +91 98797 18228
+            </a>
           </div>
 
           <div className="contact-card">
             <h3>Email Us</h3>
-            <p>debakersandmore@gmail.com</p>
+            <a href="mailto:debakersandmore@gmail.com" className="text-decoration-none text-light">
+              debakersandmore@gmail.com
+            </a>
           </div>
         </section>
-        
+
         <section className="contact-form-section text-center">
           <h2 className="customSectionHeading">Send Us a Message</h2>
           <form className="contact-form" onSubmit={handleSubmit}>
@@ -122,7 +137,11 @@ function ContactUs() {
             </button>
           </form>
 
-          {status && <p className="form-status">{status}</p>}
+          {status && (
+            <p className={`form-status ${fadeOut ? "fade-out" : ""}`}>
+              {status}
+            </p>
+          )}
         </section>
 
         <section className="timing-section text-center">

@@ -1,19 +1,22 @@
 import React, { useEffect, useState } from "react";
-import { collection, getDocs } from "firebase/firestore";
+import { collection, getDocs, doc, updateDoc } from "firebase/firestore";
 import { db } from "../firebase";
-import { Table, Badge, Spinner } from "react-bootstrap";
+import { Table, Badge, Spinner, Form, Row, Col, InputGroup } from "react-bootstrap";
 import AppNavbar from "./Navbar";
 import { getAuth, onAuthStateChanged } from "firebase/auth";
 import { useNavigate } from "react-router-dom";
 import "bootstrap/dist/css/bootstrap.min.css";
+import "./AdminResponses.css";
 
 const AdminResponses = () => {
     const [responses, setResponses] = useState([]);
     const [loading, setLoading] = useState(true);
+    const [searchQuery, setSearchQuery] = useState("");
+    const [filterStatus, setFilterStatus] = useState("all");
     const navigate = useNavigate();
     const auth = getAuth();
 
-    // Auth check
+    // ✅ Auth check
     useEffect(() => {
         const unsubscribe = onAuthStateChanged(auth, (user) => {
             if (!user) navigate("/login");
@@ -21,49 +24,103 @@ const AdminResponses = () => {
         return () => unsubscribe();
     }, [auth, navigate]);
 
-    // 📥 Fetch responses
-    useEffect(() => {
-        const fetchResponses = async () => {
-            try {
-                const querySnapshot = await getDocs(collection(db, "feedback"));
-                const fetchedData = querySnapshot.docs.map((doc) => ({
-                    id: doc.id,
-                    ...doc.data(),
-                }));
-                setResponses(fetchedData);
-            } catch (error) {
-                console.error("Error fetching responses:", error);
-            } finally {
-                setLoading(false);
-            }
-        };
+    // ✅ Fetch responses
+    const fetchResponses = async () => {
+        try {
+            const querySnapshot = await getDocs(collection(db, "feedback"));
+            const fetchedData = querySnapshot.docs.map((docSnap) => ({
+                id: docSnap.id,
+                ...docSnap.data(),
+            }));
+            setResponses(fetchedData);
+        } catch (error) {
+            console.error("Error fetching responses:", error);
+        } finally {
+            setLoading(false);
+        }
+    };
 
+    useEffect(() => {
         fetchResponses();
     }, []);
+
+    // ✅ Toggle reviewed status
+    const handleReviewToggle = async (id, currentStatus) => {
+        try {
+            const docRef = doc(db, "feedback", id);
+            await updateDoc(docRef, { reviewed: !currentStatus });
+            setResponses((prev) =>
+                prev.map((res) =>
+                    res.id === id ? { ...res, reviewed: !currentStatus } : res
+                )
+            );
+        } catch (error) {
+            console.error("Error updating reviewed status:", error);
+        }
+    };
+
+    // ✅ Filtered + searched responses
+    const filteredResponses = responses.filter((res) => {
+        const query = searchQuery.toLowerCase();
+        const matchesSearch =
+            res.name?.toLowerCase().includes(query) ||
+            res.phone?.toLowerCase().includes(query);
+
+        if (filterStatus === "reviewed") return res.reviewed && matchesSearch;
+        if (filterStatus === "unreviewed") return !res.reviewed && matchesSearch;
+        return matchesSearch;
+    });
 
     return (
         <>
             <AppNavbar />
             <div
-                className="min-vh-100 bg-dark text-light py-5 px-4"
+                className="min-vh-100 bg-dark text-light pt-4 pb-5 px-4"
                 style={{ fontFamily: "Poppins, sans-serif" }}
             >
-                <div className="container">
-                    <div className="d-flex justify-content-between align-items-center mb-4">
-                        <h2 className="fw-bold text-warning">
-                            Customer Responses & Feedback
-                        </h2>
-                    </div>
+                <div className="container-fluid">
+                    {/* ✅ Search & Filter Section */}
+                    <Row className="mb-4 g-3 align-items-center">
+                        <Col md={6} sm={12}>
+                            <InputGroup>
+                                <Form.Control
+                                    type="text"
+                                    placeholder="Search by name or phone number..."
+                                    value={searchQuery}
+                                    onChange={(e) => setSearchQuery(e.target.value)}
+                                    className="bg-dark text-light border-warning searchResponse"
+                                />
+                            </InputGroup>
+                        </Col>
+                        <Col md={3} sm={6}>
+                            <Form.Select
+                                value={filterStatus}
+                                onChange={(e) => setFilterStatus(e.target.value)}
+                                className="bg-dark text-light border-warning"
+                            >
+                                <option value="all">All</option>
+                                <option value="reviewed">Reviewed</option>
+                                <option value="unreviewed">Unreviewed</option>
+                            </Form.Select>
+                        </Col>
+                    </Row>
 
+                    {/* ✅ Table Section */}
                     <div className="card bg-secondary bg-opacity-25 border-0 shadow p-3 rounded-4">
                         {loading ? (
                             <div className="text-center py-5">
                                 <Spinner animation="border" variant="warning" />
                             </div>
-                        ) : responses.length > 0 ? (
-                            <Table hover responsive variant="dark" className="align-middle mb-0">
+                        ) : filteredResponses.length > 0 ? (
+                            <Table
+                                hover
+                                responsive
+                                variant="dark"
+                                className="align-middle mb-0"
+                            >
                                 <thead className="text-warning">
                                     <tr>
+                                        <th className="text-center">Reviewed</th>
                                         <th className="text-center">Sr. No.</th>
                                         <th className="text-center">Name</th>
                                         <th className="text-center">Email</th>
@@ -74,7 +131,7 @@ const AdminResponses = () => {
                                     </tr>
                                 </thead>
                                 <tbody>
-                                    {responses.map((res, index) => {
+                                    {filteredResponses.map((res, index) => {
                                         let date = "—";
                                         let time = "—";
 
@@ -83,7 +140,6 @@ const AdminResponses = () => {
                                                 ? new Date(res.timestamp.seconds * 1000)
                                                 : new Date(res.timestamp);
 
-                                            // Format Date and Time separately
                                             date = ts.toLocaleDateString("en-IN", {
                                                 year: "numeric",
                                                 month: "short",
@@ -100,18 +156,38 @@ const AdminResponses = () => {
 
                                         return (
                                             <tr key={res.id}>
+                                                <td className="text-center">
+                                                    <Form.Check
+                                                        type="checkbox"
+                                                        checked={res.reviewed === true}
+                                                        onChange={() =>
+                                                            handleReviewToggle(
+                                                                res.id,
+                                                                res.reviewed
+                                                            )
+                                                        }
+                                                    />
+                                                </td>
                                                 <td className="text-center">{index + 1}</td>
                                                 <td className="text-center text-warning fw-semibold">
-                                                    {res.name || <Badge bg="secondary">N/A</Badge>}
+                                                    {res.name || (
+                                                        <Badge bg="secondary">N/A</Badge>
+                                                    )}
                                                 </td>
                                                 <td className="text-center">
-                                                    {res.email || <Badge bg="secondary">N/A</Badge>}
+                                                    {res.email || (
+                                                        <Badge bg="secondary">N/A</Badge>
+                                                    )}
                                                 </td>
                                                 <td className="text-center">
-                                                    {res.phone || <Badge bg="secondary">N/A</Badge>}
+                                                    {res.phone || (
+                                                        <Badge bg="secondary">N/A</Badge>
+                                                    )}
                                                 </td>
                                                 <td className="text-center text-warning fw-semibold">
-                                                    {res.message || <Badge bg="secondary">N/A</Badge>}
+                                                    {res.message || (
+                                                        <Badge bg="secondary">N/A</Badge>
+                                                    )}
                                                 </td>
                                                 <td className="text-center">{date}</td>
                                                 <td className="text-center">{time}</td>
@@ -122,7 +198,7 @@ const AdminResponses = () => {
                             </Table>
                         ) : (
                             <p className="text-center py-4 mb-0">
-                                No responses have been submitted yet.
+                                No responses found.
                             </p>
                         )}
                     </div>
