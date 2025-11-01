@@ -44,9 +44,59 @@
     }
 }
 
-/* --- About Section --- */
+/* About Section */
+
 .about-section {
     background: #111;
+    overflow: hidden;
+}
+
+.about-section h2 {
+    font-size: 2rem;
+}
+
+.about-section p {
+    color: #ddd;
+    line-height: 1.7;
+    font-size: 1rem;
+}
+
+.about-img {
+    width: 100%;
+    max-width: 450px;
+    transition: transform 0.3s ease;
+}
+
+.about-img:hover {
+    transform: scale(1.05);
+}
+
+/* --- Mobile View Fixes --- */
+@media (max-width: 768px) {
+    .about-section {
+        text-align: center;
+        padding: 3rem 1rem;
+    }
+
+    .about-section h2 {
+        font-size: 1.7rem;
+        margin-bottom: 1rem;
+    }
+
+    .about-section p {
+        text-align: center !important;
+        font-size: 0.95rem;
+    }
+
+    .about-img {
+        width: 90%;
+        margin-bottom: 1.5rem;
+    }
+
+    .about-section .btn {
+        font-size: 0.95rem;
+        padding: 0.6rem 1.2rem;
+    }
 }
 
 /* --- Testimonials --- */
@@ -64,6 +114,11 @@
     padding: 1.5rem;
     flex-shrink: 0;
     text-align: center;
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    flex-direction: column;
 }
 
 .google-review-logo {
@@ -84,12 +139,9 @@
     filter: drop-shadow(0 0 50px rgba(255, 200, 0, 0.6));
 }
 
-/* Responsive tweaks */
-@media (max-width: 768px) {
-    .testimonial-card {
-        min-width: 260px;
-        padding: 1rem;
-    }
+.testimonial-card:hover {
+    transform: scale(1.05);
+    box-shadow: 0 6px 18px rgba(0, 0, 0, 0.3);
 }
 
 /* --- CTA Section --- */
@@ -166,6 +218,23 @@
     color: #100F0F !important;
 }
 
+.landingSectionHeading {
+    position: relative;
+    padding-bottom: 25px;
+}
+
+.landingSectionHeading::after {
+    content: "";
+    position: absolute;
+    left: 50%;
+    bottom: 0;
+    transform: translateX(-50%);
+    width: 80px;
+    height: 3px;
+    background-color: #fff;
+    border-radius: 2px;
+}
+
 /* Responsive layout */
 @media (max-width: 992px) {
     .bestseller-alt-grid {
@@ -213,21 +282,14 @@
     .bestseller-alt-grid>*:nth-child(8) {
         order: 7;
     }
+
+    .testimonial-card {
+        width: 250px;
+    }
 }
 
-.landingSectionHeading {
-    position: relative;
-    padding-bottom: 25px;
-}
-
-.landingSectionHeading::after {
-    content: "";
-    position: absolute;
-    left: 50%;
-    bottom: 0;
-    transform: translateX(-50%);
-    width: 80px;
-    height: 3px;
-    background-color: #fff;
-    border-radius: 2px;
+@media (max-width: 576px) {
+    .testimonial-card {
+        width: 90%;
+    }
 }
