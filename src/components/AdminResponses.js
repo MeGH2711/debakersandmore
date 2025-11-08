@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from "react";
-import { collection, getDocs, doc, updateDoc } from "firebase/firestore";
+import { collection, getDocs, doc, updateDoc, deleteDoc } from "firebase/firestore";
 import { db } from "../firebase";
 import { Table, Badge, Spinner, Form, Row, Col, InputGroup } from "react-bootstrap";
 import AppNavbar from "./Navbar";
@@ -56,6 +56,17 @@ const AdminResponses = () => {
             );
         } catch (error) {
             console.error("Error updating reviewed status:", error);
+        }
+    };
+
+    const handleDelete = async (id) => {
+        if (window.confirm("Are you sure you want to delete this response?")) {
+            try {
+                await deleteDoc(doc(db, "feedback", id));
+                setResponses((prev) => prev.filter((res) => res.id !== id));
+            } catch (error) {
+                console.error("Error deleting response:", error);
+            }
         }
     };
 
@@ -120,14 +131,15 @@ const AdminResponses = () => {
                             >
                                 <thead className="text-warning">
                                     <tr>
-                                        <th className="text-center">Reviewed</th>
-                                        <th className="text-center">Sr. No.</th>
-                                        <th className="text-center">Name</th>
-                                        <th className="text-center">Email</th>
-                                        <th className="text-center">Phone</th>
-                                        <th className="text-center">Message</th>
-                                        <th className="text-center">Date</th>
-                                        <th className="text-center">Time</th>
+                                        <th className="text-center text-warning">Reviewed</th>
+                                        <th className="text-center text-warning">Sr. No.</th>
+                                        <th className="text-center text-warning">Name</th>
+                                        <th className="text-center text-warning">Email</th>
+                                        <th className="text-center text-warning">Phone</th>
+                                        <th className="text-center text-warning">Message</th>
+                                        <th className="text-center text-warning">Date</th>
+                                        <th className="text-center text-warning">Time</th>
+                                        <th className="text-center text-warning">Actions</th>
                                     </tr>
                                 </thead>
                                 <tbody>
@@ -191,6 +203,14 @@ const AdminResponses = () => {
                                                 </td>
                                                 <td className="text-center">{date}</td>
                                                 <td className="text-center">{time}</td>
+                                                <td className="text-center">
+                                                    <button
+                                                        className="btn btn-sm w-100 btn-danger"
+                                                        onClick={() => handleDelete(res.id)}
+                                                    >
+                                                        Delete
+                                                    </button>
+                                                </td>
                                             </tr>
                                         );
                                     })}
