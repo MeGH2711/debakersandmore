@@ -1,10 +1,12 @@
 import React, { useState } from "react";
 import "../App.css";
 import { signInWithEmailAndPassword } from "firebase/auth";
+import { GoogleAuthProvider, signInWithPopup, signOut } from "firebase/auth";
 import { auth } from "../firebase";
 import { useNavigate } from "react-router-dom";
 import { Form, Button, Card, InputGroup } from "react-bootstrap";
 import { FaEye, FaEyeSlash } from "react-icons/fa";
+import { FcGoogle } from "react-icons/fc";
 import "./Login.css";
 
 const Login = () => {
@@ -12,6 +14,34 @@ const Login = () => {
   const [password, setPassword] = useState("");
   const [error, setError] = useState("");
   const navigate = useNavigate();
+
+  const allowedAdminEmails = [
+    "patelmeghmahesh2701@gmail.com",
+    "debakersandmore@gmail.com"
+  ];
+
+  const handleGoogleLogin = async () => {
+    const provider = new GoogleAuthProvider();
+
+    try {
+      const result = await signInWithPopup(auth, provider);
+      const user = result.user;
+
+      if (!allowedAdminEmails.includes(user.email)) {
+        await signOut(auth);
+        setError("You are not authorized to access Admin panel.");
+        return;
+      }
+
+      const expiry = new Date().getTime() + 24 * 60 * 60 * 1000;
+      localStorage.setItem("adminSession", JSON.stringify({ uid: user.uid, expiry }));
+
+      navigate("/admin");
+    } catch (error) {
+      console.error(error);
+      setError("Google Sign-in failed. Try again.");
+    }
+  };
 
   const handleLogin = async (e) => {
     e.preventDefault();
@@ -99,6 +129,17 @@ const Login = () => {
           >
             Login
           </Button>
+
+          <Button
+            onClick={handleGoogleLogin}
+            variant="light"
+            className="w-100 fw-semibold mt-3 rounded-3 d-flex align-items-center justify-content-center gap-2 shadow-sm"
+            style={{ border: "1px solid #ccc" }}
+          >
+            <FcGoogle size={22} />
+            <span className="text-dark">Sign in with Google</span>
+          </Button>
+
         </Form>
 
         <div className="text-center mt-4">
