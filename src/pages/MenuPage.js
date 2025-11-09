@@ -23,6 +23,12 @@ function ProductList() {
         acc[category].push(item);
         return acc;
       }, {});
+
+      // 🔹 Sort products inside each category by price (ascending)
+      Object.keys(grouped).forEach((cat) => {
+        grouped[cat].sort((a, b) => a.price - b.price);
+      });
+      
       setProductsByCategory(grouped);
 
       // 🔹 Fetch categories and sort by order

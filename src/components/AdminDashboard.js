@@ -15,6 +15,7 @@ import "./AdminDashboard.css";
 import { getAuth, onAuthStateChanged } from "firebase/auth";
 import { useNavigate } from "react-router-dom";
 import { DragDropContext, Droppable, Draggable } from "@hello-pangea/dnd";
+import { RxDragHandleDots1 } from "react-icons/rx";
 
 const AdminDashboard = () => {
 
@@ -522,12 +523,20 @@ const AdminDashboard = () => {
                                   className="d-flex align-items-center justify-content-between mb-2 bg-dark text-light p-2 rounded border border-warning"
                                   ref={provided.innerRef}
                                   {...provided.draggableProps}
-                                  {...provided.dragHandleProps}
                                 >
-                                  <span>
-                                    <i className="bi bi-list me-2 text-warning"></i>
-                                    {cat.name}
-                                  </span>
+                                  <div className="d-flex align-items-center">
+                                    {/* Drag handle icon using React Icon */}
+                                    <span
+                                      {...provided.dragHandleProps}
+                                      className="me-2 text-warning"
+                                      style={{ cursor: "grab" }}
+                                    >
+                                      <RxDragHandleDots1 size={20} />
+                                    </span>
+
+                                    <span>{cat.name}</span>
+                                  </div>
+
                                   <Badge bg="warning" text="dark">
                                     {index + 1}
                                   </Badge>
