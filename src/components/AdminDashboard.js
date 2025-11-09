@@ -14,6 +14,7 @@ import "bootstrap/dist/css/bootstrap.min.css";
 import "./AdminDashboard.css";
 import { getAuth, onAuthStateChanged } from "firebase/auth";
 import { useNavigate } from "react-router-dom";
+import { DragDropContext, Droppable, Draggable } from "@hello-pangea/dnd";
 
 const AdminDashboard = () => {
 
@@ -59,7 +60,10 @@ const AdminDashboard = () => {
   // Fetch Categories
   const fetchCategories = async () => {
     const querySnapshot = await getDocs(collection(db, "categories"));
-    setCategories(querySnapshot.docs.map((doc) => ({ id: doc.id, ...doc.data() })));
+    const cats = querySnapshot.docs.map((doc) => ({ id: doc.id, ...doc.data() }));
+    // sort categories by order
+    cats.sort((a, b) => (a.order || 0) - (b.order || 0));
+    setCategories(cats);
   };
 
   const filteredProducts = products.filter((prod) => {
@@ -128,11 +132,20 @@ const AdminDashboard = () => {
   // Add Category
   const handleAddCategory = async () => {
     if (!newCategory.trim()) return alert("Enter a valid category name!");
-    await addDoc(collection(db, "categories"), { name: newCategory.trim() });
+    if (!newCategoryOrder.trim()) return alert("Enter an order number!");
+
+    await addDoc(collection(db, "categories"), {
+      name: newCategory.trim(),
+      order: parseInt(newCategoryOrder),
+    });
+
     setNewCategory("");
+    setNewCategoryOrder("");
     setShowAddCategoryModal(false);
     fetchCategories();
   };
+
+  const [newCategoryOrder, setNewCategoryOrder] = useState("");
 
   return (
     <>
@@ -447,41 +460,90 @@ const AdminDashboard = () => {
         </Modal>
 
         {/* Add Category Modal */}
-        <Modal show={showAddCategoryModal} onHide={() => setShowAddCategoryModal(false)} centered>
+        <Modal size="xl" show={showAddCategoryModal} onHide={() => setShowAddCategoryModal(false)} centered>
           <Modal.Header closeButton className="bg-dark text-warning">
             <Modal.Title>Add New Category</Modal.Title>
           </Modal.Header>
           <Modal.Body className="bg-dark text-light">
-            <Form.Group className="mb-3">
-              <Form.Label className="text-warning fw-semibold">Category Name</Form.Label>
-              <Form.Control
-                type="text"
-                placeholder="e.g. Pastry, Bread, Cookies"
-                className="bg-dark text-light border-warning"
-                value={newCategory}
-                onChange={(e) => setNewCategory(e.target.value)}
-              />
-            </Form.Group>
+            <div className="row">
+              {/* Left Side — Input Fields */}
+              <div className="col-md-6 border-end border-warning">
+                <Form.Group className="mb-3">
+                  <Form.Label className="text-warning fw-semibold">Category Name</Form.Label>
+                  <Form.Control
+                    type="text"
+                    placeholder="e.g. Pastry, Bread, Cookies"
+                    className="bg-dark text-light border-warning"
+                    value={newCategory}
+                    onChange={(e) => setNewCategory(e.target.value)}
+                  />
+                </Form.Group>
 
-            {/* Existing Categories List */}
-            <div className="mt-3">
-              <h6 className="text-warning fw-semibold mb-2">Existing Categories</h6>
-              {categories.length > 0 ? (
-                <div className="d-flex flex-wrap gap-2">
-                  {categories.map((cat) => (
-                    <Badge
-                      key={cat.id}
-                      bg="warning"
-                      text="dark"
-                      className="rounded-pill px-3 py-2"
-                    >
-                      {cat.name}
-                    </Badge>
-                  ))}
-                </div>
-              ) : (
-                <p className="text-muted mb-0">No categories added yet.</p>
-              )}
+                <Form.Group className="mb-3">
+                  <Form.Label className="text-warning fw-semibold">Category Order</Form.Label>
+                  <Form.Control
+                    type="number"
+                    placeholder="e.g. 1, 2, 3..."
+                    className="bg-dark text-light border-warning"
+                    value={newCategoryOrder}
+                    onChange={(e) => setNewCategoryOrder(e.target.value)}
+                  />
+                </Form.Group>
+              </div>
+
+              {/* Right Side — Category List */}
+              <div className="col-md-6">
+                <h6 className="text-warning fw-semibold mb-2">Existing Categories</h6>
+                {categories.length > 0 ? (
+                  <DragDropContext
+                    onDragEnd={async (result) => {
+                      if (!result.destination) return;
+
+                      const reordered = Array.from(categories);
+                      const [moved] = reordered.splice(result.source.index, 1);
+                      reordered.splice(result.destination.index, 0, moved);
+
+                      setCategories(reordered);
+
+                      // Update Firestore order
+                      for (let i = 0; i < reordered.length; i++) {
+                        const catRef = doc(db, "categories", reordered[i].id);
+                        await updateDoc(catRef, { order: i + 1 });
+                      }
+                    }}
+                  >
+                    <Droppable droppableId="categories">
+                      {(provided) => (
+                        <div {...provided.droppableProps} ref={provided.innerRef}>
+                          {categories.map((cat, index) => (
+                            <Draggable key={cat.id} draggableId={cat.id} index={index}>
+                              {(provided) => (
+                                <div
+                                  className="d-flex align-items-center justify-content-between mb-2 bg-dark text-light p-2 rounded border border-warning"
+                                  ref={provided.innerRef}
+                                  {...provided.draggableProps}
+                                  {...provided.dragHandleProps}
+                                >
+                                  <span>
+                                    <i className="bi bi-list me-2 text-warning"></i>
+                                    {cat.name}
+                                  </span>
+                                  <Badge bg="warning" text="dark">
+                                    {index + 1}
+                                  </Badge>
+                                </div>
+                              )}
+                            </Draggable>
+                          ))}
+                          {provided.placeholder}
+                        </div>
+                      )}
+                    </Droppable>
+                  </DragDropContext>
+                ) : (
+                  <p className="text-muted mb-0">No categories added yet.</p>
+                )}
+              </div>
             </div>
           </Modal.Body>
           <Modal.Footer className="bg-dark border-top d-flex justify-content-between">
