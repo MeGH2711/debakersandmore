@@ -1,4 +1,5 @@
 import React from "react";
+import { useEffect } from "react";
 import { Button, Container, Row, Col, Carousel } from "react-bootstrap";
 import { Link } from "react-router-dom";
 // import { useEffect } from "react";
@@ -67,6 +68,16 @@ const Home = () => {
     for (let i = 0; i < testimonials.length; i += 3) {
         groupedTestimonials.push(testimonials.slice(i, i + 3));
     }
+
+    useEffect(() => {
+        const cards = document.querySelectorAll(".testimonial-card");
+        let maxHeight = 0;
+        cards.forEach(card => {
+            const h = card.offsetHeight;
+            if (h > maxHeight) maxHeight = h;
+        });
+        cards.forEach(card => (card.style.height = `${maxHeight}px`));
+    }, []);
 
     return (
         <>
