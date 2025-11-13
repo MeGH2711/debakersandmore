@@ -61,6 +61,61 @@ const Home = () => {
             review:
                 "Excellent place and healthy products, and the owner is very nice.",
         },
+        {
+            name: "Vijyaben Bhakhriwala",
+            review:
+                "De Baker’s bakery items? What to say?..ahh!! just amazing! 😍 The biscuits of all flavours are super tasty and fresh..yeahhh!! and yes, once you try them, you’ll definitely want more! Loved every bite. Highly recommend to all bakery lovers! Tqsmmmm:)",
+        },
+        {
+            name: "Kundan Patel",
+            review:
+                "Perfect crust, soft and fluffy texture🍔freshly baked smell and delicious, simple flavor🍞 \nWe r really satisfied with friendly staff n fast service😊",
+        },
+        {
+            name: "Komal Patel",
+            review:
+                "Best bakery\nI am very happy with their service and the taste of every item is excellent",
+        },
+        {
+            name: "Monalee Jainesh Shah",
+            review:
+                "De Baker 's bakery items are very nice and biscuits of all flavours are amazing. I loved it",
+        },
+        {
+            name: "Jimish Shah",
+            review:
+                "Good quality and fresh bakery products, test is also good.",
+        },
+        {
+            name: "Jay Prajapati",
+            review:
+                "They have unique & healthy products which actually tastes good",
+        },
+        {
+            name: "Heli Shah",
+            review:
+                "Great place! Products are excellent especially the puffs, definitely worth trying!",
+        },
+        {
+            name: "Urmisha Patel",
+            review:
+                "Very tasty and fresh bakery products😋",
+        },
+        {
+            name: "Jigar Patel",
+            review:
+                "Good Quality Bakery items, Must go for Fresh and Healthy items. 👌",
+        },
+        {
+            name: "Bipin Dattani",
+            review:
+                "Very nice products . I bought 4 different variety . Good taste and with low sugar.",
+        },
+        {
+            name: "Mahesh Patel",
+            review:
+                "Best place for fresh bakery products",
+        },
     ];
 
     // Split testimonials into groups of 3 per slide (for large screens)
@@ -76,7 +131,7 @@ const Home = () => {
             const h = card.offsetHeight;
             if (h > maxHeight) maxHeight = h;
         });
-        cards.forEach(card => (card.style.height = `${maxHeight}px`));
+        cards.forEach(card => (card.style.height = `${maxHeight + 50}px`));
     }, []);
 
     return (

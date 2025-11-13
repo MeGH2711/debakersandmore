@@ -199,3 +199,51 @@
     height: 300px;
   }
 }
+
+/* Social Media Section */
+.social-section {
+  margin: 3rem 0;
+}
+
+.social-icons {
+  display: flex;
+  justify-content: center;
+  gap: 1.2rem;
+  margin-top: 1rem;
+}
+
+.social-icon {
+  font-size: 1.8rem;
+  color: #fff;
+  background-color: #d2691e;
+  border-radius: 50%;
+  padding: 0.6rem;
+  width: 45px;
+  height: 45px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  transition: all 0.3s ease;
+}
+
+.social-icon:hover {
+  transform: translateY(-5px);
+  background-color: #a6540b;
+}
+
+/* Specific brand colors */
+.social-icon.facebook:hover {
+  background-color: #1877f2;
+}
+
+.social-icon.instagram:hover {
+  background-color: #e4405f;
+}
+
+.social-icon.youtube:hover {
+  background-color: #ff0000;
+}
+
+.social-icon.whatsapp:hover {
+  background-color: #25d366;
+}

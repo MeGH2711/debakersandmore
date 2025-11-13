@@ -3,6 +3,7 @@ import "./ContactUs.css";
 import PublicFooter from "../components/PublicFooter";
 import { db } from "../firebase";
 import { collection, addDoc, serverTimestamp } from "firebase/firestore";
+import { FaFacebookF, FaInstagram, FaYoutube, FaWhatsapp } from "react-icons/fa";
 
 function ContactUs() {
   const [formData, setFormData] = useState({
@@ -32,21 +33,14 @@ function ContactUs() {
     try {
       await addDoc(collection(db, "feedback"), {
         ...formData,
-        reviewed: false, // 👈 Add this hidden field
+        reviewed: false,
         timestamp: serverTimestamp(),
       });
       setStatus("Thank you! Your message has been submitted successfully.");
       setFormData({ name: "", phone: "", email: "", message: "" });
 
-      // Automatically fade out after 5 seconds
-      setTimeout(() => {
-        setFadeOut(true);
-      }, 4500);
-
-      // Remove message after 5 seconds
-      setTimeout(() => {
-        setStatus("");
-      }, 5000);
+      setTimeout(() => setFadeOut(true), 4500);
+      setTimeout(() => setStatus(""), 5000);
     } catch (error) {
       console.error("Error submitting feedback:", error);
       setStatus("Something went wrong. Please try again.");
@@ -66,7 +60,12 @@ function ContactUs() {
         <section className="contact-details">
           <div className="contact-card">
             <h3>Visit Us</h3>
-            <a href="https://maps.app.goo.gl/XZTJqPGctiB9j5C88" className="text-decoration-none text-light" target="_blank" rel="noreferrer">
+            <a
+              href="https://maps.app.goo.gl/XZTJqPGctiB9j5C88"
+              className="text-decoration-none text-light"
+              target="_blank"
+              rel="noreferrer"
+            >
               De Baker’s & More,<br /> Ahmedabad, Gujarat, India
             </a>
           </div>
@@ -164,6 +163,46 @@ function ContactUs() {
           </div>
         </section>
 
+        {/* 🧁 Social Media Section */}
+        <section className="social-section text-center">
+          <h2 className="customSectionHeading">Follow Us</h2>
+          <p>Stay connected for our latest cakes, offers & festive treats!</p>
+          <div className="social-icons">
+            <a
+              href="https://www.youtube.com/@VimalDeBakers"
+              target="_blank"
+              rel="noreferrer"
+              className="social-icon youtube"
+            >
+              <FaYoutube />
+            </a>
+            <a
+              href="https://www.facebook.com/debakersandmore"
+              target="_blank"
+              rel="noreferrer"
+              className="social-icon facebook"
+            >
+              <FaFacebookF />
+            </a>
+            <a
+              href="https://www.instagram.com/de.bakers.and.more"
+              target="_blank"
+              rel="noreferrer"
+              className="social-icon instagram"
+            >
+              <FaInstagram />
+            </a>
+            <a
+              href="https://wa.me/919879718228"
+              target="_blank"
+              rel="noreferrer"
+              className="social-icon whatsapp"
+            >
+              <FaWhatsapp />
+            </a>
+          </div>
+        </section>
+
         <section className="message-section text-center">
           <h2 className="customSectionHeading">Have a Special Request?</h2>
           <p>
@@ -171,6 +210,7 @@ function ContactUs() {
           </p>
         </section>
       </div>
+
       <PublicFooter />
     </>
   );
