@@ -86,6 +86,12 @@ function PageTitle() {
       case "/":
         document.title = "De Baker’s & More";
         break;
+      case "/ourstory":
+        document.title = "Our Story | De Baker’s & More";
+        break;
+      case "/menu":
+        document.title = "Menu | De Baker’s & More";
+        break;
       case "/contact":
         document.title = "Contact Us | De Baker’s & More";
         break;
