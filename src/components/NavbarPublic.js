@@ -7,14 +7,13 @@ import logo from "../assets/images/logo.png";
 function NavbarPublic() {
   const [showNavbar, setShowNavbar] = useState(true);
   const [lastScrollY, setLastScrollY] = useState(0);
+  const [openMenu, setOpenMenu] = useState(false);
 
   useEffect(() => {
     const handleScroll = () => {
       if (window.scrollY > lastScrollY && window.scrollY > 100) {
-        // scrolling down
         setShowNavbar(false);
       } else {
-        // scrolling up
         setShowNavbar(true);
       }
       setLastScrollY(window.scrollY);
@@ -34,19 +33,31 @@ function NavbarPublic() {
           <img src={logo} alt="De Baker’s & More Logo" className="brand-logo" />
         </Navbar.Brand>
 
-        <Navbar.Toggle aria-controls="basic-navbar-nav" className="nav-toggle" />
-        <Navbar.Collapse id="basic-navbar-nav" className="justify-content-end">
+        {/* Custom Animated Hamburger */}
+        <div
+          className={`hamburger ${openMenu ? "open" : ""}`}
+          onClick={() => setOpenMenu(!openMenu)}
+        >
+          <span></span>
+          <span></span>
+          <span></span>
+        </div>
+
+        <Navbar.Collapse
+          id="basic-navbar-nav"
+          className={`justify-content-end ${openMenu ? "show" : ""}`}
+        >
           <Nav className="nav-links">
-            <NavLink to="/" className="nav-link-custom">
+            <NavLink to="/" className="nav-link-custom" onClick={() => setOpenMenu(false)}>
               Home
             </NavLink>
-            <NavLink to="/ourstory" className="nav-link-custom">
+            <NavLink to="/ourstory" className="nav-link-custom" onClick={() => setOpenMenu(false)}>
               Our Story
             </NavLink>
-            <NavLink to="/menu" className="nav-link-custom">
+            <NavLink to="/menu" className="nav-link-custom" onClick={() => setOpenMenu(false)}>
               Menu
             </NavLink>
-            <NavLink to="/contact" className="nav-link-custom">
+            <NavLink to="/contact" className="nav-link-custom" onClick={() => setOpenMenu(false)}>
               Contact Us
             </NavLink>
           </Nav>
