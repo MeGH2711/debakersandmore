@@ -525,7 +525,6 @@ const AdminDashboard = () => {
                                   {...provided.draggableProps}
                                 >
                                   <div className="d-flex align-items-center">
-                                    {/* Drag handle icon using React Icon */}
                                     <span
                                       {...provided.dragHandleProps}
                                       className="me-2 text-warning"
@@ -534,12 +533,30 @@ const AdminDashboard = () => {
                                       <RxDragHandleDots1 size={20} />
                                     </span>
 
-                                    <span>{cat.name}</span>
+                                    <span className="fw-semibold">{cat.name}</span>
                                   </div>
 
-                                  <Badge bg="warning" text="dark">
-                                    {index + 1}
-                                  </Badge>
+                                  <div className="d-flex align-items-center gap-2">
+                                    <Badge bg="warning" text="dark">
+                                      {index + 1}
+                                    </Badge>
+
+                                    {/* DELETE CATEGORY BUTTON */}
+                                    <Button
+                                      variant="danger"
+                                      size="sm"
+                                      onClick={async () => {
+                                        if (!window.confirm(`Delete category '${cat.name}'?`)) return;
+
+                                        await deleteDoc(doc(db, "categories", cat.id));
+
+                                        // refresh updated list
+                                        fetchCategories();
+                                      }}
+                                    >
+                                      Delete
+                                    </Button>
+                                  </div>
                                 </div>
                               )}
                             </Draggable>
