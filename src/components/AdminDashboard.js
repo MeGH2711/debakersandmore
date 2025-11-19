@@ -156,6 +156,23 @@ const AdminDashboard = () => {
         style={{ fontFamily: "Poppins, sans-serif" }}
       >
         <div className="container-fluid">
+          {/* Stats Cards */}
+          <div className="row mb-4 g-3">
+            <div className="col-md-3">
+              <div className="clean-card p-4 rounded-4 shadow-sm">
+                <p className="label mb-1">Total Products</p>
+                <h2 className="value">{products.length}</h2>
+              </div>
+            </div>
+
+            <div className="col-md-3">
+              <div className="clean-card p-4 rounded-4 shadow-sm">
+                <p className="label mb-1">Total Categories</p>
+                <h2 className="value">{categories.length}</h2>
+              </div>
+            </div>
+          </div>
+
           {/* Header */}
           <div className="header-controls mb-4">
             <div className="filters-section d-flex flex-wrap gap-3 align-items-center">

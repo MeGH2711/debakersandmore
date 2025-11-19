@@ -35,6 +35,36 @@
   min-width: 90px;
 }
 
+/* Minimal Aesthetic Stats Cards */
+.clean-card {
+  background: rgba(255, 255, 255, 0.05);     /* soft glass look */
+  backdrop-filter: blur(8px);                /* glass effect */
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  transition: all 0.25s ease-in-out;
+}
+
+.clean-card:hover {
+  transform: translateY(-4px);
+  background: rgba(255, 255, 255, 0.09);
+  border-color: rgba(255, 255, 255, 0.15);
+  box-shadow: 0 8px 20px rgba(0, 0, 0, 0.25);
+}
+
+/* Text Styling */
+.clean-card .label {
+  color: #d0d0d0;
+  font-size: 0.95rem;
+  letter-spacing: 0.5px;
+  font-weight: 500;
+}
+
+.clean-card .value {
+  color: #ffffff;
+  font-size: 2.3rem;
+  font-weight: 600;
+  letter-spacing: -1px;
+}
+
 /* Responsive adjustments */
 @media (max-width: 768px) {
   .header-controls {
