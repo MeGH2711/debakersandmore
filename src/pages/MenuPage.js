@@ -9,7 +9,8 @@ function ProductList() {
   const [productsByCategory, setProductsByCategory] = useState({});
   const [sortedCategories, setSortedCategories] = useState([]);
   const [expandedIndex, setExpandedIndex] = useState(null);
-  const [loading, setLoading] = useState(true); // 🔹 Added loading state
+  const [loading, setLoading] = useState(true);
+  const [searchQuery, setSearchQuery] = useState("");
 
   useEffect(() => {
     const fetchData = async () => {
@@ -61,7 +62,16 @@ function ProductList() {
       <div className="product-page">
         <h2 className="heading">Our Delicious Menu</h2>
 
-        {/* 🔹 Show loading spinner while data is being fetched */}
+        <div className="search-wrapper text-center mb-4">
+          <input
+            type="text"
+            className="form-control w-75 mx-auto search-input"
+            placeholder="Search for a product..."
+            value={searchQuery}
+            onChange={(e) => setSearchQuery(e.target.value.toLowerCase())}
+          />
+        </div>
+
         {loading ? (
           <Container className="d-flex justify-content-center align-items-center" style={{ minHeight: "60vh" }}>
             <div className="text-center">
@@ -76,13 +86,21 @@ function ProductList() {
             const category = cat.name;
             if (!productsByCategory[category]) return null;
 
+            // 🔎 Filter products by search text
+            const filteredProducts = productsByCategory[category].filter((p) =>
+              p.name.toLowerCase().includes(searchQuery)
+            );
+
+            // If no match in this category → hide the whole category
+            if (filteredProducts.length === 0) return null;
+
             return (
               <div key={index} className="category-section">
                 <h3 className="category-title">{category}</h3>
 
                 {/* ===== Desktop View ===== */}
                 <Row className="desktop-view">
-                  {productsByCategory[category].map((p, i) => (
+                  {filteredProducts.map((p, i) => (
                     <Col md={4} key={i} className="mb-4">
                       <Card className="product-card h-100">
                         <Card.Body className="product-body d-flex flex-column justify-content-between">
@@ -105,9 +123,7 @@ function ProductList() {
                                   : p.ingredients.trim() !== "") && (
                                   <p>
                                     <strong>Ingredients:</strong>{" "}
-                                    {Array.isArray(p.ingredients)
-                                      ? p.ingredients.join(", ")
-                                      : p.ingredients}
+                                    {Array.isArray(p.ingredients) ? p.ingredients.join(", ") : p.ingredients}
                                   </p>
                                 )}
 
@@ -129,7 +145,7 @@ function ProductList() {
 
                 {/* ===== Mobile View ===== */}
                 <div className="mobile-view">
-                  {productsByCategory[category].map((p, i) => {
+                  {filteredProducts.map((p, i) => {
                     const key = `${category}-${i}`;
                     const hasIngredients =
                       p.ingredients &&
@@ -146,7 +162,6 @@ function ProductList() {
                         }}
                         style={{ cursor: hasIngredients ? "pointer" : "default" }}
                       >
-                        {/* Top Row: Product Info and Price */}
                         <div className="d-flex justify-content-between align-items-center w-100">
                           <div className="d-flex flex-column">
                             <span className="mobile-product-name">
@@ -162,13 +177,10 @@ function ProductList() {
                           <span className="mobile-product-price">₹ {p.price}</span>
                         </div>
 
-                        {/* Ingredients (only if available and expanded) */}
                         {hasIngredients && isExpanded && (
                           <div className="mobile-ingredients mt-3">
                             <strong>Ingredients:</strong>{" "}
-                            {Array.isArray(p.ingredients)
-                              ? p.ingredients.join(", ")
-                              : p.ingredients}
+                            {Array.isArray(p.ingredients) ? p.ingredients.join(", ") : p.ingredients}
                           </div>
                         )}
                       </div>
