@@ -40,6 +40,9 @@ const AdminDashboard = () => {
   const [selectedProduct, setSelectedProduct] = useState(null);
   const [newCategory, setNewCategory] = useState("");
 
+  const [dailyVisits, setDailyVisits] = useState(null);
+  const [dailyAvg, setDailyAvg] = useState(null);
+
   const [newProduct, setNewProduct] = useState({
     name: "",
     price: "",
@@ -81,6 +84,20 @@ const AdminDashboard = () => {
   useEffect(() => {
     fetchProducts();
     fetchCategories();
+  }, []);
+
+  useEffect(() => {
+    async function loadAnalytics() {
+      try {
+        const res = await fetch("/api/analytics");
+        const data = await res.json();
+        setDailyVisits(data.dailyVisits);
+        setDailyAvg(data.dailyAvg);
+      } catch (e) {
+        console.error(e);
+      }
+    }
+    loadAnalytics();
   }, []);
 
   // Add Product
@@ -171,6 +188,21 @@ const AdminDashboard = () => {
                 <h2 className="value">{categories.length}</h2>
               </div>
             </div>
+
+            <div className="col-md-3">
+              <div className="clean-card p-4 rounded-4 shadow-sm">
+                <p className="label mb-1">Daily Visits</p>
+                <h2 className="value">{dailyVisits ?? "…"}</h2>
+              </div>
+            </div>
+
+            <div className="col-md-3">
+              <div className="clean-card p-4 rounded-4 shadow-sm">
+                <p className="label mb-1">Daily Average Visits</p>
+                <h2 className="value">{dailyAvg ?? "…"}</h2>
+              </div>
+            </div>
+
           </div>
 
           {/* Header */}
