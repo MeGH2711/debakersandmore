@@ -9,6 +9,7 @@ import NavbarPublic from "./components/NavbarPublic";
 import Home from "./pages/Home";
 import OurStory from "./pages/OurStory";
 import ContactUs from "./pages/ContactUs";
+import { Analytics } from "@vercel/analytics/react"
 
 function App() {
   const [isLoggedIn, setIsLoggedIn] = useState(null);
@@ -39,6 +40,7 @@ function App() {
 
   return (
     <Router>
+      <Analytics />
       <PageTitle />
       <ConditionalNavbar />
       <Routes>
