@@ -171,6 +171,18 @@ const AdminDashboard = () => {
                 <h2 className="value">{categories.length}</h2>
               </div>
             </div>
+
+            <div className="col-md-3">
+              <div className="clean-card p-4 rounded-4 shadow-sm">
+                <p className="label mb-1">Available Items</p>
+                <h2 className="value">
+                  {products.filter((p) => p.available).length}
+                  <span className="text-warning"> / </span>
+                  {products.length}
+                </h2>
+              </div>
+            </div>
+
           </div>
 
           {/* Header */}
