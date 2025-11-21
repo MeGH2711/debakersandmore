@@ -1,4 +1,4 @@
-body{
+body {
   background-color: #121212;
 }
 
@@ -7,6 +7,31 @@ body{
   opacity: 1;
 }
 
-.text-justify{
+.text-justify {
   text-align: justify !important;
+}
+
+/* --- Scrollbar Styling --- */
+::-webkit-scrollbar {
+  width: 10px;
+}
+
+::-webkit-scrollbar-track {
+  background: #0d0d0d;
+}
+
+::-webkit-scrollbar-thumb {
+  background: linear-gradient(180deg, #f7b731, #b35a00);
+  border-radius: 10px;
+  border: 2px solid #0d0d0d;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: linear-gradient(180deg, #ffca4f, #e67300);
+}
+
+/* For Firefox */
+* {
+  scrollbar-width: thin;
+  scrollbar-color: #f7b731 #0d0d0d;
 }
