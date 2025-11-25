@@ -116,6 +116,11 @@ const Home = () => {
             review:
                 "Best place for fresh bakery products",
         },
+        {
+            name: "Prisha Ajmera",
+            review:
+                "De Bakers is such a lovely place! The cookies are super tasty and freshly made. The atmosphere is cozy and welcoming, and everything feels just perfect. Definitely a must-visit spot for all dessert lovers! 🍪✨",
+        },
     ];
 
     // Split testimonials into groups of 3 per slide (for large screens)
