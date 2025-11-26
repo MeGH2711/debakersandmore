@@ -1,7 +1,7 @@
 import React, { useEffect, useState, useMemo } from "react";
 import "./OurStory.css";
 import PublicFooter from "../components/PublicFooter";
-import OpeningImage from "../assets/images/landingpageimage.jpeg"; // ✅ import your image
+import OpeningImage from "../assets/images/landingpageimage.jpeg";
 
 function OurStory() {
   const startDate = useMemo(() => new Date("2023-06-04T00:00:00"), []);
@@ -83,7 +83,6 @@ function OurStory() {
           </p>
         </div>
 
-        {/* ✅ Add the image here */}
         <div className="story-image-container">
           <img src={OpeningImage} alt="De Baker’s & More Opening Day" className="story-image" />
           <p className="image-caption">Our Grand Opening Day — the start of something sweet!</p>
