@@ -18,7 +18,7 @@ function PublicFooter() {
         </p>
 
         <p className="footer-dev">
-          Developed & Designed with ❤️ by{" "}
+          Developed & Designed with 💛 by{" "}
           <a
             href="https://meghportfolio.netlify.app/"
             target="_blank"

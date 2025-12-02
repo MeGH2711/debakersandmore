@@ -51,6 +51,7 @@ const AdminDashboard = () => {
 
   const [searchTerm, setSearchTerm] = useState("");
   const [filterCategory, setFilterCategory] = useState("");
+  const [filterAvailability, setFilterAvailability] = useState("");
 
   // Fetch Products
   const fetchProducts = async () => {
@@ -75,7 +76,11 @@ const AdminDashboard = () => {
     const matchesCategory =
       filterCategory === "" || prod.category === filterCategory;
 
-    return matchesSearch && matchesCategory;
+    const matchesAvailability =
+      filterAvailability === "" ||
+      prod.available === (filterAvailability === "true");
+
+    return matchesSearch && matchesCategory && matchesAvailability;
   });
 
   useEffect(() => {
@@ -211,8 +216,18 @@ const AdminDashboard = () => {
                 ))}
               </Form.Select>
 
+              <Form.Select
+                className="bg-dark text-light border-warning custom-select flex-grow-1"
+                value={filterAvailability}
+                onChange={(e) => setFilterAvailability(e.target.value)}
+              >
+                <option value="">All Availability</option>
+                <option value="true">Available</option>
+                <option value="false">Unavailable</option>
+              </Form.Select>
+
               {/* Reset Button */}
-              {(searchTerm || filterCategory) && (
+              {(searchTerm || filterCategory || filterAvailability) && (
                 <Button
                   variant="outline-light"
                   size="sm"
@@ -220,11 +235,13 @@ const AdminDashboard = () => {
                   onClick={() => {
                     setSearchTerm("");
                     setFilterCategory("");
+                    setFilterAvailability("");
                   }}
                 >
                   Reset
                 </Button>
               )}
+
             </div>
 
             <div className="action-buttons d-flex flex-wrap gap-2 mt-3 mt-md-0">
