@@ -79,6 +79,16 @@ const AppNavbar = () => {
 
               <Nav.Link
                 onClick={() => {
+                  navigate("/offers");
+                  setExpanded(false);
+                }}
+                className="nav-item"
+              >
+                Offers
+              </Nav.Link>
+
+              <Nav.Link
+                onClick={() => {
                   setShowModal(true);
                   setExpanded(false);
                 }}

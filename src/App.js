@@ -4,6 +4,7 @@ import { getAuth, onAuthStateChanged } from "firebase/auth";
 import MenuPage from "./pages/MenuPage";
 import AdminDashboard from "./components/AdminDashboard";
 import AdminResponses from "./components/AdminResponses";
+import AdminOffers from "./components/AdminOffers";
 import Login from "./components/Login";
 import NavbarPublic from "./components/NavbarPublic";
 import Home from "./pages/Home";
@@ -55,6 +56,10 @@ function App() {
           element={isLoggedIn ? <AdminResponses /> : <Navigate to="/login" replace />}
         />
         <Route
+          path="/offers"
+          element={isLoggedIn ? <AdminOffers /> : <Navigate to="/login" replace />}
+        />
+        <Route
           path="/login"
           element={isLoggedIn ? <Navigate to="/admin" replace /> : <Login />}
         />
@@ -67,7 +72,7 @@ function App() {
 // Hide Navbar on admin and login routes
 function ConditionalNavbar() {
   const location = useLocation();
-  const hideNavbar = location.pathname.startsWith("/admin") || location.pathname.startsWith("/responses") || location.pathname === "/login";
+  const hideNavbar = location.pathname.startsWith("/admin") || location.pathname.startsWith("/responses") || location.pathname.startsWith("/offers") || location.pathname === "/login";
   return !hideNavbar ? <NavbarPublic /> : null;
 }
 
@@ -97,6 +102,9 @@ function PageTitle() {
         break;
       case "/responses":
         document.title = "Customer Responses | De Baker’s & More";
+        break;
+      case "/offers":
+        document.title = "Offers Management | De Baker’s & More";
         break;
       default:
         document.title = "De Baker’s & More";

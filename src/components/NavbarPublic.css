@@ -126,6 +126,47 @@
   display: none !important;
 }
 
+.top-offer-bar {
+  background: linear-gradient(90deg, #f7b731, #f5a623);
+  color: #0f0f0f;
+  font-weight: 600;
+  text-align: center;
+  padding: 8px 0;
+  font-family: "Montserrat", sans-serif;
+  letter-spacing: 0.5px;
+  font-size: 14px;
+}
+
+.offer-text {
+  display: inline-block;
+  padding: 0 10px;
+}
+
+/* Fade In-Out Animation */
+.fade-animation {
+  animation: fadeSwap 4s infinite;
+}
+
+@keyframes fadeSwap {
+  0% {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+
+  10% {
+    opacity: 1;
+    transform: translateY(0);
+  }
+
+  70% {
+    opacity: 1;
+  }
+
+  100% {
+    opacity: 0;
+  }
+}
+
 @media (min-width: 992px) {
   .hamburger {
     display: none;

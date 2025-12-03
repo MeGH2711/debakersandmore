@@ -1,0 +1,4 @@
+.offerSearchBar::placeholder {
+    color: var(--color-text-secondary) !important;
+    opacity: 1;
+}
