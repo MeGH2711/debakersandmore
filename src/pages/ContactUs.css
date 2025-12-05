@@ -2,7 +2,7 @@
 .contact-page {
   color: #f0f0f0;
   background-color: #121212;
-  padding: 80px 20px; /* Increased padding for more breathing room */
+  padding: 80px 20px;
   min-height: 100vh;
 }
 
@@ -12,7 +12,7 @@
 }
 
 .contact-heading {
-  font-size: 3rem; /* Larger heading */
+  font-size: 3rem;
   color: #f7b731;
   font-weight: 800;
   margin-bottom: 15px;
@@ -26,7 +26,7 @@
   line-height: 1.7;
 }
 
-/* --- Section Titles & Separators (Reusing/Updating existing class) --- */
+/* --- Section Titles & Separators --- */
 .customSectionHeading {
   color: #ffffff;
   font-size: 2rem;
@@ -38,7 +38,7 @@
   content: "";
   display: block;
   width: 90px;
-  height: 4px; 
+  height: 4px;
   background: #f7b731;
   margin: 15px auto 0;
   border-radius: 2px;
@@ -52,17 +52,17 @@
 }
 
 .section-title-small {
-    color: #fff;
-    font-size: 1.5rem;
-    margin-bottom: 20px;
-    text-align: center;
-    font-weight: 600;
+  color: #fff;
+  font-size: 1.5rem;
+  margin-bottom: 20px;
+  text-align: center;
+  font-weight: 600;
 }
 
-/* --- Main Content Grid (Two-Column Layout) --- */
+/* --- Main Content Grid --- */
 .contact-main-grid {
   display: grid;
-  grid-template-columns: 1fr; /* Default to single column on mobile */
+  grid-template-columns: 1fr;
   gap: 60px;
   max-width: 1200px;
   margin: 0 auto 80px;
@@ -70,20 +70,28 @@
 
 @media (min-width: 992px) {
   .contact-main-grid {
-    grid-template-columns: 1.2fr 1fr; /* Form slightly wider than details */
+    grid-template-columns: 1.2fr 1fr;
     align-items: start;
   }
 }
 
+/* --- LEFT COLUMN WRAPPER (NEW) --- */
+.contact-left-column {
+  display: flex;
+  flex-direction: column;
+  gap: 40px;
+  /* Spacing between Form and Review Card */
+}
+
 /* --- Contact Form Section --- */
-.contact-form-section { /* Reusing existing class name for container, updated styles */
+.contact-form-section {
   background: #1c1c1c;
   padding: 40px;
   border-radius: 15px;
   box-shadow: 0 5px 25px rgba(0, 0, 0, 0.4);
 }
 
-.contact-form-new { /* New class for the form structure */
+.contact-form-new {
   display: flex;
   flex-direction: column;
   gap: 20px;
@@ -109,10 +117,10 @@
 }
 
 .contact-form-new textarea {
-    resize: vertical;
+  resize: vertical;
 }
 
-.submit-btn-new { /* New class for submit button */
+.submit-btn-new {
   background: #f7b731;
   color: #121212;
   padding: 15px 0;
@@ -130,7 +138,7 @@
   transform: translateY(-1px);
 }
 
-.form-status { /* Reusing existing status class */
+.form-status {
   margin-top: 15px;
   color: #f7b731;
   font-weight: 500;
@@ -143,19 +151,85 @@
   opacity: 0;
 }
 
-/* --- Contact Details & Map Group --- */
-.contact-details-location-group {
-    display: flex;
-    flex-direction: column;
-    gap: 40px;
+/* --- GOOGLE REVIEW CARD (NEW) --- */
+.google-review-card {
+  background: #1c1c1c;
+  padding: 30px;
+  border-radius: 15px;
+  box-shadow: 0 5px 25px rgba(0, 0, 0, 0.4);
+  border: 1px solid rgba(247, 183, 49, 0.1);
+  /* Subtle gold border */
+  text-align: center;
 }
 
-/* --- Compact Details Cards (Replacing old contact-card styles) --- */
+.google-review-card .review-content {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 20px;
+}
+
+@media (min-width: 576px) {
+  .google-review-card .review-content {
+    flex-direction: row;
+    justify-content: space-between;
+    text-align: left;
+  }
+}
+
+.google-review-card h3 {
+  color: #fff;
+  font-size: 1.3rem;
+  margin-bottom: 5px;
+}
+
+.google-review-card .stars {
+  color: #f7b731;
+  margin-bottom: 5px;
+  display: flex;
+  gap: 3px;
+}
+
+.google-review-card p {
+  color: #cfcfcf;
+  font-size: 0.95rem;
+  margin: 0;
+}
+
+.google-btn {
+  background: transparent;
+  color: #fff;
+  border: 2px solid #f7b731;
+  padding: 10px 25px;
+  border-radius: 50px;
+  font-weight: 600;
+  text-decoration: none;
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+  transition: all 0.3s ease;
+  white-space: nowrap;
+}
+
+.google-btn:hover {
+  background: #f7b731;
+  color: #121212;
+  box-shadow: 0 0 15px rgba(247, 183, 49, 0.4);
+}
+
+/* --- Contact Details & Map Group --- */
+.contact-details-location-group {
+  display: flex;
+  flex-direction: column;
+  gap: 40px;
+}
+
+/* --- Compact Details Cards --- */
 .contact-details-compact {
-    background: #1c1c1c;
-    padding: 30px;
-    border-radius: 15px;
-    box-shadow: 0 5px 25px rgba(0, 0, 0, 0.4);
+  background: #1c1c1c;
+  padding: 30px;
+  border-radius: 15px;
+  box-shadow: 0 5px 25px rgba(0, 0, 0, 0.4);
 }
 
 .contact-card-compact {
@@ -165,13 +239,13 @@
   margin-bottom: 25px;
   padding-bottom: 15px;
   border-bottom: 1px solid rgba(255, 255, 255, 0.05);
-  text-align: left; /* Adjust alignment for new structure */
+  text-align: left;
 }
 
 .contact-card-compact:last-child {
-    margin-bottom: 0;
-    padding-bottom: 0;
-    border-bottom: none;
+  margin-bottom: 0;
+  padding-bottom: 0;
+  border-bottom: none;
 }
 
 .contact-card-compact .card-icon {
@@ -198,14 +272,13 @@
 }
 
 .contact-card-compact .card-content a:hover {
-    color: #fff;
-    text-decoration: underline;
+  color: #fff;
+  text-decoration: underline;
 }
 
-
 /* --- Map Section --- */
-.map-section-new { /* New class for map container */
-    margin-top: 0; /* No top margin needed for grid structure */
+.map-section-new {
+  margin-top: 0;
 }
 
 .map-container-new {
@@ -224,7 +297,7 @@
 }
 
 /* --- Social Media Section --- */
-.social-section-new { /* New class for social section container */
+.social-section-new {
   padding: 40px 0;
   margin: 60px 0 80px;
   border-top: 1px solid rgba(255, 255, 255, 0.1);
@@ -232,20 +305,20 @@
 }
 
 .social-subtext {
-    color: #cfcfcf;
-    margin-bottom: 30px;
+  color: #cfcfcf;
+  margin-bottom: 30px;
 }
 
-.social-icons-new { /* New class for icon container */
+.social-icons-new {
   display: flex;
   justify-content: center;
   gap: 1.5rem;
   margin-top: 1rem;
 }
 
-.social-icon { /* Reusing existing social-icon class */
+.social-icon {
   font-size: 2rem;
-  color: #121212; 
+  color: #121212;
   background-color: #f7b731;
   border-radius: 50%;
   padding: 0.8rem;
@@ -261,10 +334,9 @@
 .social-icon:hover {
   transform: translateY(-3px) scale(1.05);
   box-shadow: 0 6px 15px rgba(247, 183, 49, 0.6);
-  background-color: #ffffff; 
+  background-color: #ffffff;
 }
 
-/* Specific brand colors on hover for a modern effect */
 .social-icon.facebook:hover {
   background-color: #1877f2;
   color: #fff;
@@ -285,17 +357,17 @@
   color: #fff;
 }
 
-/* --- Message Section (Consolidated) --- */
+/* --- Message Section --- */
 .message-section-new {
-    max-width: 800px;
-    margin: 40px auto;
-    padding: 20px 0;
+  max-width: 800px;
+  margin: 40px auto;
+  padding: 20px 0;
 }
 
 .message-section-new p {
-    color: #cfcfcf;
-    line-height: 1.7;
-    font-size: 1.05rem;
+  color: #cfcfcf;
+  line-height: 1.7;
+  font-size: 1.05rem;
 }
 
 /* --- Responsive Adjustments --- */
@@ -311,14 +383,15 @@
   .section-title-new {
     font-size: 1.8rem;
   }
-  
+
   .section-title-small {
-      text-align: left;
+    text-align: left;
   }
 
   .contact-form-section,
-  .contact-details-compact {
-      padding: 30px;
+  .contact-details-compact,
+  .google-review-card {
+    padding: 30px;
   }
 
   .social-icon {
@@ -329,6 +402,6 @@
   }
 
   .map-container-new {
-      height: 300px;
+    height: 300px;
   }
 }

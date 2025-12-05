@@ -1,12 +1,12 @@
 import React, { useState } from "react";
-import "./ContactUs.css"; // Using original CSS file name
+import "./ContactUs.css";
 import PublicFooter from "../components/PublicFooter";
 import { db } from "../firebase";
 import { collection, addDoc, serverTimestamp } from "firebase/firestore";
-// Updated imports to include all necessary icons for the new layout
-import { FaFacebookF, FaInstagram, FaYoutube, FaWhatsapp, FaClock, FaMapMarkerAlt, FaPhoneAlt, FaEnvelope } from "react-icons/fa";
+// Added FaGoogle and FaStar to imports
+import { FaFacebookF, FaInstagram, FaYoutube, FaWhatsapp, FaClock, FaMapMarkerAlt, FaPhoneAlt, FaEnvelope, FaGoogle, FaStar } from "react-icons/fa";
 
-function ContactUs() { // Using original component name
+function ContactUs() {
   const [formData, setFormData] = useState({
     name: "",
     phone: "",
@@ -51,7 +51,7 @@ function ContactUs() { // Using original component name
   return (
     <>
       <div className="contact-page">
-        {/* 1. Hero Section - More impactful title and subtext */}
+        {/* 1. Hero Section */}
         <section className="contact-hero text-center">
           <h1 className="contact-heading">Bake Your Connection</h1>
           <p className="contact-subtext">
@@ -59,48 +59,74 @@ function ContactUs() { // Using original component name
           </p>
         </section>
 
-        {/* 2. Main Content Grid - Two-column layout for Form and Details */}
+        {/* 2. Main Content Grid */}
         <div className="contact-main-grid">
-          
-          {/* A. Contact Form Section (Left/Top) */}
-          <section className="contact-form-section">
-            <h2 className="section-title-new">Send Us a Message</h2>
-            <form className="contact-form-new" onSubmit={handleSubmit}>
-              <div className="form-group-new">
-                <input type="text" name="name" placeholder="Full Name *" value={formData.name} onChange={handleChange} required />
-              </div>
 
-              <div className="form-group-new">
-                <input type="tel" name="phone" placeholder="Phone Number *" value={formData.phone} onChange={handleChange} required />
-              </div>
+          {/* A. LEFT COLUMN WRAPPER (Form + Review Card) */}
+          <div className="contact-left-column">
 
-              <div className="form-group-new">
-                <input type="email" name="email" placeholder="Email ID (Optional)" value={formData.email} onChange={handleChange} />
-              </div>
+            {/* Contact Form Section */}
+            <section className="contact-form-section">
+              <h2 className="section-title-new">Send Us a Message</h2>
+              <form className="contact-form-new" onSubmit={handleSubmit}>
+                <div className="form-group-new">
+                  <input type="text" name="name" placeholder="Full Name *" value={formData.name} onChange={handleChange} required />
+                </div>
 
-              <div className="form-group-new">
-                <textarea name="message" placeholder="Your Sweet Message *" rows="5" value={formData.message} onChange={handleChange} required></textarea>
-              </div>
+                <div className="form-group-new">
+                  <input type="tel" name="phone" placeholder="Phone Number *" value={formData.phone} onChange={handleChange} required />
+                </div>
 
-              <button type="submit" className="submit-btn-new">
-                Send Message
-              </button>
-              
-              {status && (
-                <p className={`form-status ${fadeOut ? "fade-out" : ""}`}>
-                  {status}
-                </p>
-              )}
-            </form>
-          </section>
+                <div className="form-group-new">
+                  <input type="email" name="email" placeholder="Email ID (Optional)" value={formData.email} onChange={handleChange} />
+                </div>
+
+                <div className="form-group-new">
+                  <textarea name="message" placeholder="Your Sweet Message *" rows="5" value={formData.message} onChange={handleChange} required></textarea>
+                </div>
+
+                <button type="submit" className="submit-btn-new">
+                  Send Message
+                </button>
+
+                {status && (
+                  <p className={`form-status ${fadeOut ? "fade-out" : ""}`}>
+                    {status}
+                  </p>
+                )}
+              </form>
+            </section>
+
+            {/* NEW: Google Review Card */}
+            <section className="google-review-card">
+              <div className="review-content">
+                <div className="review-text">
+                  <h3>Loved our Bakes?</h3>
+                  <div className="stars">
+                    <FaStar /><FaStar /><FaStar /><FaStar /><FaStar />
+                  </div>
+                  <p>Rate us on Google and help others find us!</p>
+                </div>
+                <a
+                  href="https://g.page/r/CYngCkd3rft1EBM/review"
+                  target="_blank"
+                  rel="noreferrer"
+                  className="google-btn"
+                >
+                  <FaGoogle className="btn-icon" /> Write a Review
+                </a>
+              </div>
+            </section>
+
+          </div>
 
           {/* B. Details and Location (Right/Bottom) */}
           <div className="contact-details-location-group">
-            
-            {/* Contact Details Cards - Smaller, more compact */}
+
+            {/* Contact Details Cards */}
             <section className="contact-details-compact">
               <h3 className="section-title-small">Our Details</h3>
-              
+
               <div className="contact-card-compact">
                 <FaMapMarkerAlt className="card-icon" />
                 <div className="card-content">
@@ -126,7 +152,7 @@ function ContactUs() { // Using original component name
                   <a href="mailto:debakersandmore@gmail.com">debakersandmore@gmail.com</a>
                 </div>
               </div>
-              
+
               <div className="contact-card-compact timing-card">
                 <FaClock className="card-icon" />
                 <div className="card-content">
@@ -136,7 +162,7 @@ function ContactUs() { // Using original component name
               </div>
             </section>
 
-            {/* Map Section - Integrated seamlessly */}
+            {/* Map Section */}
             <section className="map-section-new">
               <h3 className="section-title-small">Find Us</h3>
               <div className="map-container-new">
@@ -153,7 +179,7 @@ function ContactUs() { // Using original component name
           </div>
         </div>
 
-        {/* 3. Social Media Section - Dedicated block */}
+        {/* 3. Social Media Section */}
         <section className="social-section-new text-center">
           <h2 className="customSectionHeading">Connect with Sweetness</h2>
           <p className="social-subtext">Stay updated with our newest creations and special offers!</p>
@@ -164,13 +190,13 @@ function ContactUs() { // Using original component name
             <a href="https://wa.me/919879718228" target="_blank" rel="noreferrer" className="social-icon whatsapp"><FaWhatsapp /></a>
           </div>
         </section>
-        
-        {/* 4. Footer Message - Consolidated */}
+
+        {/* 4. Footer Message */}
         <section className="message-section-new text-center">
-           <h2 className="customSectionHeading">Got a Custom Cake Idea?</h2>
-           <p>
-             Every great celebration deserves a perfect cake. Tell us your vision—we’d be delighted to bake something unique just for you!
-           </p>
+          <h2 className="customSectionHeading">Got a Custom Cake Idea?</h2>
+          <p>
+            Every great celebration deserves a perfect cake. Tell us your vision—we’d be delighted to bake something unique just for you!
+          </p>
         </section>
       </div>
 
