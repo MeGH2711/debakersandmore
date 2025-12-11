@@ -1,14 +1,18 @@
 import { useEffect, useState } from "react";
 import { BrowserRouter as Router, Routes, Route, Navigate, useLocation } from "react-router-dom";
 import { getAuth, onAuthStateChanged } from "firebase/auth";
-import MenuPage from "./pages/MenuPage";
+
+// Admin Panel
+import Login from "./components/Login";
 import AdminDashboard from "./components/AdminDashboard";
 import AdminResponses from "./components/AdminResponses";
 import AdminOffers from "./components/AdminOffers";
-import Login from "./components/Login";
+
+// Public Pages
 import NavbarPublic from "./components/NavbarPublic";
 import Home from "./pages/Home";
 import OurStory from "./pages/OurStory";
+import MenuPage from "./pages/MenuPage";
 import ContactUs from "./pages/ContactUs";
 
 function App() {
@@ -56,7 +60,7 @@ function App() {
           element={isLoggedIn ? <AdminResponses /> : <Navigate to="/login" replace />}
         />
         <Route
-          path="/offers"
+          path="/adminoffer"
           element={isLoggedIn ? <AdminOffers /> : <Navigate to="/login" replace />}
         />
         <Route
@@ -72,11 +76,11 @@ function App() {
 // Hide Navbar on admin and login routes
 function ConditionalNavbar() {
   const location = useLocation();
-  const hideNavbar = location.pathname.startsWith("/admin") || location.pathname.startsWith("/responses") || location.pathname.startsWith("/offers") || location.pathname === "/login";
+  const hideNavbar = location.pathname.startsWith("/admin") || location.pathname.startsWith("/responses") || location.pathname.startsWith("/adminoffer") || location.pathname === "/login";
   return !hideNavbar ? <NavbarPublic /> : null;
 }
 
-// ✅ Dynamic page titles
+// Dynamic page titles
 function PageTitle() {
   const location = useLocation();
 
@@ -103,7 +107,7 @@ function PageTitle() {
       case "/responses":
         document.title = "Customer Responses | De Baker’s & More";
         break;
-      case "/offers":
+      case "/adminoffer":
         document.title = "Offers Management | De Baker’s & More";
         break;
       default:

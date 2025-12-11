@@ -79,7 +79,7 @@ const AppNavbar = () => {
 
               <Nav.Link
                 onClick={() => {
-                  navigate("/offers");
+                  navigate("/adminoffer");
                   setExpanded(false);
                 }}
                 className="nav-item"
