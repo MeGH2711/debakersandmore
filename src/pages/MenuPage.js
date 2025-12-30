@@ -127,6 +127,13 @@ function ProductList() {
                                   </p>
                                 )}
 
+                              {p.isOutsourced && p.brandName && (
+                                <p>
+                                  <strong>Brand:</strong>{" "}
+                                  <span className="fw-semibold">{p.brandName}</span>
+                                </p>
+                              )}
+
                               <p>
                                 <strong>Status:</strong>{" "}
                                 {p.available ? (
@@ -151,6 +158,11 @@ function ProductList() {
                       p.ingredients &&
                       ((Array.isArray(p.ingredients) && p.ingredients.join("").trim() !== "") ||
                         (typeof p.ingredients === "string" && p.ingredients.trim() !== ""));
+
+                    const hasBrand = p.isOutsourced && p.brandName && p.brandName.trim() !== "";
+
+                    const canExpand = hasIngredients || hasBrand;
+
                     const isExpanded = expandedIndex === key;
 
                     return (
@@ -158,9 +170,9 @@ function ProductList() {
                         key={i}
                         className={`mobile-product-row ${isExpanded ? "expanded" : ""}`}
                         onClick={() => {
-                          if (hasIngredients) toggleExpand(key);
+                          if (canExpand) toggleExpand(key);
                         }}
-                        style={{ cursor: hasIngredients ? "pointer" : "default" }}
+                        style={{ cursor: canExpand ? "pointer" : "default" }}
                       >
                         <div className="d-flex justify-content-between align-items-center w-100">
                           <div className="d-flex flex-column">
@@ -177,12 +189,26 @@ function ProductList() {
                           <span className="mobile-product-price">₹ {p.price}</span>
                         </div>
 
-                        {hasIngredients && isExpanded && (
+                        {canExpand && isExpanded && (
                           <div className="mobile-ingredients mt-3">
-                            <strong>Ingredients:</strong>{" "}
-                            {Array.isArray(p.ingredients) ? p.ingredients.join(", ") : p.ingredients}
+                            {hasIngredients && (
+                              <p className="mb-1">
+                                <strong>Ingredients:</strong>{" "}
+                                {Array.isArray(p.ingredients)
+                                  ? p.ingredients.join(", ")
+                                  : p.ingredients}
+                              </p>
+                            )}
+
+                            {hasBrand && (
+                              <p className="mb-0">
+                                <strong>Brand:</strong>{" "}
+                                <span className="fw-semibold">{p.brandName}</span>
+                              </p>
+                            )}
                           </div>
                         )}
+
                       </div>
                     );
                   })}

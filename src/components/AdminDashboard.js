@@ -47,11 +47,16 @@ const AdminDashboard = () => {
     weight: "",
     ingredients: "",
     measurement: "gm",
+    isOutsourced: false,
+    brandName: "",
   });
 
   const [searchTerm, setSearchTerm] = useState("");
   const [filterCategory, setFilterCategory] = useState("");
   const [filterAvailability, setFilterAvailability] = useState("");
+
+  const [toastMsg, setToastMsg] = useState("");
+  const [showToast, setShowToast] = useState(false);
 
   // Fetch Products
   const fetchProducts = async () => {
@@ -90,42 +95,124 @@ const AdminDashboard = () => {
 
   // Add Product
   const handleAddProduct = async () => {
+    // 🔴 Basic required field validation
     if (
-      !newProduct.name ||
+      !newProduct.name.trim() ||
       !newProduct.price ||
       !newProduct.category ||
       !newProduct.weight
-    )
-      return alert("Please fill all fields!");
+    ) {
+      setToastMsg("Please fill all required fields");
+      setShowToast(true);
+      return;
+    }
 
-    const ingredientsArray = newProduct.ingredients
-      ? newProduct.ingredients.split(",").map((i) => i.trim())
-      : [];
+    // 🔴 Outsourced product → brand name required
+    if (newProduct.isOutsourced && !newProduct.brandName.trim()) {
+      setToastMsg("Please fill the brand name for outsourced product");
+      setShowToast(true);
+      return;
+    }
 
-    await addDoc(collection(db, "products"), {
-      ...newProduct,
-      ingredients: ingredientsArray,
-      available: true,
-    });
+    try {
+      const ingredientsArray = newProduct.ingredients
+        ? newProduct.ingredients.split(",").map((i) => i.trim()).filter(Boolean)
+        : [];
 
-    setShowAddModal(false);
-    setNewProduct({ name: "", price: "", category: "", weight: "", ingredients: "" });
-    fetchProducts();
+      await addDoc(collection(db, "products"), {
+        name: newProduct.name.trim(),
+        price: Number(newProduct.price),
+        category: newProduct.category,
+        weight: newProduct.weight,
+        measurement: newProduct.measurement,
+        ingredients: ingredientsArray,
+        available: true,
+
+        // 🔹 Outsourced fields
+        isOutsourced: newProduct.isOutsourced,
+        brandName: newProduct.isOutsourced
+          ? newProduct.brandName.trim()
+          : "",
+      });
+
+      // ✅ Reset form
+      setNewProduct({
+        name: "",
+        price: "",
+        category: "",
+        weight: "",
+        ingredients: "",
+        measurement: "gm",
+        isOutsourced: false,
+        brandName: "",
+      });
+
+      setShowAddModal(false);
+      fetchProducts();
+    } catch (error) {
+      console.error("Error adding product:", error);
+      setToastMsg("Something went wrong while adding the product");
+      setShowToast(true);
+    }
   };
 
   // Edit Product
   const handleEditProduct = async () => {
-    const productRef = doc(db, "products", selectedProduct.id);
-    const ingredientsArray = selectedProduct.ingredients
-      ? selectedProduct.ingredients.split(",").map((i) => i.trim())
-      : [];
-    await updateDoc(productRef, {
-      ...selectedProduct,
-      ingredients: ingredientsArray,
-      available: selectedProduct.available,
-    });
-    setShowEditModal(false);
-    fetchProducts();
+    // 🔴 Outsourced product → brand name required
+    if (
+      selectedProduct.isOutsourced &&
+      (!selectedProduct.brandName || !selectedProduct.brandName.trim())
+    ) {
+      setToastMsg("Please fill the brand name for outsourced product");
+      setShowToast(true);
+      return;
+    }
+
+    // 🔴 Basic required field validation
+    if (
+      !selectedProduct.name.trim() ||
+      !selectedProduct.price ||
+      !selectedProduct.category ||
+      !selectedProduct.weight
+    ) {
+      setToastMsg("Please fill all required fields");
+      setShowToast(true);
+      return;
+    }
+
+    try {
+      const productRef = doc(db, "products", selectedProduct.id);
+
+      const ingredientsArray = selectedProduct.ingredients
+        ? selectedProduct.ingredients
+          .split(",")
+          .map((i) => i.trim())
+          .filter(Boolean)
+        : [];
+
+      await updateDoc(productRef, {
+        name: selectedProduct.name.trim(),
+        price: Number(selectedProduct.price),
+        category: selectedProduct.category,
+        weight: selectedProduct.weight,
+        measurement: selectedProduct.measurement || "gm",
+        ingredients: ingredientsArray,
+        available: selectedProduct.available,
+
+        // 🔹 Outsourced fields
+        isOutsourced: selectedProduct.isOutsourced,
+        brandName: selectedProduct.isOutsourced
+          ? selectedProduct.brandName.trim()
+          : "",
+      });
+
+      setShowEditModal(false);
+      fetchProducts();
+    } catch (error) {
+      console.error("Error updating product:", error);
+      setToastMsg("Something went wrong while updating the product");
+      setShowToast(true);
+    }
   };
 
   // Delete Product
@@ -274,6 +361,7 @@ const AdminDashboard = () => {
                   <th className="text-center">Ingredients</th>
                   <th className="text-center">Price</th>
                   <th className="text-center">Availability</th>
+                  <th className="text-center">Brand</th>
                   <th className="text-center">Actions</th>
                 </tr>
               </thead>
@@ -292,7 +380,7 @@ const AdminDashboard = () => {
                           </span>
                         </>
                       ) : (
-                        <span className="text-muted">—</span>
+                        <span>—</span>
                       )}
                     </td>
                     <td className="text-center">
@@ -308,7 +396,7 @@ const AdminDashboard = () => {
                           </Badge>
                         ))
                       ) : (
-                        <span className="text-muted">—</span>
+                        <span>—</span>
                       )}
                     </td>
                     <td className="text-center">
@@ -339,6 +427,15 @@ const AdminDashboard = () => {
                         }
                         className=""
                       />
+                    </td>
+                    <td className="text-center">
+                      {prod.isOutsourced ? (
+                        <Badge bg="info" text="dark">
+                          {prod.brandName || "Other Brand"}
+                        </Badge>
+                      ) : (
+                        <span>In-house</span>
+                      )}
                     </td>
                     <td className="text-center">
                       <Button
@@ -485,6 +582,40 @@ const AdminDashboard = () => {
                     />
                   </Form.Group>
                 </div>
+                <div className="col-12">
+                  <Form.Check
+                    type="checkbox"
+                    label="This product is from another brand (Outsourced)"
+                    className="text-warning fw-semibold"
+                    checked={newProduct.isOutsourced}
+                    onChange={(e) =>
+                      setNewProduct({
+                        ...newProduct,
+                        isOutsourced: e.target.checked,
+                        brandName: e.target.checked ? newProduct.brandName : "",
+                      })
+                    }
+                  />
+                </div>
+
+                {newProduct.isOutsourced && (
+                  <div className="col-12">
+                    <Form.Group>
+                      <Form.Label className="text-warning fw-semibold">
+                        Brand Name
+                      </Form.Label>
+                      <Form.Control
+                        type="text"
+                        placeholder="e.g. Britannia, Amul, Cadbury"
+                        className="bg-dark text-light border-warning"
+                        value={newProduct.brandName}
+                        onChange={(e) =>
+                          setNewProduct({ ...newProduct, brandName: e.target.value })
+                        }
+                      />
+                    </Form.Group>
+                  </div>
+                )}
               </div>
             </Form>
           </Modal.Body>
@@ -755,6 +886,43 @@ const AdminDashboard = () => {
                       />
                     </Form.Group>
                   </div>
+                  <div className="col-12">
+                    <Form.Check
+                      type="checkbox"
+                      label="This product is from another brand (Outsourced)"
+                      className="text-info fw-semibold"
+                      checked={selectedProduct.isOutsourced || false}
+                      onChange={(e) =>
+                        setSelectedProduct({
+                          ...selectedProduct,
+                          isOutsourced: e.target.checked,
+                          brandName: e.target.checked ? selectedProduct.brandName : "",
+                        })
+                      }
+                    />
+                  </div>
+
+                  {selectedProduct.isOutsourced && (
+                    <div className="col-12">
+                      <Form.Group>
+                        <Form.Label className="text-info fw-semibold">
+                          Brand Name
+                        </Form.Label>
+                        <Form.Control
+                          type="text"
+                          placeholder="Brand name"
+                          className="bg-dark text-light border-info"
+                          value={selectedProduct.brandName || ""}
+                          onChange={(e) =>
+                            setSelectedProduct({
+                              ...selectedProduct,
+                              brandName: e.target.value,
+                            })
+                          }
+                        />
+                      </Form.Group>
+                    </div>
+                  )}
                 </div>
               </Form>
             )}
@@ -796,6 +964,21 @@ const AdminDashboard = () => {
           </Modal.Footer>
         </Modal>
       </div>
+      {showToast && (
+        <div
+          className="toast show position-fixed bottom-0 end-0 m-4 text-bg-danger border-0"
+          style={{ zIndex: 9999 }}
+        >
+          <div className="toast-body d-flex justify-content-between align-items-center">
+            <span className="fw-semibold">{toastMsg}</span>
+            <button
+              type="button"
+              className="btn-close btn-close-white ms-3"
+              onClick={() => setShowToast(false)}
+            ></button>
+          </div>
+        </div>
+      )}
     </>
   );
 };
