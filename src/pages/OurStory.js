@@ -17,28 +17,36 @@ function OurStory() {
   useEffect(() => {
     const timer = setInterval(() => {
       const now = new Date();
-      const diff = now - startDate;
 
-      const years = now.getFullYear() - startDate.getFullYear();
-      const months =
-        years * 12 +
-        (now.getMonth() - startDate.getMonth() < 0
-          ? 0
-          : now.getMonth() - startDate.getMonth());
-      const totalDays = Math.floor(diff / (1000 * 60 * 60 * 24));
-      const totalHours = Math.floor(diff / (1000 * 60 * 60));
-      const totalMinutes = Math.floor(diff / (1000 * 60));
-      const totalSeconds = Math.floor(diff / 1000);
+      let years = now.getFullYear() - startDate.getFullYear();
+      let months = now.getMonth() - startDate.getMonth();
+      let days = now.getDate() - startDate.getDate();
 
-      const remainingDays = totalDays % 30;
-      const remainingHours = totalHours % 24;
-      const remainingMinutes = totalMinutes % 60;
-      const remainingSeconds = totalSeconds % 60;
+      // 1. Adjust for days (if current day is before start day)
+      if (days < 0) {
+        months -= 1;
+        // Get the last day of the previous month
+        const lastMonth = new Date(now.getFullYear(), now.getMonth(), 0);
+        days += lastMonth.getDate();
+      }
+
+      // 2. Adjust for months (if current month is before start month)
+      if (months < 0) {
+        years -= 1;
+        months += 12;
+      }
+
+      // 3. Calculate time remainders for hours/mins/secs
+      const diffInMs = now - startDate;
+
+      const remainingHours = Math.floor((diffInMs / (1000 * 60 * 60)) % 24);
+      const remainingMinutes = Math.floor((diffInMs / (1000 * 60)) % 60);
+      const remainingSeconds = Math.floor((diffInMs / 1000) % 60);
 
       setTimeElapsed({
         years,
-        months: months % 12,
-        days: remainingDays,
+        months,
+        days,
         hours: remainingHours,
         minutes: remainingMinutes,
         seconds: remainingSeconds,

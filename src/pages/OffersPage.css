@@ -1,0 +1,137 @@
+.designer-voucher {
+    width: 850px;
+    height: 400px;
+    display: flex;
+    background: #1a1a1a;
+    border: 2px solid #f7b731;
+    color: #fff;
+    font-family: 'Montserrat', sans-serif;
+    position: relative;
+    overflow: hidden;
+}
+
+.designer-voucher::before {
+    content: "";
+    position: absolute;
+    inset: 0;
+    background-image: url("../assets/images/voucherbg.jpg");
+    background-repeat: no-repeat;
+    background-position: center;
+    background-size: cover;
+    opacity: 0.03;
+    z-index: 0;
+}
+
+.designer-voucher > * {
+    position: relative;
+    z-index: 1;
+}
+
+.voucher-sidebar {
+    width: 60px;
+    background: #f7b731;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.sidebar-text {
+    transform: rotate(-90deg);
+    white-space: nowrap;
+    color: #000;
+    font-weight: 900;
+    letter-spacing: 5px;
+    font-size: 1.2rem;
+}
+
+.voucher-main {
+    flex: 1;
+    padding: 30px 40px;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    background-image: radial-gradient(circle at 100% 0%, rgba(247, 183, 49, 0.05) 0%, transparent 50%);
+}
+
+.voucher-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    border-bottom: 1px solid rgba(247, 183, 49, 0.3);
+    padding-bottom: 15px;
+}
+
+.voucher-logo {
+    width: 80px;
+    height: auto;
+    margin-bottom: 0;
+}
+
+.voucher-tagline {
+    font-size: 1.5rem;
+    color: #f7b731;
+    text-transform: uppercase;
+    letter-spacing: 2px;
+}
+
+.voucher-body {
+    padding: 20px 0;
+}
+
+.voucher-offer-text {
+    font-size: 1.2rem;
+    font-weight: 900;
+    color: #fff;
+    margin: 0;
+    line-height: 1.5;
+    text-transform: uppercase;
+}
+
+.voucher-details-grid {
+    display: grid;
+    grid-template-columns: 1.5fr 1fr;
+    gap: 20px;
+    margin-top: 25px;
+}
+
+.voucher-info-box {
+    font-size: 0.95rem;
+    line-height: 1.6;
+}
+
+.voucher-info-box strong {
+    color: #f7b731;
+    text-transform: uppercase;
+    font-size: 0.75rem;
+    display: block;
+}
+
+.voucher-notch {
+    position: absolute;
+    right: -20px;
+    top: 50%;
+    transform: translateY(-50%);
+    width: 40px;
+    height: 40px;
+    background: #121212;
+    border-radius: 50%;
+    border: 2px solid #f7b731;
+}
+
+.product-page .btn-warning {
+    background-color: #f7b731;
+    border: none;
+    transition: all 0.3s ease;
+}
+
+.product-page .btn-warning:hover {
+    background-color: #ffcc6f;
+    transform: translateY(-2px);
+    box-shadow: 0 5px 15px rgba(247, 183, 49, 0.3);
+}
+
+@media (max-width: 768px) {
+    .mobile-view {
+        display: block !important;
+    }
+}

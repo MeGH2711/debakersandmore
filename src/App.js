@@ -14,6 +14,7 @@ import Home from "./pages/Home";
 import OurStory from "./pages/OurStory";
 import MenuPage from "./pages/MenuPage";
 import ContactUs from "./pages/ContactUs";
+import OffersPage from "./pages/OffersPage";
 
 function App() {
   const [isLoggedIn, setIsLoggedIn] = useState(null);
@@ -51,6 +52,7 @@ function App() {
         <Route path="/ourstory" element={<OurStory />} />
         <Route path="/menu" element={<MenuPage />} />
         <Route path="/contact" element={<ContactUs />} />
+        <Route path="/offers" element={<OffersPage />} />
         <Route
           path="/admin"
           element={isLoggedIn ? <AdminDashboard /> : <Navigate to="/login" replace />}
@@ -103,6 +105,9 @@ function PageTitle() {
         break;
       case "/contact":
         document.title = "Contact Us | De Baker’s & More";
+        break;
+      case "/offers":
+        document.title = "Offers | De Baker’s & More";
         break;
       case "/responses":
         document.title = "Customer Responses | De Baker’s & More";

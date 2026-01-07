@@ -93,6 +93,9 @@ function NavbarPublic() {
               <NavLink to="/ourstory" className="nav-link-custom" onClick={() => setOpenMenu(false)}>
                 Our Story
               </NavLink>
+              <NavLink to="/offers" className="nav-link-custom" onClick={() => setOpenMenu(false)}>
+                Offers
+              </NavLink>
               <NavLink to="/menu" className="nav-link-custom" onClick={() => setOpenMenu(false)}>
                 Menu
               </NavLink>

@@ -28,6 +28,7 @@ const AdminOffers = () => {
     const [loading, setLoading] = useState(true);
     const [newOffer, setNewOffer] = useState("");
     const [searchQuery, setSearchQuery] = useState("");
+    const [validUntil, setValidUntil] = useState("");
 
     const navigate = useNavigate();
     const auth = getAuth();
@@ -62,20 +63,22 @@ const AdminOffers = () => {
 
     // ➕ Add new offer
     const handleAddOffer = async () => {
-        if (!newOffer.trim()) return alert("Offer cannot be empty!");
+        if (!newOffer.trim() || !validUntil) return alert("Please fill in both offer text and validity date!");
 
         try {
             const docRef = await addDoc(collection(db, "offers"), {
                 offerText: newOffer,
+                validUntil: validUntil, // Store the date string
                 active: true,
                 createdAt: Date.now(),
             });
 
             setOffers((prev) => [
                 ...prev,
-                { id: docRef.id, offerText: newOffer, active: true },
+                { id: docRef.id, offerText: newOffer, validUntil, active: true },
             ]);
             setNewOffer("");
+            setValidUntil(""); // Reset date
         } catch (error) {
             console.error("Error adding offer:", error);
         }
@@ -126,7 +129,7 @@ const AdminOffers = () => {
                     {/* ➕ Add Offer Section */}
                     <div className="card bg-secondary bg-opacity-25 p-3 mb-4 rounded-4">
                         <Row className="g-3 align-items-center">
-                            <Col md={8}>
+                            <Col md={5}>
                                 <Form.Control
                                     type="text"
                                     placeholder="Enter new offer..."
@@ -136,11 +139,18 @@ const AdminOffers = () => {
                                 />
                             </Col>
                             <Col md={4}>
-                                <Button
-                                    variant="warning"
-                                    className="w-100 fw-semibold"
-                                    onClick={handleAddOffer}
-                                >
+                                <InputGroup>
+                                    <InputGroup.Text className="bg-dark text-warning border-warning">Valid Until:</InputGroup.Text>
+                                    <Form.Control
+                                        type="date"
+                                        value={validUntil}
+                                        onChange={(e) => setValidUntil(e.target.value)}
+                                        className="bg-dark text-light border-warning"
+                                    />
+                                </InputGroup>
+                            </Col>
+                            <Col md={3}>
+                                <Button variant="warning" className="w-100 fw-semibold" onClick={handleAddOffer}>
                                     Add Offer
                                 </Button>
                             </Col>
@@ -180,6 +190,7 @@ const AdminOffers = () => {
                                         <th className="text-center">Active</th>
                                         <th className="text-center">Sr. No.</th>
                                         <th className="text-center">Offer</th>
+                                        <th className="text-center">Valid Until</th>
                                         <th className="text-center">Actions</th>
                                     </tr>
                                 </thead>
@@ -199,6 +210,8 @@ const AdminOffers = () => {
                                             <td className="text-warning fw-semibold text-center">
                                                 {offer.offerText}
                                             </td>
+
+                                            <td className="text-center">{offer.validUntil}</td>
 
                                             <td className="text-center">
                                                 <button
