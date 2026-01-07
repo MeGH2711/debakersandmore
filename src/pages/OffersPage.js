@@ -50,6 +50,7 @@ const OffersPage = () => {
         try {
             // 1. Save to Firebase first
             await addDoc(collection(db, "redeemed_offers"), {
+                offerId: selectedOffer.id, // Store ID for Admin lookup
                 customerName: customerData.name,
                 customerPhone: customerData.phone,
                 customerAddress: customerData.address,
