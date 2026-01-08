@@ -15,7 +15,6 @@ const OffersPage = () => {
     const [customerData, setCustomerData] = useState({ name: "", phone: "", address: "" });
     const voucherRef = useRef(null);
 
-    // Helper function to format YYYY-MM-DD to "13 Jan 2026"
     const formatDate = (dateString) => {
         if (!dateString) return "";
         const months = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"];
@@ -23,7 +22,6 @@ const OffersPage = () => {
         return `${parseInt(day)} ${months[parseInt(month) - 1]} ${year}`;
     };
 
-    // Helper for current date in same format
     const getTodayFormatted = () => {
         const today = new Date();
         const months = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"];
@@ -49,11 +47,9 @@ const OffersPage = () => {
     const handleRedeem = async (e) => {
         e.preventDefault();
 
-        // Use a loading toast to give immediate feedback
         const loadingToast = toast.loading("Verifying your details...");
 
         try {
-            // 2. Check for existing redemption
             const redeemedRef = collection(db, "redeemed_offers");
             const q = query(
                 redeemedRef,
@@ -72,7 +68,6 @@ const OffersPage = () => {
                 return;
             }
 
-            // 3. Save to Firebase
             await addDoc(collection(db, "redeemed_offers"), {
                 offerId: selectedOffer.id,
                 customerName: customerData.name,
@@ -82,10 +77,8 @@ const OffersPage = () => {
                 redeemedAt: serverTimestamp(),
             });
 
-            // 4. Update Toast to Success
             toast.success("Voucher generated! Starting download...", { id: loadingToast });
 
-            // 5. Generate and Download Image
             setTimeout(async () => {
                 const element = voucherRef.current;
                 if (!element) return;
@@ -100,7 +93,7 @@ const OffersPage = () => {
                 const image = canvas.toDataURL("image/png");
                 const link = document.createElement("a");
                 link.href = image;
-                link.download = `Voucher_${customerData.name.replace(/\s+/g, '_')}.png`;
+                link.download = `DB_Voucher_${customerData.name.replace(/\s+/g, '_')}.png`;
                 link.click();
 
                 setShowModal(false);
@@ -236,14 +229,13 @@ const OffersPage = () => {
                             <Form.Group className="mb-3">
                                 <Form.Label>Phone Number</Form.Label>
                                 <Form.Control
-                                    type="text" // Use text for better pattern control
-                                    inputMode="numeric" // Shows numeric keyboard on mobile
+                                    type="text"
+                                    inputMode="numeric"
                                     className="bg-dark text-light border-secondary"
                                     required
                                     placeholder="10-digit mobile number"
                                     value={customerData.phone}
                                     onInput={(e) => {
-                                        // Remove any non-numeric characters and limit length to 10
                                         e.target.value = e.target.value.replace(/\D/g, '').slice(0, 10);
                                         setCustomerData({ ...customerData, phone: e.target.value });
                                     }}
