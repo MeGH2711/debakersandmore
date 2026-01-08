@@ -72,7 +72,6 @@ const AdminOffers = () => {
 
             const fetchedOffers = offersSnap.docs.map((d) => ({ id: d.id, ...d.data() }));
 
-            // Map redemptions to offer text for counting
             const counts = {};
             redemptionsSnap.docs.forEach(doc => {
                 const data = doc.data();
@@ -146,12 +145,10 @@ const AdminOffers = () => {
             const docRef = doc(db, "redeemed_offers", redemptionId);
             await updateDoc(docRef, { claimed: !currentStatus });
 
-            // Update modal data
             setRedemptions(prev =>
                 prev.map(r => r.id === redemptionId ? { ...r, claimed: !currentStatus } : r)
             );
 
-            // Update stats for the main table
             setStats(prev => ({
                 ...prev,
                 [offerText]: {
@@ -161,6 +158,36 @@ const AdminOffers = () => {
             }));
         } catch (error) {
             console.error("Error updating claimed status:", error);
+        }
+    };
+
+    // FUNCTION TO DELETE A REDEEMED VOUCHER RECORD
+    const handleDeleteRedemption = async (redemptionId, isClaimed, offerText) => {
+        if (!window.confirm("Are you sure you want to delete this customer record?")) return;
+
+        try {
+            await deleteDoc(doc(db, "redeemed_offers", redemptionId));
+
+            // Update local redemptions list (Modal)
+            setRedemptions(prev => prev.filter(r => r.id !== redemptionId));
+
+            // Update stats (Main Dashboard Table)
+            setStats(prev => {
+                const currentRedeemed = prev[offerText]?.redeemed || 0;
+                const currentClaimed = prev[offerText]?.claimed || 0;
+
+                return {
+                    ...prev,
+                    [offerText]: {
+                        ...prev[offerText],
+                        redeemed: Math.max(0, currentRedeemed - 1),
+                        claimed: isClaimed ? Math.max(0, currentClaimed - 1) : currentClaimed
+                    }
+                };
+            });
+        } catch (error) {
+            console.error("Error deleting redemption:", error);
+            alert("Failed to delete record.");
         }
     };
 
@@ -198,8 +225,6 @@ const AdminOffers = () => {
             <AppNavbar />
             <div className="min-vh-100 bg-dark text-light pt-4 pb-5 px-4" style={{ fontFamily: "Poppins, sans-serif" }}>
                 <div className="container-fluid">
-
-                    {/* Search and Add Button Row */}
                     <Row className="mb-4 align-items-center">
                         <Col md={6}>
                             <Form.Control
@@ -251,7 +276,6 @@ const AdminOffers = () => {
                                                 </td>
                                                 <td className="text-center">{index + 1}</td>
                                                 <td className="text-warning fw-semibold text-center">{offer.offerText}</td>
-                                                {/* PLAIN TEXT REDEMPTION COLUMN */}
                                                 <td className="text-center fw-bold">
                                                     {claimed} / <span className="text-warning">{redeemed}</span>
                                                 </td>
@@ -314,7 +338,7 @@ const AdminOffers = () => {
                 </Modal.Footer>
             </Modal>
 
-            {/* MODAL: View Redemptions */}
+            {/* MODAL: View Redemptions (UPDATED WITH DELETE) */}
             <Modal show={showRedemptionModal} onHide={() => setShowRedemptionModal(false)} size="xl" centered contentClassName="bg-dark text-light">
                 <Modal.Header closeButton closeVariant="white">
                     <Modal.Title>Customer Details: {viewingOffer?.offerText}</Modal.Title>
@@ -341,6 +365,7 @@ const AdminOffers = () => {
                                     <th>Phone</th>
                                     <th>Address</th>
                                     <th>Date Generated</th>
+                                    <th className="text-center">Actions</th>
                                 </tr>
                             </thead>
                             <tbody>
@@ -358,6 +383,15 @@ const AdminOffers = () => {
                                         <td>{r.customerPhone}</td>
                                         <td style={{ fontSize: '0.85rem' }}>{r.customerAddress}</td>
                                         <td>{r.redeemedAt?.toDate().toLocaleDateString('en-GB', { day: 'numeric', month: 'short', year: 'numeric' }) || "N/A"}</td>
+                                        <td className="text-center">
+                                            <Button
+                                                variant="outline-danger"
+                                                size="sm"
+                                                onClick={() => handleDeleteRedemption(r.id, r.claimed, r.offerText)}
+                                            >
+                                                Delete Record
+                                            </Button>
+                                        </td>
                                     </tr>
                                 ))}
                             </tbody>
