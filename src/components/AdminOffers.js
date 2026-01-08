@@ -22,6 +22,7 @@ import {
 import AppNavbar from "./Navbar";
 import { getAuth, onAuthStateChanged } from "firebase/auth";
 import { useNavigate } from "react-router-dom";
+import * as XLSX from "xlsx"; // Added for Excel Export
 import "bootstrap/dist/css/bootstrap.min.css";
 import "./AdminOffers.css";
 
@@ -96,6 +97,48 @@ const AdminOffers = () => {
 
     useEffect(() => { fetchData(); }, []);
 
+    // NEW: Function to Export Customer Data to Excel
+    const exportToExcel = () => {
+        if (filteredCustomers.length === 0) return;
+
+        // Map the filtered data to a clean format for Excel
+        const excelData = filteredCustomers.map((r, index) => ({
+            "Sr. No.": index + 1,
+            "Offer": viewingOffer?.offerText,
+            "Customer Name": r.customerName,
+            "Phone Number": r.customerPhone,
+            "Address": r.customerAddress,
+            "Date Generated": r.redeemedAt?.toDate().toLocaleDateString('en-GB', {
+                day: 'numeric', month: 'short', year: 'numeric'
+            }) || "N/A",
+            "Claimed Status": r.claimed ? "Claimed" : "Pending"
+        }));
+
+        // Create Worksheet
+        const worksheet = XLSX.utils.json_to_sheet(excelData);
+        const workbook = XLSX.utils.book_new();
+        XLSX.utils.book_append_sheet(workbook, worksheet, "Redemptions");
+
+        // Set column widths for better readability
+        const wscols = [
+            { wch: 8 },  // Sr. No.
+            { wch: 25 }, // Offer
+            { wch: 20 }, // Name
+            { wch: 15 }, // Phone
+            { wch: 40 }, // Address
+            { wch: 15 }, // Date
+            { wch: 12 }  // Status
+        ];
+        worksheet['!cols'] = wscols;
+
+        // Generate Filename
+        const safeOfferName = viewingOffer?.offerText.replace(/[^a-z0-9]/gi, '_');
+        const fileName = `${safeOfferName}_Customers.xlsx`;
+
+        // Export file
+        XLSX.writeFile(workbook, fileName);
+    };
+
     const handleAddOffer = async () => {
         if (!newOffer.trim() || !validUntil) return alert("Please fill in both offer text and validity date!");
         try {
@@ -161,21 +204,15 @@ const AdminOffers = () => {
         }
     };
 
-    // FUNCTION TO DELETE A REDEEMED VOUCHER RECORD
     const handleDeleteRedemption = async (redemptionId, isClaimed, offerText) => {
         if (!window.confirm("Are you sure you want to delete this customer record?")) return;
 
         try {
             await deleteDoc(doc(db, "redeemed_offers", redemptionId));
-
-            // Update local redemptions list (Modal)
             setRedemptions(prev => prev.filter(r => r.id !== redemptionId));
-
-            // Update stats (Main Dashboard Table)
             setStats(prev => {
                 const currentRedeemed = prev[offerText]?.redeemed || 0;
                 const currentClaimed = prev[offerText]?.claimed || 0;
-
                 return {
                     ...prev,
                     [offerText]: {
@@ -338,21 +375,33 @@ const AdminOffers = () => {
                 </Modal.Footer>
             </Modal>
 
-            {/* MODAL: View Redemptions (UPDATED WITH DELETE) */}
+            {/* MODAL: View Redemptions (UPDATED WITH EXCEL DOWNLOAD) */}
             <Modal show={showRedemptionModal} onHide={() => setShowRedemptionModal(false)} size="xl" centered contentClassName="bg-dark text-light">
                 <Modal.Header closeButton closeVariant="white">
                     <Modal.Title>Customer Details: {viewingOffer?.offerText}</Modal.Title>
                 </Modal.Header>
                 <Modal.Body>
-                    <div className="mb-3">
-                        <Form.Control
-                            type="text"
-                            placeholder="Search by name or phone..."
-                            value={customerSearchQuery}
-                            onChange={(e) => setCustomerSearchQuery(e.target.value)}
-                            className="bg-dark text-light border-warning"
-                        />
-                    </div>
+                    <Row className="mb-3 g-2">
+                        <Col md={8}>
+                            <Form.Control
+                                type="text"
+                                placeholder="Search by name or phone..."
+                                value={customerSearchQuery}
+                                onChange={(e) => setCustomerSearchQuery(e.target.value)}
+                                className="bg-dark text-light border-warning offerSearchBar"
+                            />
+                        </Col>
+                        <Col md={4}>
+                            <Button
+                                variant="success"
+                                className="w-100 fw-bold"
+                                onClick={exportToExcel}
+                                disabled={filteredCustomers.length === 0}
+                            >
+                                Download Excel
+                            </Button>
+                        </Col>
+                    </Row>
 
                     {loadingRedemptions ? (
                         <div className="text-center py-4"><Spinner animation="border" variant="warning" /></div>
