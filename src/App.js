@@ -16,6 +16,8 @@ import MenuPage from "./pages/MenuPage";
 import ContactUs from "./pages/ContactUs";
 import OffersPage from "./pages/OffersPage";
 
+import { Analytics } from '@vercel/analytics/react';
+
 function App() {
   const [isLoggedIn, setIsLoggedIn] = useState(null);
 
@@ -71,6 +73,7 @@ function App() {
         />
         <Route path="*" element={<Navigate to="/" replace />} />
       </Routes>
+      <Analytics />
     </Router>
   );
 }
