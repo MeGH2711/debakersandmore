@@ -6,6 +6,7 @@ import html2canvas from "html2canvas";
 import PublicFooter from "../components/PublicFooter";
 import BakeryLogo from "../assets/images/logo.png";
 import "./OffersPage.css";
+import toast, { Toaster } from "react-hot-toast";
 
 const OffersPage = () => {
     const [offers, setOffers] = useState([]);
@@ -47,10 +48,33 @@ const OffersPage = () => {
 
     const handleRedeem = async (e) => {
         e.preventDefault();
+
+        // Use a loading toast to give immediate feedback
+        const loadingToast = toast.loading("Verifying your details...");
+
         try {
-            // 1. Save to Firebase first
+            // 2. Check for existing redemption
+            const redeemedRef = collection(db, "redeemed_offers");
+            const q = query(
+                redeemedRef,
+                where("offerId", "==", selectedOffer.id),
+                where("customerPhone", "==", customerData.phone)
+            );
+
+            const querySnapshot = await getDocs(q);
+
+            if (!querySnapshot.empty) {
+                toast.dismiss(loadingToast);
+                toast.error("This mobile number has already redeemed this specific voucher!", {
+                    duration: 4000,
+                    style: { background: '#333', color: '#fff' }
+                });
+                return;
+            }
+
+            // 3. Save to Firebase
             await addDoc(collection(db, "redeemed_offers"), {
-                offerId: selectedOffer.id, // Store ID for Admin lookup
+                offerId: selectedOffer.id,
                 customerName: customerData.name,
                 customerPhone: customerData.phone,
                 customerAddress: customerData.address,
@@ -58,15 +82,17 @@ const OffersPage = () => {
                 redeemedAt: serverTimestamp(),
             });
 
-            // 2. Wait a split second for the hidden DOM to update with state data
+            // 4. Update Toast to Success
+            toast.success("Voucher generated! Starting download...", { id: loadingToast });
+
+            // 5. Generate and Download Image
             setTimeout(async () => {
                 const element = voucherRef.current;
                 if (!element) return;
 
-                // Inside handleRedeem
                 const canvas = await html2canvas(element, {
-                    backgroundColor: "#ffffff", // Changed from #121212
-                    scale: 3, // Increased scale for even higher quality
+                    backgroundColor: "#ffffff",
+                    scale: 3,
                     useCORS: true,
                     logging: false,
                 });
@@ -79,16 +105,17 @@ const OffersPage = () => {
 
                 setShowModal(false);
                 setCustomerData({ name: "", phone: "", address: "" });
-            }, 300); // 300ms is usually enough for the DOM to catch up
+            }, 500);
 
         } catch (error) {
             console.error("Redemption error:", error);
-            alert("There was an error generating your voucher. Please try again.");
+            toast.error("Error generating voucher. Please try again.", { id: loadingToast });
         }
     };
 
     return (
         <>
+            <Toaster position="top-center" reverseOrder={false} />
             <div className="product-page">
                 <div style={{ position: "absolute", left: "-9999px" }}>
                     <div ref={voucherRef} className="designer-voucher">
@@ -209,12 +236,21 @@ const OffersPage = () => {
                             <Form.Group className="mb-3">
                                 <Form.Label>Phone Number</Form.Label>
                                 <Form.Control
-                                    type="tel"
+                                    type="text" // Use text for better pattern control
+                                    inputMode="numeric" // Shows numeric keyboard on mobile
                                     className="bg-dark text-light border-secondary"
                                     required
+                                    placeholder="10-digit mobile number"
                                     value={customerData.phone}
-                                    onChange={(e) => setCustomerData({ ...customerData, phone: e.target.value })}
+                                    onInput={(e) => {
+                                        // Remove any non-numeric characters and limit length to 10
+                                        e.target.value = e.target.value.replace(/\D/g, '').slice(0, 10);
+                                        setCustomerData({ ...customerData, phone: e.target.value });
+                                    }}
                                 />
+                                <Form.Text className="text-warning">
+                                    Enter 10 digits without spaces or country code.
+                                </Form.Text>
                             </Form.Group>
                             <Form.Group className="mb-3">
                                 <Form.Label>Area / Address</Form.Label>

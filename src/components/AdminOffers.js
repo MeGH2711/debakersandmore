@@ -16,7 +16,6 @@ import {
     Form,
     Row,
     Col,
-    InputGroup,
     Button,
     Modal
 } from "react-bootstrap";
@@ -29,8 +28,14 @@ import "./AdminOffers.css";
 const AdminOffers = () => {
     const [offers, setOffers] = useState([]);
     const [loading, setLoading] = useState(true);
-    const [newOffer, setNewOffer] = useState("");
     const [searchQuery, setSearchQuery] = useState("");
+
+    // State for tracking voucher counts locally
+    const [stats, setStats] = useState({});
+
+    // States for the Create Offer Modal
+    const [showAddModal, setShowAddModal] = useState(false);
+    const [newOffer, setNewOffer] = useState("");
     const [validUntil, setValidUntil] = useState("");
 
     const [redemptions, setRedemptions] = useState([]);
@@ -42,7 +47,6 @@ const AdminOffers = () => {
     const navigate = useNavigate();
     const auth = getAuth();
 
-    // Helper function to format YYYY-MM-DD to "13 Jan 2026"
     const formatDate = (dateString) => {
         if (!dateString) return "N/A";
         const months = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"];
@@ -57,18 +61,60 @@ const AdminOffers = () => {
         return () => unsubscribe();
     }, [auth, navigate]);
 
-    const fetchOffers = async () => {
+    // Fetch offers and calculate voucher stats
+    const fetchData = async () => {
+        setLoading(true);
         try {
-            const querySnapshot = await getDocs(collection(db, "offers"));
-            const fetchedData = querySnapshot.docs.map((d) => ({
-                id: d.id,
-                ...d.data(),
-            }));
-            setOffers(fetchedData);
+            const [offersSnap, redemptionsSnap] = await Promise.all([
+                getDocs(collection(db, "offers")),
+                getDocs(collection(db, "redeemed_offers"))
+            ]);
+
+            const fetchedOffers = offersSnap.docs.map((d) => ({ id: d.id, ...d.data() }));
+
+            // Map redemptions to offer text for counting
+            const counts = {};
+            redemptionsSnap.docs.forEach(doc => {
+                const data = doc.data();
+                const text = data.offerText;
+                if (!counts[text]) {
+                    counts[text] = { redeemed: 0, claimed: 0 };
+                }
+                counts[text].redeemed += 1;
+                if (data.claimed) {
+                    counts[text].claimed += 1;
+                }
+            });
+
+            setOffers(fetchedOffers);
+            setStats(counts);
         } catch (error) {
-            console.error("Error fetching offers:", error);
+            console.error("Error fetching data:", error);
         } finally {
             setLoading(false);
+        }
+    };
+
+    useEffect(() => { fetchData(); }, []);
+
+    const handleAddOffer = async () => {
+        if (!newOffer.trim() || !validUntil) return alert("Please fill in both offer text and validity date!");
+        try {
+            const docRef = await addDoc(collection(db, "offers"), {
+                offerText: newOffer,
+                validUntil: validUntil,
+                active: true,
+                createdAt: Date.now(),
+            });
+            setOffers((prev) => [
+                ...prev,
+                { id: docRef.id, offerText: newOffer, validUntil, active: true },
+            ]);
+            setNewOffer("");
+            setValidUntil("");
+            setShowAddModal(false);
+        } catch (error) {
+            console.error("Error adding offer:", error);
         }
     };
 
@@ -95,37 +141,26 @@ const AdminOffers = () => {
         }
     };
 
-    const handleToggleClaimed = async (redemptionId, currentStatus) => {
+    const handleToggleClaimed = async (redemptionId, currentStatus, offerText) => {
         try {
             const docRef = doc(db, "redeemed_offers", redemptionId);
             await updateDoc(docRef, { claimed: !currentStatus });
+
+            // Update modal data
             setRedemptions(prev =>
                 prev.map(r => r.id === redemptionId ? { ...r, claimed: !currentStatus } : r)
             );
+
+            // Update stats for the main table
+            setStats(prev => ({
+                ...prev,
+                [offerText]: {
+                    ...prev[offerText],
+                    claimed: (prev[offerText]?.claimed || 0) + (!currentStatus ? 1 : -1)
+                }
+            }));
         } catch (error) {
             console.error("Error updating claimed status:", error);
-        }
-    };
-
-    useEffect(() => { fetchOffers(); }, []);
-
-    const handleAddOffer = async () => {
-        if (!newOffer.trim() || !validUntil) return alert("Please fill in both offer text and validity date!");
-        try {
-            const docRef = await addDoc(collection(db, "offers"), {
-                offerText: newOffer,
-                validUntil: validUntil,
-                active: true,
-                createdAt: Date.now(),
-            });
-            setOffers((prev) => [
-                ...prev,
-                { id: docRef.id, offerText: newOffer, validUntil, active: true },
-            ]);
-            setNewOffer("");
-            setValidUntil("");
-        } catch (error) {
-            console.error("Error adding offer:", error);
         }
     };
 
@@ -163,35 +198,9 @@ const AdminOffers = () => {
             <AppNavbar />
             <div className="min-vh-100 bg-dark text-light pt-4 pb-5 px-4" style={{ fontFamily: "Poppins, sans-serif" }}>
                 <div className="container-fluid">
-                    <div className="card bg-secondary bg-opacity-25 p-3 mb-4 rounded-4">
-                        <Row className="g-3 align-items-center">
-                            <Col md={5}>
-                                <Form.Control
-                                    type="text"
-                                    placeholder="Enter new offer..."
-                                    value={newOffer}
-                                    onChange={(e) => setNewOffer(e.target.value)}
-                                    className="bg-dark text-light border-warning"
-                                />
-                            </Col>
-                            <Col md={4}>
-                                <InputGroup>
-                                    <InputGroup.Text className="bg-dark text-warning border-warning">Valid Until:</InputGroup.Text>
-                                    <Form.Control
-                                        type="date"
-                                        value={validUntil}
-                                        onChange={(e) => setValidUntil(e.target.value)}
-                                        className="bg-dark text-light border-warning"
-                                    />
-                                </InputGroup>
-                            </Col>
-                            <Col md={3}>
-                                <Button variant="warning" className="w-100 fw-semibold" onClick={handleAddOffer}>Add Offer</Button>
-                            </Col>
-                        </Row>
-                    </div>
 
-                    <Row className="mb-3">
+                    {/* Search and Add Button Row */}
+                    <Row className="mb-4 align-items-center">
                         <Col md={6}>
                             <Form.Control
                                 type="text"
@@ -200,6 +209,15 @@ const AdminOffers = () => {
                                 onChange={(e) => setSearchQuery(e.target.value)}
                                 className="bg-dark text-light border-warning offerSearchBar"
                             />
+                        </Col>
+                        <Col md={{ span: 3, offset: 3 }}>
+                            <Button
+                                variant="warning"
+                                className="w-100 fw-bold"
+                                onClick={() => setShowAddModal(true)}
+                            >
+                                + Create New Offer
+                            </Button>
                         </Col>
                     </Row>
 
@@ -213,36 +231,44 @@ const AdminOffers = () => {
                                         <th className="text-center">Active</th>
                                         <th className="text-center">Sr. No.</th>
                                         <th className="text-center">Offer</th>
+                                        <th className="text-center">Claimed / Redeemed</th>
                                         <th className="text-center">Valid Until</th>
                                         <th className="text-center">Actions</th>
                                     </tr>
                                 </thead>
                                 <tbody>
-                                    {filteredOffers.map((offer, index) => (
-                                        <tr key={offer.id}>
-                                            <td className="text-center">
-                                                <Form.Check
-                                                    type="checkbox"
-                                                    checked={offer.active}
-                                                    onChange={() => handleToggleActive(offer.id, offer.active)}
-                                                />
-                                            </td>
-                                            <td className="text-center">{index + 1}</td>
-                                            <td className="text-warning fw-semibold text-center">{offer.offerText}</td>
-                                            {/* Changed display here */}
-                                            <td className="text-center">{formatDate(offer.validUntil)}</td>
-                                            <td className="text-center">
-                                                <div className="d-flex justify-content-center gap-2">
-                                                    <Button variant="info" size="sm" onClick={() => fetchRedemptions(offer)}>
-                                                        View Customers
-                                                    </Button>
-                                                    <Button variant="danger" size="sm" onClick={() => handleDelete(offer.id)}>
-                                                        Delete
-                                                    </Button>
-                                                </div>
-                                            </td>
-                                        </tr>
-                                    ))}
+                                    {filteredOffers.map((offer, index) => {
+                                        const redeemed = stats[offer.offerText]?.redeemed || 0;
+                                        const claimed = stats[offer.offerText]?.claimed || 0;
+                                        return (
+                                            <tr key={offer.id}>
+                                                <td className="text-center">
+                                                    <Form.Check
+                                                        type="checkbox"
+                                                        checked={offer.active}
+                                                        onChange={() => handleToggleActive(offer.id, offer.active)}
+                                                    />
+                                                </td>
+                                                <td className="text-center">{index + 1}</td>
+                                                <td className="text-warning fw-semibold text-center">{offer.offerText}</td>
+                                                {/* PLAIN TEXT REDEMPTION COLUMN */}
+                                                <td className="text-center fw-bold">
+                                                    {claimed} / <span className="text-warning">{redeemed}</span>
+                                                </td>
+                                                <td className="text-center">{formatDate(offer.validUntil)}</td>
+                                                <td className="text-center">
+                                                    <div className="d-flex justify-content-center gap-2">
+                                                        <Button variant="info" size="sm" onClick={() => fetchRedemptions(offer)}>
+                                                            View Customers
+                                                        </Button>
+                                                        <Button variant="danger" size="sm" onClick={() => handleDelete(offer.id)}>
+                                                            Delete
+                                                        </Button>
+                                                    </div>
+                                                </td>
+                                            </tr>
+                                        );
+                                    })}
                                 </tbody>
                             </Table>
                         )}
@@ -250,6 +276,45 @@ const AdminOffers = () => {
                 </div>
             </div>
 
+            {/* MODAL: Add New Offer */}
+            <Modal show={showAddModal} onHide={() => setShowAddModal(false)} centered contentClassName="bg-dark text-light">
+                <Modal.Header closeButton closeVariant="white">
+                    <Modal.Title className="text-warning">Create New Offer</Modal.Title>
+                </Modal.Header>
+                <Modal.Body>
+                    <Form>
+                        <Form.Group className="mb-3">
+                            <Form.Label>Offer Description</Form.Label>
+                            <Form.Control
+                                type="text"
+                                placeholder="e.g. 20% Off on Haircut"
+                                value={newOffer}
+                                onChange={(e) => setNewOffer(e.target.value)}
+                                className="bg-dark text-light border-secondary focus-warning"
+                            />
+                        </Form.Group>
+                        <Form.Group className="mb-3">
+                            <Form.Label>Valid Until</Form.Label>
+                            <Form.Control
+                                type="date"
+                                value={validUntil}
+                                onChange={(e) => setValidUntil(e.target.value)}
+                                className="bg-dark text-light border-secondary"
+                            />
+                        </Form.Group>
+                    </Form>
+                </Modal.Body>
+                <Modal.Footer className="border-0">
+                    <Button variant="outline-light" onClick={() => setShowAddModal(false)}>
+                        Cancel
+                    </Button>
+                    <Button variant="warning" className="px-4 fw-bold" onClick={handleAddOffer}>
+                        Save Offer
+                    </Button>
+                </Modal.Footer>
+            </Modal>
+
+            {/* MODAL: View Redemptions */}
             <Modal show={showRedemptionModal} onHide={() => setShowRedemptionModal(false)} size="xl" centered contentClassName="bg-dark text-light">
                 <Modal.Header closeButton closeVariant="white">
                     <Modal.Title>Customer Details: {viewingOffer?.offerText}</Modal.Title>
@@ -286,13 +351,12 @@ const AdminOffers = () => {
                                                 type="switch"
                                                 id={`custom-switch-${r.id}`}
                                                 checked={r.claimed || false}
-                                                onChange={() => handleToggleClaimed(r.id, r.claimed)}
+                                                onChange={() => handleToggleClaimed(r.id, r.claimed, r.offerText)}
                                             />
                                         </td>
                                         <td>{r.customerName}</td>
                                         <td>{r.customerPhone}</td>
                                         <td style={{ fontSize: '0.85rem' }}>{r.customerAddress}</td>
-                                        {/* Added formatted date for voucher generation */}
                                         <td>{r.redeemedAt?.toDate().toLocaleDateString('en-GB', { day: 'numeric', month: 'short', year: 'numeric' }) || "N/A"}</td>
                                     </tr>
                                 ))}
