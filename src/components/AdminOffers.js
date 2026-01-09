@@ -45,6 +45,8 @@ const AdminOffers = () => {
     const [viewingOffer, setViewingOffer] = useState(null);
     const [customerSearchQuery, setCustomerSearchQuery] = useState("");
 
+    const [claimFilter, setClaimFilter] = useState("all");
+
     const navigate = useNavigate();
     const auth = getAuth();
 
@@ -252,10 +254,14 @@ const AdminOffers = () => {
         o.offerText.toLowerCase().includes(searchQuery.toLowerCase())
     );
 
-    const filteredCustomers = redemptions.filter((r) =>
-        r.customerName.toLowerCase().includes(customerSearchQuery.toLowerCase()) ||
-        r.customerPhone.includes(customerSearchQuery)
-    );
+    const filteredCustomers = redemptions.filter((r) => {
+        const matchesSearch = r.customerName.toLowerCase().includes(customerSearchQuery.toLowerCase()) ||
+            r.customerPhone.includes(customerSearchQuery);
+
+        if (claimFilter === "claimed") return matchesSearch && r.claimed === true;
+        if (claimFilter === "pending") return matchesSearch && !r.claimed;
+        return matchesSearch;
+    });
 
     return (
         <>
@@ -375,14 +381,14 @@ const AdminOffers = () => {
                 </Modal.Footer>
             </Modal>
 
-            {/* MODAL: View Redemptions (UPDATED WITH EXCEL DOWNLOAD) */}
+            {/* MODAL: View Redemptions */}
             <Modal show={showRedemptionModal} onHide={() => setShowRedemptionModal(false)} size="xl" centered contentClassName="bg-dark text-light">
                 <Modal.Header closeButton closeVariant="white">
                     <Modal.Title>Customer Details: {viewingOffer?.offerText}</Modal.Title>
                 </Modal.Header>
                 <Modal.Body>
                     <Row className="mb-3 g-2">
-                        <Col md={8}>
+                        <Col md={5}>
                             <Form.Control
                                 type="text"
                                 placeholder="Search by name or phone..."
@@ -391,6 +397,17 @@ const AdminOffers = () => {
                                 className="bg-dark text-light border-warning offerSearchBar"
                             />
                         </Col>
+                        <Col md={3}>
+                            <Form.Select
+                                value={claimFilter}
+                                onChange={(e) => setClaimFilter(e.target.value)}
+                                className="bg-dark text-light border-warning"
+                            >
+                                <option value="all">All Status</option>
+                                <option value="claimed">Claimed</option>
+                                <option value="pending">Pending</option>
+                            </Form.Select>
+                        </Col>
                         <Col md={4}>
                             <Button
                                 variant="success"
@@ -398,7 +415,7 @@ const AdminOffers = () => {
                                 onClick={exportToExcel}
                                 disabled={filteredCustomers.length === 0}
                             >
-                                Download Excel
+                                Download Excel ({filteredCustomers.length})
                             </Button>
                         </Col>
                     </Row>
