@@ -192,17 +192,17 @@ const AdminDashboard = () => {
 
       await updateDoc(productRef, {
         name: selectedProduct.name.trim(),
-        price: Number(selectedProduct.price),
-        category: selectedProduct.category,
-        weight: selectedProduct.weight,
+        price: Number(selectedProduct.price) || 0, // Fallback to 0
+        category: selectedProduct.category || "", // Fallback to empty string
+        weight: selectedProduct.weight || "",
         measurement: selectedProduct.measurement || "gm",
         ingredients: ingredientsArray,
-        available: selectedProduct.available,
+        available: selectedProduct.available ?? true, // Use nullish coalescing for booleans
 
-        // 🔹 Outsourced fields
-        isOutsourced: selectedProduct.isOutsourced,
+        // 🔹 FIX: Ensure these are never undefined
+        isOutsourced: !!selectedProduct.isOutsourced, // Coerce to boolean (false if undefined)
         brandName: selectedProduct.isOutsourced
-          ? selectedProduct.brandName.trim()
+          ? (selectedProduct.brandName?.trim() || "")
           : "",
       });
 
