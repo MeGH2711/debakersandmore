@@ -22,7 +22,7 @@
     z-index: 0;
 }
 
-.designer-voucher > * {
+.designer-voucher>* {
     position: relative;
     z-index: 1;
 }
@@ -134,4 +134,12 @@
     .mobile-view {
         display: block !important;
     }
+}
+
+.grayscale {
+    filter: grayscale(0.8);
+}
+
+.text-decoration-line-through {
+    text-decoration: line-through;
 }

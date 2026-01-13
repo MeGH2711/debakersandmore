@@ -38,8 +38,14 @@ const OffersPage = () => {
             const querySnapshot = await getDocs(q);
             const allActive = querySnapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
 
-            const currentOffers = allActive.filter(offer => offer.validUntil >= today);
-            setOffers(currentOffers);
+            // Sort: Valid offers first, then expired ones
+            const sortedOffers = allActive.sort((a, b) => {
+                const aExpired = a.validUntil < today;
+                const bExpired = b.validUntil < today;
+                return aExpired - bExpired;
+            });
+
+            setOffers(sortedOffers);
         };
         fetchOffers();
     }, []);
@@ -159,54 +165,68 @@ const OffersPage = () => {
                     <h2 className="heading">Exclusive Offers</h2>
 
                     <Row className="desktop-view d-flex justify-content-center">
-                        {offers.map((offer) => (
-                            <Col md={4} key={offer.id} className="mb-4">
-                                <Card className="product-card h-100">
-                                    <Card.Body className="product-body d-flex flex-column justify-content-between">
-                                        <div>
-                                            <div className="card-header-section">
-                                                <Card.Title className="product-title">{offer.offerText}</Card.Title>
+                        {offers.map((offer) => {
+                            const isExpired = offer.validUntil < new Date().toISOString().split('T')[0];
+                            return (
+                                <Col md={4} key={offer.id} className="mb-4">
+                                    <Card className={`product-card h-100 ${isExpired ? "opacity-75 grayscale" : ""}`}>
+                                        <Card.Body className="product-body d-flex flex-column justify-content-between">
+                                            <div>
+                                                <div className="card-header-section d-flex justify-content-between align-items-start">
+                                                    <Card.Title className="product-title">{offer.offerText}</Card.Title>
+                                                    {isExpired && <span className="badge bg-danger">EXPIRED</span>}
+                                                </div>
+                                                <div className="product-info mt-3">
+                                                    <p>
+                                                        <strong>Valid Until:</strong>{" "}
+                                                        <span className={isExpired ? "text-danger text-decoration-line-through" : "price-tag"}>
+                                                            {formatDate(offer.validUntil)}
+                                                        </span>
+                                                    </p>
+                                                </div>
                                             </div>
-                                            <div className="product-info mt-3">
-                                                <p>
-                                                    <strong>Valid Until:</strong>{" "}
-                                                    <span className="price-tag">{formatDate(offer.validUntil)}</span>
-                                                </p>
-                                                <p className="small opacity-75">
-                                                    Download your personalized voucher to claim this deal at our shop.
-                                                </p>
-                                            </div>
-                                        </div>
-                                        <Button
-                                            variant="warning"
-                                            className="mt-3 fw-bold w-100 py-2"
-                                            style={{ borderRadius: "12px" }}
-                                            onClick={() => { setSelectedOffer(offer); setShowModal(true); }}
-                                        >
-                                            Get Voucher
-                                        </Button>
-                                    </Card.Body>
-                                </Card>
-                            </Col>
-                        ))}
+                                            <Button
+                                                variant={isExpired ? "secondary" : "warning"}
+                                                className="mt-3 fw-bold w-100 py-2"
+                                                style={{ borderRadius: "12px" }}
+                                                disabled={isExpired}
+                                                onClick={() => { setSelectedOffer(offer); setShowModal(true); }}
+                                            >
+                                                {isExpired ? "Offer Ended" : "Get Voucher"}
+                                            </Button>
+                                        </Card.Body>
+                                    </Card>
+                                </Col>
+                            );
+                        })}
                     </Row>
 
                     <div className="mobile-view">
-                        {offers.map((offer, i) => (
-                            <div
-                                key={i}
-                                className="mobile-product-row"
-                                onClick={() => { setSelectedOffer(offer); setShowModal(true); }}
-                            >
-                                <div className="d-flex justify-content-between align-items-center w-100">
-                                    <div className="d-flex flex-column">
-                                        <span className="mobile-product-name">{offer.offerText}</span>
-                                        <small className="text-warning mt-1">Valid: {formatDate(offer.validUntil)}</small>
+                        {offers.map((offer, i) => {
+                            const isExpired = offer.validUntil < new Date().toISOString().split('T')[0];
+                            return (
+                                <div
+                                    key={i}
+                                    className={`mobile-product-row ${isExpired ? "opacity-50" : ""}`}
+                                    onClick={() => { if (!isExpired) { setSelectedOffer(offer); setShowModal(true); } }}
+                                    style={{ cursor: isExpired ? "not-allowed" : "pointer" }}
+                                >
+                                    <div className="d-flex justify-content-between align-items-center w-100">
+                                        <div className="d-flex flex-column">
+                                            <span className={`mobile-product-name ${isExpired ? "text-decoration-line-through" : ""}`}>
+                                                {offer.offerText}
+                                            </span>
+                                            <small className={`${isExpired ? "text-danger" : "text-warning"} mt-1`}>
+                                                {isExpired ? "Expired: " : "Valid: "} {formatDate(offer.validUntil)}
+                                            </small>
+                                        </div>
+                                        <span className="mobile-product-price text-warning">
+                                            {isExpired ? "✕" : "➔"}
+                                        </span>
                                     </div>
-                                    <span className="mobile-product-price text-warning">➔</span>
                                 </div>
-                            </div>
-                        ))}
+                            );
+                        })}
                     </div>
                 </Container>
 
