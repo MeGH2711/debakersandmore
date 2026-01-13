@@ -30,9 +30,7 @@ const OffersPage = () => {
 
     useEffect(() => {
         const fetchOffers = async () => {
-            // const today = new Date().toISOString().split('T')[0];
             const today = new Date().toLocaleDateString('en-CA');
-            // This query ensures ONLY items marked for 'Display' appear
             const q = query(
                 collection(db, "offers"),
                 where("active", "==", true)
@@ -40,10 +38,9 @@ const OffersPage = () => {
             const querySnapshot = await getDocs(q);
             const allToDisplay = querySnapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
 
-            // Sort: Valid offers first, then expired ones (both still within the 'Display' group)
             const sortedOffers = allToDisplay.sort((a, b) => {
-                const aExpired = a.validUntil <= today;
-                const bExpired = b.validUntil <= today;
+                const aExpired = a.validUntil < today;
+                const bExpired = b.validUntil < today;
                 return aExpired - bExpired;
             });
 
@@ -114,6 +111,8 @@ const OffersPage = () => {
         }
     };
 
+    const todayStr = new Date().toLocaleDateString('en-CA');
+
     return (
         <>
             <Toaster position="top-center" reverseOrder={false} />
@@ -168,7 +167,8 @@ const OffersPage = () => {
 
                     <Row className="desktop-view">
                         {offers.map((offer) => {
-                            const isExpired = offer.validUntil <= new Date().toISOString().split('T')[0];
+                            const isExpired = offer.validUntil < todayStr;
+                            const isLastDay = offer.validUntil === todayStr;
                             return (
                                 <Col md={12} key={offer.id} className="mb-4">
                                     <div className={`full-width-offer-card ${isExpired ? "expired" : ""}`}>
@@ -180,18 +180,20 @@ const OffersPage = () => {
 
                                         {/* Middle Section: Content */}
                                         <div className="offer-content">
+                                            {/* Inside .offer-content */}
                                             <div className="d-flex justify-content-between align-items-start">
                                                 <div>
                                                     <h3 className="offer-main-text">{offer.offerText}</h3>
-                                                    {/* ADD THIS LINE FOR DESCRIPTION */}
                                                     <p className="offer-description-text">{offer.description}</p>
-
                                                     <p className="offer-expiry">
                                                         <span className="label">VALID UNTIL:</span>
                                                         <span className="date">{formatDate(offer.validUntil)}</span>
                                                     </p>
                                                 </div>
-                                                {isExpired && <span className="status-pill">OFFER ENDED</span>}
+                                                <div className="d-flex flex-column align-items-end gap-2">
+                                                    {isExpired && <span className="status-pill">OFFER ENDED</span>}
+                                                    {isLastDay && <span className="status-pill last-day-pill">ENDS TODAY</span>}
+                                                </div>
                                             </div>
                                         </div>
 
@@ -215,7 +217,9 @@ const OffersPage = () => {
 
                     <div className="mobile-view">
                         {offers.map((offer, i) => {
-                            const isExpired = offer.validUntil <= new Date().toISOString().split('T')[0];
+                            const isExpired = offer.validUntil < todayStr;
+                            const isLastDay = offer.validUntil === todayStr;
+
                             return (
                                 <div
                                     key={i}
@@ -228,6 +232,10 @@ const OffersPage = () => {
                                             <span className={`mobile-product-name ${isExpired ? "text-decoration-line-through" : ""}`}>
                                                 {offer.offerText}
                                             </span>
+
+                                            {/* Correctly defined isLastDay now works here */}
+                                            {isLastDay && <small className="last-day-text">Ends Tonight!</small>}
+
                                             <small className="text-light opacity-50 d-block mt-1" style={{ fontSize: '0.75rem' }}>
                                                 {offer.description}
                                             </small>

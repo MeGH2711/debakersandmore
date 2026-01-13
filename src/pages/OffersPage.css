@@ -163,3 +163,32 @@
         margin-bottom: 10px;
     }
 }
+
+/* Styling for the Last Day Pill */
+.last-day-pill {
+    background: rgba(247, 183, 49, 0.2) !important;
+    color: #f7b731 !important;
+    border: 1px solid #f7b731 !important;
+    animation: pulse 2s infinite;
+}
+
+.last-day-text {
+    color: #f7b731;
+    font-weight: bold;
+    font-size: 0.7rem;
+    text-transform: uppercase;
+}
+
+@keyframes pulse {
+    0% {
+        opacity: 1;
+    }
+
+    50% {
+        opacity: 0.6;
+    }
+
+    100% {
+        opacity: 1;
+    }
+}
