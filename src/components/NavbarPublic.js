@@ -12,41 +12,6 @@ function NavbarPublic() {
   const [lastScrollY, setLastScrollY] = useState(0);
   const [openMenu, setOpenMenu] = useState(false);
 
-  // Offer States
-  const [offers, setOffers] = useState([]);
-  const [currentOfferIndex, setCurrentOfferIndex] = useState(0);
-
-  // Fetch Offers from Firestore
-  // Fetch Offers from Firestore
-  useEffect(() => {
-    const fetchOffers = async () => {
-      try {
-        const offersSnapshot = await getDocs(collection(db, "offers"));
-
-        const offerList = offersSnapshot.docs
-          .map(doc => doc.data())
-          .filter(offer => offer.active === true)
-          .map(offer => offer.offerText);
-
-        setOffers(offerList);
-      } catch (error) {
-        console.error("Error fetching offers:", error);
-      }
-    };
-
-    fetchOffers();
-  }, []);
-
-  // Auto change offer every 4 seconds
-  useEffect(() => {
-    if (offers.length > 1) {
-      const interval = setInterval(() => {
-        setCurrentOfferIndex((prev) => (prev + 1) % offers.length);
-      }, 4000);
-      return () => clearInterval(interval);
-    }
-  }, [offers]);
-
   // Hide Navbar on Scroll
   useEffect(() => {
     const handleScroll = () => {
@@ -106,15 +71,6 @@ function NavbarPublic() {
           </Navbar.Collapse>
         </Container>
       </Navbar>
-
-      {/* OFFER BAR */}
-      {offers.length > 0 && (
-        <div className="top-offer-bar">
-          <div className={`offer-text ${offers.length > 1 ? "fade-animation" : ""}`}>
-            {offers[currentOfferIndex]}
-          </div>
-        </div>
-      )}
     </>
   );
 }
