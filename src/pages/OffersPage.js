@@ -30,7 +30,8 @@ const OffersPage = () => {
 
     useEffect(() => {
         const fetchOffers = async () => {
-            const today = new Date().toISOString().split('T')[0];
+            // const today = new Date().toISOString().split('T')[0];
+            const today = new Date().toLocaleDateString('en-CA');
             // This query ensures ONLY items marked for 'Display' appear
             const q = query(
                 collection(db, "offers"),
@@ -41,8 +42,8 @@ const OffersPage = () => {
 
             // Sort: Valid offers first, then expired ones (both still within the 'Display' group)
             const sortedOffers = allToDisplay.sort((a, b) => {
-                const aExpired = a.validUntil < today;
-                const bExpired = b.validUntil < today;
+                const aExpired = a.validUntil <= today;
+                const bExpired = b.validUntil <= today;
                 return aExpired - bExpired;
             });
 
@@ -167,7 +168,7 @@ const OffersPage = () => {
 
                     <Row className="desktop-view">
                         {offers.map((offer) => {
-                            const isExpired = offer.validUntil < new Date().toISOString().split('T')[0];
+                            const isExpired = offer.validUntil <= new Date().toISOString().split('T')[0];
                             return (
                                 <Col md={12} key={offer.id} className="mb-4">
                                     <div className={`full-width-offer-card ${isExpired ? "expired" : ""}`}>
@@ -214,7 +215,7 @@ const OffersPage = () => {
 
                     <div className="mobile-view">
                         {offers.map((offer, i) => {
-                            const isExpired = offer.validUntil < new Date().toISOString().split('T')[0];
+                            const isExpired = offer.validUntil <= new Date().toISOString().split('T')[0];
                             return (
                                 <div
                                     key={i}
