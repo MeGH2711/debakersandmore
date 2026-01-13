@@ -165,38 +165,48 @@ const OffersPage = () => {
                 <Container>
                     <h2 className="heading">Exclusive Offers</h2>
 
-                    <Row className="desktop-view d-flex justify-content-center">
+                    <Row className="desktop-view">
                         {offers.map((offer) => {
                             const isExpired = offer.validUntil < new Date().toISOString().split('T')[0];
                             return (
-                                <Col md={4} key={offer.id} className="mb-4">
-                                    <Card className={`product-card h-100 ${isExpired ? "opacity-75 grayscale" : ""}`}>
-                                        <Card.Body className="product-body d-flex flex-column justify-content-between">
-                                            <div>
-                                                <div className="card-header-section d-flex justify-content-between align-items-start">
-                                                    <Card.Title className="product-title">{offer.offerText}</Card.Title>
-                                                    {isExpired && <span className="badge bg-danger">EXPIRED</span>}
-                                                </div>
-                                                <div className="product-info mt-3">
-                                                    <p>
-                                                        <strong>Valid Until:</strong>{" "}
-                                                        <span className={isExpired ? "text-danger text-decoration-line-through" : "price-tag"}>
-                                                            {formatDate(offer.validUntil)}
-                                                        </span>
+                                <Col md={12} key={offer.id} className="mb-4">
+                                    <div className={`full-width-offer-card ${isExpired ? "expired" : ""}`}>
+                                        {/* Left Section: Visual/Icon */}
+                                        <div className="offer-visual">
+                                            <div className="promo-badge">PROMO</div>
+                                            <img src={BakeryLogo} alt="Bakery" className="offer-mini-logo" />
+                                        </div>
+
+                                        {/* Middle Section: Content */}
+                                        <div className="offer-content">
+                                            <div className="d-flex justify-content-between align-items-start">
+                                                <div>
+                                                    <h3 className="offer-main-text">{offer.offerText}</h3>
+                                                    {/* ADD THIS LINE FOR DESCRIPTION */}
+                                                    <p className="offer-description-text">{offer.description}</p>
+
+                                                    <p className="offer-expiry">
+                                                        <span className="label">VALID UNTIL:</span>
+                                                        <span className="date">{formatDate(offer.validUntil)}</span>
                                                     </p>
                                                 </div>
+                                                {isExpired && <span className="status-pill">OFFER ENDED</span>}
                                             </div>
+                                        </div>
+
+                                        {/* Right Section: Action */}
+                                        <div className="offer-action">
+                                            <div className="dash-divider"></div>
                                             <Button
                                                 variant={isExpired ? "secondary" : "warning"}
-                                                className="mt-3 fw-bold w-100 py-2"
-                                                style={{ borderRadius: "12px" }}
+                                                className="redeem-btn"
                                                 disabled={isExpired}
                                                 onClick={() => { setSelectedOffer(offer); setShowModal(true); }}
                                             >
-                                                {isExpired ? "Offer Ended" : "Get Voucher"}
+                                                {isExpired ? "EXPIRED" : "CLAIM NOW"}
                                             </Button>
-                                        </Card.Body>
-                                    </Card>
+                                        </div>
+                                    </div>
                                 </Col>
                             );
                         })}
@@ -217,6 +227,10 @@ const OffersPage = () => {
                                             <span className={`mobile-product-name ${isExpired ? "text-decoration-line-through" : ""}`}>
                                                 {offer.offerText}
                                             </span>
+                                            <small className="text-light opacity-50 d-block mt-1" style={{ fontSize: '0.75rem' }}>
+                                                {offer.description}
+                                            </small>
+
                                             <small className={`${isExpired ? "text-danger" : "text-warning"} mt-1`}>
                                                 {isExpired ? "Expired: " : "Valid: "} {formatDate(offer.validUntil)}
                                             </small>

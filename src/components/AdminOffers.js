@@ -22,7 +22,7 @@ import {
 import AppNavbar from "./Navbar";
 import { getAuth, onAuthStateChanged } from "firebase/auth";
 import { useNavigate } from "react-router-dom";
-import * as XLSX from "xlsx"; // Added for Excel Export
+import * as XLSX from "xlsx";
 import "bootstrap/dist/css/bootstrap.min.css";
 import "./AdminOffers.css";
 
@@ -30,13 +30,14 @@ const AdminOffers = () => {
     const [offers, setOffers] = useState([]);
     const [loading, setLoading] = useState(true);
     const [searchQuery, setSearchQuery] = useState("");
-
-    // State for tracking voucher counts locally
     const [stats, setStats] = useState({});
 
-    // States for the Create Offer Modal
-    const [showAddModal, setShowAddModal] = useState(false);
-    const [newOffer, setNewOffer] = useState("");
+    // States for the Offer Modal (Handles both Add and Edit)
+    const [showOfferModal, setShowOfferModal] = useState(false);
+    const [isEditing, setIsEditing] = useState(false);
+    const [currentOfferId, setCurrentOfferId] = useState(null);
+    const [newOfferTitle, setNewOfferTitle] = useState("");
+    const [newOfferDescription, setNewOfferDescription] = useState("");
     const [validUntil, setValidUntil] = useState("");
 
     const [redemptions, setRedemptions] = useState([]);
@@ -44,7 +45,6 @@ const AdminOffers = () => {
     const [loadingRedemptions, setLoadingRedemptions] = useState(false);
     const [viewingOffer, setViewingOffer] = useState(null);
     const [customerSearchQuery, setCustomerSearchQuery] = useState("");
-
     const [claimFilter, setClaimFilter] = useState("all");
 
     const navigate = useNavigate();
@@ -64,7 +64,6 @@ const AdminOffers = () => {
         return () => unsubscribe();
     }, [auth, navigate]);
 
-    // Fetch offers and calculate voucher stats
     const fetchData = async () => {
         setLoading(true);
         try {
@@ -99,10 +98,60 @@ const AdminOffers = () => {
 
     useEffect(() => { fetchData(); }, []);
 
-    // Function to Export Customer Data to Excel
+    // Open Modal for New Offer
+    const handleShowAdd = () => {
+        setIsEditing(false);
+        setCurrentOfferId(null);
+        setNewOfferTitle("");
+        setNewOfferDescription("");
+        setValidUntil("");
+        setShowOfferModal(true);
+    };
+
+    // Open Modal for Editing existing offer
+    const handleShowEdit = (offer) => {
+        setIsEditing(true);
+        setCurrentOfferId(offer.id);
+        setNewOfferTitle(offer.offerText);
+        setNewOfferDescription(offer.description || "");
+        setValidUntil(offer.validUntil);
+        setShowOfferModal(true);
+    };
+
+    const handleSaveOffer = async () => {
+        if (!newOfferTitle.trim() || !newOfferDescription.trim() || !validUntil) {
+            return alert("Please fill in all fields (Title, Description, and Validity Date)!");
+        }
+
+        const offerData = {
+            offerText: newOfferTitle,
+            description: newOfferDescription,
+            validUntil: validUntil,
+        };
+
+        try {
+            if (isEditing) {
+                const docRef = doc(db, "offers", currentOfferId);
+                await updateDoc(docRef, offerData);
+                setOffers((prev) => prev.map((o) => (o.id === currentOfferId ? { ...o, ...offerData } : o)));
+            } else {
+                const fullNewOffer = { 
+                    ...offerData, 
+                    active: true, 
+                    createdAt: Date.now() 
+                };
+                const docRef = await addDoc(collection(db, "offers"), fullNewOffer);
+                setOffers((prev) => [...prev, { id: docRef.id, ...fullNewOffer }]);
+            }
+            setShowOfferModal(false);
+        } catch (error) {
+            console.error("Error saving offer:", error);
+            alert("Failed to save offer.");
+        }
+    };
+
     const exportToExcel = () => {
         if (filteredCustomers.length === 0) return;
-
         const excelData = filteredCustomers.map((r, index) => ({
             "Sr. No.": index + 1,
             "Offer": viewingOffer?.offerText,
@@ -118,43 +167,7 @@ const AdminOffers = () => {
         const worksheet = XLSX.utils.json_to_sheet(excelData);
         const workbook = XLSX.utils.book_new();
         XLSX.utils.book_append_sheet(workbook, worksheet, "Redemptions");
-
-        const wscols = [
-            { wch: 8 },  // Sr. No.
-            { wch: 25 }, // Offer
-            { wch: 20 }, // Name
-            { wch: 15 }, // Phone
-            { wch: 40 }, // Address
-            { wch: 15 }, // Date
-            { wch: 12 }  // Status
-        ];
-        worksheet['!cols'] = wscols;
-
-        const safeOfferName = viewingOffer?.offerText.replace(/[^a-z0-9]/gi, '_');
-        const fileName = `${safeOfferName}_Customers.xlsx`;
-
-        XLSX.writeFile(workbook, fileName);
-    };
-
-    const handleAddOffer = async () => {
-        if (!newOffer.trim() || !validUntil) return alert("Please fill in both offer text and validity date!");
-        try {
-            const docRef = await addDoc(collection(db, "offers"), {
-                offerText: newOffer,
-                validUntil: validUntil,
-                active: true, // Defaulting to true so it displays upon creation
-                createdAt: Date.now(),
-            });
-            setOffers((prev) => [
-                ...prev,
-                { id: docRef.id, offerText: newOffer, validUntil, active: true },
-            ]);
-            setNewOffer("");
-            setValidUntil("");
-            setShowAddModal(false);
-        } catch (error) {
-            console.error("Error adding offer:", error);
-        }
+        XLSX.writeFile(workbook, `${viewingOffer?.offerText.replace(/[^a-z0-9]/gi, '_')}_Customers.xlsx`);
     };
 
     const fetchRedemptions = async (offer) => {
@@ -168,10 +181,7 @@ const AdminOffers = () => {
                 where("offerText", "==", offer.offerText)
             );
             const querySnapshot = await getDocs(q);
-            const data = querySnapshot.docs.map(doc => ({
-                id: doc.id,
-                ...doc.data()
-            }));
+            const data = querySnapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
             setRedemptions(data);
         } catch (error) {
             console.error("Error fetching redemptions:", error);
@@ -184,11 +194,7 @@ const AdminOffers = () => {
         try {
             const docRef = doc(db, "redeemed_offers", redemptionId);
             await updateDoc(docRef, { claimed: !currentStatus });
-
-            setRedemptions(prev =>
-                prev.map(r => r.id === redemptionId ? { ...r, claimed: !currentStatus } : r)
-            );
-
+            setRedemptions(prev => prev.map(r => r.id === redemptionId ? { ...r, claimed: !currentStatus } : r));
             setStats(prev => ({
                 ...prev,
                 [offerText]: {
@@ -203,29 +209,22 @@ const AdminOffers = () => {
 
     const handleDeleteRedemption = async (redemptionId, isClaimed, offerText) => {
         if (!window.confirm("Are you sure you want to delete this customer record?")) return;
-
         try {
             await deleteDoc(doc(db, "redeemed_offers", redemptionId));
             setRedemptions(prev => prev.filter(r => r.id !== redemptionId));
-            setStats(prev => {
-                const currentRedeemed = prev[offerText]?.redeemed || 0;
-                const currentClaimed = prev[offerText]?.claimed || 0;
-                return {
-                    ...prev,
-                    [offerText]: {
-                        ...prev[offerText],
-                        redeemed: Math.max(0, currentRedeemed - 1),
-                        claimed: isClaimed ? Math.max(0, currentClaimed - 1) : currentClaimed
-                    }
-                };
-            });
+            setStats(prev => ({
+                ...prev,
+                [offerText]: {
+                    ...prev[offerText],
+                    redeemed: Math.max(0, (prev[offerText]?.redeemed || 0) - 1),
+                    claimed: isClaimed ? Math.max(0, (prev[offerText]?.claimed || 0) - 1) : (prev[offerText]?.claimed || 0)
+                }
+            }));
         } catch (error) {
             console.error("Error deleting redemption:", error);
-            alert("Failed to delete record.");
         }
     };
 
-    // Renamed function to handle Display logic
     const handleToggleDisplay = async (id, currentStatus) => {
         try {
             const docRef = doc(db, "offers", id);
@@ -253,7 +252,6 @@ const AdminOffers = () => {
     const filteredCustomers = redemptions.filter((r) => {
         const matchesSearch = r.customerName.toLowerCase().includes(customerSearchQuery.toLowerCase()) ||
             r.customerPhone.includes(customerSearchQuery);
-
         if (claimFilter === "claimed") return matchesSearch && r.claimed === true;
         if (claimFilter === "pending") return matchesSearch && !r.claimed;
         return matchesSearch;
@@ -275,11 +273,7 @@ const AdminOffers = () => {
                             />
                         </Col>
                         <Col md={{ span: 3, offset: 3 }}>
-                            <Button
-                                variant="warning"
-                                className="w-100 fw-bold"
-                                onClick={() => setShowAddModal(true)}
-                            >
+                            <Button variant="warning" className="w-100 fw-bold" onClick={handleShowAdd}>
                                 + Create New Offer
                             </Button>
                         </Col>
@@ -292,10 +286,9 @@ const AdminOffers = () => {
                             <Table hover responsive variant="dark" className="align-middle mb-0">
                                 <thead className="text-warning">
                                     <tr>
-                                        {/* Updated Column Header */}
                                         <th className="text-center">Display Status</th>
                                         <th className="text-center">Sr. No.</th>
-                                        <th className="text-center">Offer</th>
+                                        <th>Offer Details</th>
                                         <th className="text-center">Claimed / Redeemed</th>
                                         <th className="text-center">Valid Until</th>
                                         <th className="text-center">Actions</th>
@@ -308,7 +301,6 @@ const AdminOffers = () => {
                                         return (
                                             <tr key={offer.id}>
                                                 <td className="text-center">
-                                                    {/* Updated Toggle Switch for Display/Do Not Display */}
                                                     <div className="d-flex flex-column align-items-center">
                                                         <Form.Check
                                                             type="switch"
@@ -323,13 +315,19 @@ const AdminOffers = () => {
                                                     </div>
                                                 </td>
                                                 <td className="text-center">{index + 1}</td>
-                                                <td className="text-warning fw-semibold text-center">{offer.offerText}</td>
+                                                <td>
+                                                    <div className="text-warning fw-semibold">{offer.offerText}</div>
+                                                    <div className="text-light small opacity-75">{offer.description || "No description provided."}</div>
+                                                </td>
                                                 <td className="text-center fw-bold">
                                                     {claimed} / <span className="text-warning">{redeemed}</span>
                                                 </td>
                                                 <td className="text-center">{formatDate(offer.validUntil)}</td>
                                                 <td className="text-center">
                                                     <div className="d-flex justify-content-center gap-2">
+                                                        <Button variant="outline-warning" size="sm" onClick={() => handleShowEdit(offer)}>
+                                                            Edit
+                                                        </Button>
                                                         <Button variant="info" size="sm" onClick={() => fetchRedemptions(offer)}>
                                                             View Customers
                                                         </Button>
@@ -348,20 +346,33 @@ const AdminOffers = () => {
                 </div>
             </div>
 
-            {/* MODAL: Add New Offer */}
-            <Modal show={showAddModal} onHide={() => setShowAddModal(false)} centered contentClassName="bg-dark text-light">
+            {/* MODAL: Add or Edit Offer */}
+            <Modal show={showOfferModal} onHide={() => setShowOfferModal(false)} centered contentClassName="bg-dark text-light">
                 <Modal.Header closeButton closeVariant="white">
-                    <Modal.Title className="text-warning">Create New Offer</Modal.Title>
+                    <Modal.Title className="text-warning">
+                        {isEditing ? "Edit Offer" : "Create New Offer"}
+                    </Modal.Title>
                 </Modal.Header>
                 <Modal.Body>
                     <Form>
                         <Form.Group className="mb-3">
-                            <Form.Label>Offer Description</Form.Label>
+                            <Form.Label>Offer Title</Form.Label>
                             <Form.Control
                                 type="text"
                                 placeholder="e.g. 20% Off on Haircut"
-                                value={newOffer}
-                                onChange={(e) => setNewOffer(e.target.value)}
+                                value={newOfferTitle}
+                                onChange={(e) => setNewOfferTitle(e.target.value)}
+                                className="bg-dark text-light border-secondary focus-warning"
+                            />
+                        </Form.Group>
+                        <Form.Group className="mb-3">
+                            <Form.Label>Offer Description</Form.Label>
+                            <Form.Control
+                                as="textarea"
+                                rows={3}
+                                placeholder="Enter detailed terms, conditions, or offer scope..."
+                                value={newOfferDescription}
+                                onChange={(e) => setNewOfferDescription(e.target.value)}
                                 className="bg-dark text-light border-secondary focus-warning"
                             />
                         </Form.Group>
@@ -377,16 +388,16 @@ const AdminOffers = () => {
                     </Form>
                 </Modal.Body>
                 <Modal.Footer className="border-0">
-                    <Button variant="outline-light" onClick={() => setShowAddModal(false)}>
+                    <Button variant="outline-light" onClick={() => setShowOfferModal(false)}>
                         Cancel
                     </Button>
-                    <Button variant="warning" className="px-4 fw-bold" onClick={handleAddOffer}>
-                        Save Offer
+                    <Button variant="warning" className="px-4 fw-bold" onClick={handleSaveOffer}>
+                        {isEditing ? "Update Offer" : "Save Offer"}
                     </Button>
                 </Modal.Footer>
             </Modal>
 
-            {/* MODAL: View Redemptions */}
+            {/* MODAL: View Redemptions (Customers) */}
             <Modal show={showRedemptionModal} onHide={() => setShowRedemptionModal(false)} size="xl" centered contentClassName="bg-dark text-light">
                 <Modal.Header closeButton closeVariant="white">
                     <Modal.Title>Customer Details: {viewingOffer?.offerText}</Modal.Title>
