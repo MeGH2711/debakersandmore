@@ -99,11 +99,10 @@ const AdminOffers = () => {
 
     useEffect(() => { fetchData(); }, []);
 
-    // NEW: Function to Export Customer Data to Excel
+    // Function to Export Customer Data to Excel
     const exportToExcel = () => {
         if (filteredCustomers.length === 0) return;
 
-        // Map the filtered data to a clean format for Excel
         const excelData = filteredCustomers.map((r, index) => ({
             "Sr. No.": index + 1,
             "Offer": viewingOffer?.offerText,
@@ -116,12 +115,10 @@ const AdminOffers = () => {
             "Claimed Status": r.claimed ? "Claimed" : "Pending"
         }));
 
-        // Create Worksheet
         const worksheet = XLSX.utils.json_to_sheet(excelData);
         const workbook = XLSX.utils.book_new();
         XLSX.utils.book_append_sheet(workbook, worksheet, "Redemptions");
 
-        // Set column widths for better readability
         const wscols = [
             { wch: 8 },  // Sr. No.
             { wch: 25 }, // Offer
@@ -133,11 +130,9 @@ const AdminOffers = () => {
         ];
         worksheet['!cols'] = wscols;
 
-        // Generate Filename
         const safeOfferName = viewingOffer?.offerText.replace(/[^a-z0-9]/gi, '_');
         const fileName = `${safeOfferName}_Customers.xlsx`;
 
-        // Export file
         XLSX.writeFile(workbook, fileName);
     };
 
@@ -147,7 +142,7 @@ const AdminOffers = () => {
             const docRef = await addDoc(collection(db, "offers"), {
                 offerText: newOffer,
                 validUntil: validUntil,
-                active: true,
+                active: true, // Defaulting to true so it displays upon creation
                 createdAt: Date.now(),
             });
             setOffers((prev) => [
@@ -230,13 +225,14 @@ const AdminOffers = () => {
         }
     };
 
-    const handleToggleActive = async (id, current) => {
+    // Renamed function to handle Display logic
+    const handleToggleDisplay = async (id, currentStatus) => {
         try {
             const docRef = doc(db, "offers", id);
-            await updateDoc(docRef, { active: !current });
-            setOffers((prev) => prev.map((o) => o.id === id ? { ...o, active: !current } : o));
+            await updateDoc(docRef, { active: !currentStatus });
+            setOffers((prev) => prev.map((o) => o.id === id ? { ...o, active: !currentStatus } : o));
         } catch (error) {
-            console.error("Error updating offer:", error);
+            console.error("Error updating display status:", error);
         }
     };
 
@@ -296,7 +292,8 @@ const AdminOffers = () => {
                             <Table hover responsive variant="dark" className="align-middle mb-0">
                                 <thead className="text-warning">
                                     <tr>
-                                        <th className="text-center">Active</th>
+                                        {/* Updated Column Header */}
+                                        <th className="text-center">Display Status</th>
                                         <th className="text-center">Sr. No.</th>
                                         <th className="text-center">Offer</th>
                                         <th className="text-center">Claimed / Redeemed</th>
@@ -311,11 +308,19 @@ const AdminOffers = () => {
                                         return (
                                             <tr key={offer.id}>
                                                 <td className="text-center">
-                                                    <Form.Check
-                                                        type="checkbox"
-                                                        checked={offer.active}
-                                                        onChange={() => handleToggleActive(offer.id, offer.active)}
-                                                    />
+                                                    {/* Updated Toggle Switch for Display/Do Not Display */}
+                                                    <div className="d-flex flex-column align-items-center">
+                                                        <Form.Check
+                                                            type="switch"
+                                                            id={`display-switch-${offer.id}`}
+                                                            checked={offer.active}
+                                                            onChange={() => handleToggleDisplay(offer.id, offer.active)}
+                                                            className="mb-1"
+                                                        />
+                                                        <small style={{ fontSize: '0.7rem', color: offer.active ? '#ffc107' : '#6c757d' }}>
+                                                            {offer.active ? "DISPLAYING" : "HIDDEN"}
+                                                        </small>
+                                                    </div>
                                                 </td>
                                                 <td className="text-center">{index + 1}</td>
                                                 <td className="text-warning fw-semibold text-center">{offer.offerText}</td>

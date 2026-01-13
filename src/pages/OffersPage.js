@@ -31,15 +31,16 @@ const OffersPage = () => {
     useEffect(() => {
         const fetchOffers = async () => {
             const today = new Date().toISOString().split('T')[0];
+            // This query ensures ONLY items marked for 'Display' appear
             const q = query(
                 collection(db, "offers"),
                 where("active", "==", true)
             );
             const querySnapshot = await getDocs(q);
-            const allActive = querySnapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
+            const allToDisplay = querySnapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
 
-            // Sort: Valid offers first, then expired ones
-            const sortedOffers = allActive.sort((a, b) => {
+            // Sort: Valid offers first, then expired ones (both still within the 'Display' group)
+            const sortedOffers = allToDisplay.sort((a, b) => {
                 const aExpired = a.validUntil < today;
                 const bExpired = b.validUntil < today;
                 return aExpired - bExpired;
