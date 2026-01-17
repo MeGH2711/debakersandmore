@@ -13,3 +13,22 @@
     transform: translateY(-1px) !important;
     box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2) !important;
 }
+
+/* Preview Modal Wrapper */
+.voucher-modal-wrapper {
+    /* The actual voucher is 450px wide. We scale it down slightly to fit modals well */
+    transform: scale(0.85);
+    transform-origin: center top;
+    height: 560px;
+    /* Adjusted height to account for scaling */
+    display: flex;
+    justify-content: center;
+}
+
+/* On very small screens, scale it down further */
+@media (max-width: 576px) {
+    .voucher-modal-wrapper {
+        transform: scale(0.65);
+        height: 430px;
+    }
+}

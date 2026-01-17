@@ -1,4 +1,3 @@
-import VoucherTemplate from "./Vouchers/RepublicDayVoucher";
 import React, { useEffect, useState } from "react";
 import {
     collection,
@@ -24,6 +23,7 @@ import AppNavbar from "./Navbar";
 import { getAuth, onAuthStateChanged } from "firebase/auth";
 import { useNavigate } from "react-router-dom";
 import * as XLSX from "xlsx";
+import VoucherTemplate from "./Vouchers/RepublicDayVoucher"; // Imported the Template
 import "bootstrap/dist/css/bootstrap.min.css";
 import "./AdminOffers.css";
 
@@ -41,6 +41,10 @@ const AdminOffers = () => {
     const [newOfferDescription, setNewOfferDescription] = useState("");
     const [validUntil, setValidUntil] = useState("");
 
+    // States for Voucher Preview
+    const [showPreviewModal, setShowPreviewModal] = useState(false);
+    const [previewOffer, setPreviewOffer] = useState(null);
+
     const [redemptions, setRedemptions] = useState([]);
     const [showRedemptionModal, setShowRedemptionModal] = useState(false);
     const [loadingRedemptions, setLoadingRedemptions] = useState(false);
@@ -56,6 +60,12 @@ const AdminOffers = () => {
         const months = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"];
         const [year, month, day] = dateString.split("-");
         return `${parseInt(day)} ${months[parseInt(month) - 1]} ${year}`;
+    };
+
+    const getTodayFormatted = () => {
+        return new Date().toLocaleDateString('en-GB', {
+            day: 'numeric', month: 'short', year: 'numeric'
+        });
     };
 
     useEffect(() => {
@@ -98,6 +108,11 @@ const AdminOffers = () => {
     };
 
     useEffect(() => { fetchData(); }, []);
+
+    const handleShowPreview = (offer) => {
+        setPreviewOffer(offer);
+        setShowPreviewModal(true);
+    };
 
     const handleShowAdd = () => {
         setIsEditing(false);
@@ -148,7 +163,6 @@ const AdminOffers = () => {
         }
     };
 
-    // Updated Excel export to include Security Code
     const exportToExcel = () => {
         if (filteredCustomers.length === 0) return;
         const excelData = filteredCustomers.map((r, index) => ({
@@ -249,7 +263,6 @@ const AdminOffers = () => {
         o.offerText.toLowerCase().includes(searchQuery.toLowerCase())
     );
 
-    // Updated filtering to also allow searching by Security Code
     const filteredCustomers = redemptions.filter((r) => {
         const matchesSearch =
             r.customerName.toLowerCase().includes(customerSearchQuery.toLowerCase()) ||
@@ -329,6 +342,7 @@ const AdminOffers = () => {
                                                 <td className="text-center">{formatDate(offer.validUntil)}</td>
                                                 <td className="text-center">
                                                     <div className="d-flex justify-content-center gap-2">
+                                                        <Button variant="outline-info" size="sm" onClick={() => handleShowPreview(offer)}>Preview</Button>
                                                         <Button variant="outline-warning" size="sm" onClick={() => handleShowEdit(offer)}>Edit</Button>
                                                         <Button variant="info" size="sm" onClick={() => fetchRedemptions(offer)}>View Customers</Button>
                                                         <Button variant="danger" size="sm" onClick={() => handleDelete(offer.id)}>Delete</Button>
@@ -343,6 +357,29 @@ const AdminOffers = () => {
                     </div>
                 </div>
             </div>
+
+            {/* MODAL: Voucher Preview */}
+            <Modal show={showPreviewModal} onHide={() => setShowPreviewModal(false)} centered size="md" contentClassName="bg-dark">
+                <Modal.Header closeButton closeVariant="white">
+                    <Modal.Title className="text-warning">Design Preview</Modal.Title>
+                </Modal.Header>
+                <Modal.Body className="d-flex justify-content-center bg-secondary py-4" style={{ overflow: "hidden" }}>
+                    <div className="voucher-modal-wrapper">
+                        {previewOffer && (
+                            <VoucherTemplate 
+                                selectedOffer={previewOffer} 
+                                customerData={{ name: "John Doe", phone: "+91 9876543210", securityCode: "SAMPLE" }} 
+                                formatDate={formatDate} 
+                                getTodayFormatted={getTodayFormatted}
+                                isPreview={true} 
+                            />
+                        )}
+                    </div>
+                </Modal.Body>
+                <Modal.Footer className="border-0">
+                    <Button variant="warning" onClick={() => setShowPreviewModal(false)}>Close Preview</Button>
+                </Modal.Footer>
+            </Modal>
 
             {/* MODAL: Add/Edit Offer */}
             <Modal show={showOfferModal} onHide={() => setShowOfferModal(false)} centered contentClassName="bg-dark text-light">
@@ -388,7 +425,7 @@ const AdminOffers = () => {
                 </Modal.Footer>
             </Modal>
 
-            {/* MODAL: View Redemptions - Security Code added here */}
+            {/* MODAL: View Redemptions */}
             <Modal show={showRedemptionModal} onHide={() => setShowRedemptionModal(false)} size="xl" centered contentClassName="bg-dark text-light">
                 <Modal.Header closeButton closeVariant="white">
                     <Modal.Title>Customer Details: {viewingOffer?.offerText}</Modal.Title>
@@ -429,7 +466,7 @@ const AdminOffers = () => {
                             <thead className="text-warning">
                                 <tr>
                                     <th className="text-center">Claimed</th>
-                                    <th className="text-center">Code</th> {/* New column header */}
+                                    <th className="text-center">Code</th>
                                     <th>Customer Name</th>
                                     <th>Phone</th>
                                     <th>Address</th>
@@ -448,7 +485,6 @@ const AdminOffers = () => {
                                                 onChange={() => handleToggleClaimed(r.id, r.claimed, r.offerText)}
                                             />
                                         </td>
-                                        {/* Security Code Cell */}
                                         <td className="text-center">
                                             <span className="badge bg-warning text-dark font-monospace" style={{ fontSize: '0.9rem' }}>
                                                 {r.securityCode || "N/A"}
