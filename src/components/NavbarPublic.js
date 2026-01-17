@@ -4,9 +4,6 @@ import { NavLink } from "react-router-dom";
 import "./NavbarPublic.css";
 import logo from "../assets/images/logo.png";
 
-import { collection, getDocs } from "firebase/firestore";
-import { db } from "../firebase";
-
 function NavbarPublic() {
   const [showNavbar, setShowNavbar] = useState(true);
   const [lastScrollY, setLastScrollY] = useState(0);
