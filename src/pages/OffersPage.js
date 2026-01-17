@@ -1,7 +1,7 @@
 import React, { useEffect, useState, useRef } from "react";
 import { collection, getDocs, query, where, addDoc, serverTimestamp } from "firebase/firestore";
 import { db } from "../firebase";
-import { Container, Row, Col, Card, Button, Modal, Form } from "react-bootstrap";
+import { Container, Row, Col, Button, Modal, Form } from "react-bootstrap";
 import html2canvas from "html2canvas";
 import PublicFooter from "../components/PublicFooter";
 import BakeryLogo from "../assets/images/logo.png";
