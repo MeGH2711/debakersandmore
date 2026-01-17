@@ -4,6 +4,7 @@ import { db } from "../firebase";
 import { Container, Row, Col, Button, Modal, Form } from "react-bootstrap";
 import html2canvas from "html2canvas";
 import PublicFooter from "../components/PublicFooter";
+import VoucherTemplate from "../components/Vouchers/RepublicDayVoucher";
 import BakeryLogo from "../assets/images/logo.png";
 import "./OffersPage.css";
 import toast, { Toaster } from "react-hot-toast";
@@ -12,8 +13,18 @@ const OffersPage = () => {
     const [offers, setOffers] = useState([]);
     const [showModal, setShowModal] = useState(false);
     const [selectedOffer, setSelectedOffer] = useState(null);
-    const [customerData, setCustomerData] = useState({ name: "", phone: "", address: "" });
+    const [customerData, setCustomerData] = useState({ name: "", phone: "", address: "", securityCode: "" });
     const voucherRef = useRef(null);
+
+    // Helper to generate a unique 6-digit alphanumeric code
+    const generateSecurityCode = () => {
+        const chars = "ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789";
+        let result = "";
+        for (let i = 0; i < 6; i++) {
+            result += chars.charAt(Math.floor(Math.random() * chars.length));
+        }
+        return result;
+    };
 
     const formatDate = (dateString) => {
         if (!dateString) return "";
@@ -73,17 +84,26 @@ const OffersPage = () => {
                 return;
             }
 
+            // 1. Generate the unique code
+            const newSecurityCode = generateSecurityCode();
+
+            // 2. Save to Firestore with the security code
             await addDoc(collection(db, "redeemed_offers"), {
                 offerId: selectedOffer.id,
                 customerName: customerData.name,
                 customerPhone: customerData.phone,
                 customerAddress: customerData.address,
                 offerText: selectedOffer.offerText,
+                securityCode: newSecurityCode, // Stored in DB
                 redeemedAt: serverTimestamp(),
             });
 
+            // 3. Update local state so the voucher template can see the code
+            setCustomerData(prev => ({ ...prev, securityCode: newSecurityCode }));
+
             toast.success("Voucher generated! Starting download...", { id: loadingToast });
 
+            // Small delay to ensure state update is reflected in the DOM before capture
             setTimeout(async () => {
                 const element = voucherRef.current;
                 if (!element) return;
@@ -102,8 +122,8 @@ const OffersPage = () => {
                 link.click();
 
                 setShowModal(false);
-                setCustomerData({ name: "", phone: "", address: "" });
-            }, 500);
+                setCustomerData({ name: "", phone: "", address: "", securityCode: "" });
+            }, 600);
 
         } catch (error) {
             console.error("Redemption error:", error);
@@ -117,50 +137,14 @@ const OffersPage = () => {
         <>
             <Toaster position="top-center" reverseOrder={false} />
             <div className="product-page">
-                <div style={{ position: "absolute", left: "-9999px" }}>
-                    <div ref={voucherRef} className="designer-voucher">
-                        <div className="voucher-sidebar">
-                            <span className="sidebar-text">EXCLUSIVE DEALS</span>
-                        </div>
 
-                        <div className="voucher-main">
-                            <div className="voucher-header">
-                                <img src={BakeryLogo} alt="Logo" className="voucher-logo" />
-                                <span className="voucher-tagline">De Baker’s & More</span>
-                            </div>
-
-                            <div className="voucher-body">
-                                <h4 className="voucher-offer-text">{selectedOffer?.offerText}</h4>
-
-                                <div className="voucher-details-grid">
-                                    <div className="voucher-info-box">
-                                        <strong>Issued To</strong>
-                                        <span className="customer-name">{customerData.name} <br /></span>
-                                        <span className="customer-number" style={{ fontSize: '0.8rem', opacity: 0.8 }}>{customerData.phone}</span>
-                                    </div>
-                                    <div className="voucher-info-box text-end">
-                                        <strong>Valid Until</strong>
-                                        <span style={{ color: '#f7b731', fontWeight: 'bold' }}>
-                                            {formatDate(selectedOffer?.validUntil)}
-                                        </span>
-                                    </div>
-                                </div>
-                            </div>
-
-                            <div className="voucher-footer d-flex justify-content-between align-items-end">
-                                <div style={{ fontSize: '0.7rem', color: '#666' }}>
-                                    * Present this image at the counter to redeem. <br />
-                                    Generated on: {getTodayFormatted()}
-                                </div>
-                                <div style={{ fontWeight: 'bold', letterSpacing: '2px', color: '#f7b731' }}>
-                                    FRESHLY BAKED
-                                </div>
-                            </div>
-                        </div>
-
-                        <div className="voucher-notch"></div>
-                    </div>
-                </div>
+                <VoucherTemplate
+                    ref={voucherRef}
+                    selectedOffer={selectedOffer}
+                    customerData={customerData}
+                    formatDate={formatDate}
+                    getTodayFormatted={getTodayFormatted}
+                />
 
                 <Container>
                     <h2 className="heading">Exclusive Offers</h2>
@@ -172,15 +156,12 @@ const OffersPage = () => {
                             return (
                                 <Col md={12} key={offer.id} className="mb-4">
                                     <div className={`full-width-offer-card ${isExpired ? "expired" : ""}`}>
-                                        {/* Left Section: Visual/Icon */}
                                         <div className="offer-visual">
                                             <div className="promo-badge">PROMO</div>
                                             <img src={BakeryLogo} alt="Bakery" className="offer-mini-logo" />
                                         </div>
 
-                                        {/* Middle Section: Content */}
                                         <div className="offer-content">
-                                            {/* Inside .offer-content */}
                                             <div className="d-flex justify-content-between align-items-start">
                                                 <div>
                                                     <h3 className="offer-main-text">{offer.offerText}</h3>
@@ -197,7 +178,6 @@ const OffersPage = () => {
                                             </div>
                                         </div>
 
-                                        {/* Right Section: Action */}
                                         <div className="offer-action">
                                             <div className="dash-divider"></div>
                                             <Button
@@ -232,14 +212,10 @@ const OffersPage = () => {
                                             <span className={`mobile-product-name ${isExpired ? "text-decoration-line-through" : ""}`}>
                                                 {offer.offerText}
                                             </span>
-
-                                            {/* Correctly defined isLastDay now works here */}
                                             {isLastDay && <small className="last-day-text">Ends Tonight!</small>}
-
                                             <small className="text-light opacity-50 d-block mt-1" style={{ fontSize: '0.75rem' }}>
                                                 {offer.description}
                                             </small>
-
                                             <small className={`${isExpired ? "text-danger" : "text-warning"} mt-1`}>
                                                 {isExpired ? "Expired: " : "Valid: "} {formatDate(offer.validUntil)}
                                             </small>

@@ -1,0 +1,142 @@
+/* Container Reset and Base */
+.premium-voucher {
+    width: 700px;
+    /* Widened for better balance */
+    height: 350px;
+    background: #0a0a0a;
+    display: flex;
+    position: relative;
+    font-family: 'Inter', 'Montserrat', sans-serif;
+    color: #ffffff;
+    overflow: hidden;
+    border: 1px solid #222;
+}
+
+/* Vertical Gold Accent Strip */
+.accent-bar {
+    width: 8px;
+    height: 100%;
+    background: linear-gradient(to bottom, #bf953f, #fcf6ba, #b38728, #fbf5b7, #aa771c);
+}
+
+.voucher-content {
+    flex: 1;
+    padding: 35px;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    z-index: 2;
+}
+
+/* Header Styling */
+.header-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+}
+
+.brand-info {
+    display: flex;
+    align-items: center;
+    gap: 15px;
+}
+
+.brand-logo {
+    height: 50px;
+    filter: drop-shadow(0 0 5px rgba(212, 175, 55, 0.3));
+}
+
+.brand-name {
+    display: block;
+    font-weight: 800;
+    letter-spacing: 2px;
+    font-size: 1.1rem;
+    color: #d4af37;
+}
+
+.brand-subtext {
+    font-size: 0.65rem;
+    color: #777;
+    text-transform: uppercase;
+}
+
+/* Hero Offer Section */
+.hero-section {
+    margin: 20px 0;
+}
+
+.exclusive-tag {
+    font-size: 0.7rem;
+    font-weight: 700;
+    letter-spacing: 3px;
+    color: #d4af37;
+    border: 1px solid #d4af37;
+    padding: 4px 10px;
+    border-radius: 50px;
+}
+
+.main-offer-title {
+    font-size: 2.8rem;
+    font-weight: 900;
+    margin-top: 15px;
+    letter-spacing: -1px;
+}
+
+/* Footer & Customer Info */
+.footer-details {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-end;
+    border-top: 1px solid #222;
+    padding-top: 20px;
+}
+
+.label {
+    display: block;
+    font-size: 0.6rem;
+    font-weight: 600;
+    color: #555;
+    margin-bottom: 5px;
+}
+
+.client-name {
+    font-size: 1.1rem;
+    font-weight: 700;
+    display: block;
+}
+
+.client-phone {
+    font-size: 0.8rem;
+    color: #888;
+}
+
+.date-badge {
+    text-align: right;
+    background: rgba(212, 175, 55, 0.1);
+    padding: 10px 15px;
+    border-radius: 8px;
+    border: 1px solid rgba(212, 175, 55, 0.2);
+}
+
+.date-badge .value {
+    color: #d4af37;
+    font-weight: 700;
+}
+
+.verification-zone {
+    text-align: right;
+    font-family: monospace;
+    font-size: 0.65rem;
+    color: #444;
+}
+
+/* Background Decoration */
+.background-glow {
+    position: absolute;
+    bottom: -50px;
+    right: -50px;
+    width: 250px;
+    height: 250px;
+    background: radial-gradient(circle, rgba(212, 175, 55, 0.08) 0%, transparent 70%);
+    z-index: 1;
+}

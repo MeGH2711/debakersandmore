@@ -32,7 +32,7 @@ const AdminOffers = () => {
     const [searchQuery, setSearchQuery] = useState("");
     const [stats, setStats] = useState({});
 
-    // States for the Offer Modal (Handles both Add and Edit)
+    // States for the Offer Modal
     const [showOfferModal, setShowOfferModal] = useState(false);
     const [isEditing, setIsEditing] = useState(false);
     const [currentOfferId, setCurrentOfferId] = useState(null);
@@ -98,7 +98,6 @@ const AdminOffers = () => {
 
     useEffect(() => { fetchData(); }, []);
 
-    // Open Modal for New Offer
     const handleShowAdd = () => {
         setIsEditing(false);
         setCurrentOfferId(null);
@@ -108,7 +107,6 @@ const AdminOffers = () => {
         setShowOfferModal(true);
     };
 
-    // Open Modal for Editing existing offer
     const handleShowEdit = (offer) => {
         setIsEditing(true);
         setCurrentOfferId(offer.id);
@@ -120,7 +118,7 @@ const AdminOffers = () => {
 
     const handleSaveOffer = async () => {
         if (!newOfferTitle.trim() || !newOfferDescription.trim() || !validUntil) {
-            return alert("Please fill in all fields (Title, Description, and Validity Date)!");
+            return alert("Please fill in all fields!");
         }
 
         const offerData = {
@@ -135,10 +133,10 @@ const AdminOffers = () => {
                 await updateDoc(docRef, offerData);
                 setOffers((prev) => prev.map((o) => (o.id === currentOfferId ? { ...o, ...offerData } : o)));
             } else {
-                const fullNewOffer = { 
-                    ...offerData, 
-                    active: true, 
-                    createdAt: Date.now() 
+                const fullNewOffer = {
+                    ...offerData,
+                    active: true,
+                    createdAt: Date.now()
                 };
                 const docRef = await addDoc(collection(db, "offers"), fullNewOffer);
                 setOffers((prev) => [...prev, { id: docRef.id, ...fullNewOffer }]);
@@ -146,14 +144,15 @@ const AdminOffers = () => {
             setShowOfferModal(false);
         } catch (error) {
             console.error("Error saving offer:", error);
-            alert("Failed to save offer.");
         }
     };
 
+    // Updated Excel export to include Security Code
     const exportToExcel = () => {
         if (filteredCustomers.length === 0) return;
         const excelData = filteredCustomers.map((r, index) => ({
             "Sr. No.": index + 1,
+            "Security Code": r.securityCode || "N/A",
             "Offer": viewingOffer?.offerText,
             "Customer Name": r.customerName,
             "Phone Number": r.customerPhone,
@@ -249,9 +248,13 @@ const AdminOffers = () => {
         o.offerText.toLowerCase().includes(searchQuery.toLowerCase())
     );
 
+    // Updated filtering to also allow searching by Security Code
     const filteredCustomers = redemptions.filter((r) => {
-        const matchesSearch = r.customerName.toLowerCase().includes(customerSearchQuery.toLowerCase()) ||
-            r.customerPhone.includes(customerSearchQuery);
+        const matchesSearch =
+            r.customerName.toLowerCase().includes(customerSearchQuery.toLowerCase()) ||
+            r.customerPhone.includes(customerSearchQuery) ||
+            (r.securityCode && r.securityCode.toLowerCase().includes(customerSearchQuery.toLowerCase()));
+
         if (claimFilter === "claimed") return matchesSearch && r.claimed === true;
         if (claimFilter === "pending") return matchesSearch && !r.claimed;
         return matchesSearch;
@@ -325,15 +328,9 @@ const AdminOffers = () => {
                                                 <td className="text-center">{formatDate(offer.validUntil)}</td>
                                                 <td className="text-center">
                                                     <div className="d-flex justify-content-center gap-2">
-                                                        <Button variant="outline-warning" size="sm" onClick={() => handleShowEdit(offer)}>
-                                                            Edit
-                                                        </Button>
-                                                        <Button variant="info" size="sm" onClick={() => fetchRedemptions(offer)}>
-                                                            View Customers
-                                                        </Button>
-                                                        <Button variant="danger" size="sm" onClick={() => handleDelete(offer.id)}>
-                                                            Delete
-                                                        </Button>
+                                                        <Button variant="outline-warning" size="sm" onClick={() => handleShowEdit(offer)}>Edit</Button>
+                                                        <Button variant="info" size="sm" onClick={() => fetchRedemptions(offer)}>View Customers</Button>
+                                                        <Button variant="danger" size="sm" onClick={() => handleDelete(offer.id)}>Delete</Button>
                                                     </div>
                                                 </td>
                                             </tr>
@@ -346,12 +343,10 @@ const AdminOffers = () => {
                 </div>
             </div>
 
-            {/* MODAL: Add or Edit Offer */}
+            {/* MODAL: Add/Edit Offer */}
             <Modal show={showOfferModal} onHide={() => setShowOfferModal(false)} centered contentClassName="bg-dark text-light">
                 <Modal.Header closeButton closeVariant="white">
-                    <Modal.Title className="text-warning">
-                        {isEditing ? "Edit Offer" : "Create New Offer"}
-                    </Modal.Title>
+                    <Modal.Title className="text-warning">{isEditing ? "Edit Offer" : "Create New Offer"}</Modal.Title>
                 </Modal.Header>
                 <Modal.Body>
                     <Form>
@@ -362,7 +357,7 @@ const AdminOffers = () => {
                                 placeholder="e.g. 20% Off on Haircut"
                                 value={newOfferTitle}
                                 onChange={(e) => setNewOfferTitle(e.target.value)}
-                                className="bg-dark text-light border-secondary focus-warning"
+                                className="bg-dark text-light border-secondary"
                             />
                         </Form.Group>
                         <Form.Group className="mb-3">
@@ -370,10 +365,9 @@ const AdminOffers = () => {
                             <Form.Control
                                 as="textarea"
                                 rows={3}
-                                placeholder="Enter detailed terms, conditions, or offer scope..."
                                 value={newOfferDescription}
                                 onChange={(e) => setNewOfferDescription(e.target.value)}
-                                className="bg-dark text-light border-secondary focus-warning"
+                                className="bg-dark text-light border-secondary"
                             />
                         </Form.Group>
                         <Form.Group className="mb-3">
@@ -388,16 +382,12 @@ const AdminOffers = () => {
                     </Form>
                 </Modal.Body>
                 <Modal.Footer className="border-0">
-                    <Button variant="outline-light" onClick={() => setShowOfferModal(false)}>
-                        Cancel
-                    </Button>
-                    <Button variant="warning" className="px-4 fw-bold" onClick={handleSaveOffer}>
-                        {isEditing ? "Update Offer" : "Save Offer"}
-                    </Button>
+                    <Button variant="outline-light" onClick={() => setShowOfferModal(false)}>Cancel</Button>
+                    <Button variant="warning" onClick={handleSaveOffer}>{isEditing ? "Update Offer" : "Save Offer"}</Button>
                 </Modal.Footer>
             </Modal>
 
-            {/* MODAL: View Redemptions (Customers) */}
+            {/* MODAL: View Redemptions - Security Code added here */}
             <Modal show={showRedemptionModal} onHide={() => setShowRedemptionModal(false)} size="xl" centered contentClassName="bg-dark text-light">
                 <Modal.Header closeButton closeVariant="white">
                     <Modal.Title>Customer Details: {viewingOffer?.offerText}</Modal.Title>
@@ -407,7 +397,7 @@ const AdminOffers = () => {
                         <Col md={5}>
                             <Form.Control
                                 type="text"
-                                placeholder="Search by name or phone..."
+                                placeholder="Search by name, phone, or code..."
                                 value={customerSearchQuery}
                                 onChange={(e) => setCustomerSearchQuery(e.target.value)}
                                 className="bg-dark text-light border-warning offerSearchBar"
@@ -425,12 +415,7 @@ const AdminOffers = () => {
                             </Form.Select>
                         </Col>
                         <Col md={4}>
-                            <Button
-                                variant="success"
-                                className="w-100 fw-bold"
-                                onClick={exportToExcel}
-                                disabled={filteredCustomers.length === 0}
-                            >
+                            <Button variant="success" className="w-100 fw-bold" onClick={exportToExcel} disabled={filteredCustomers.length === 0}>
                                 Download Excel ({filteredCustomers.length})
                             </Button>
                         </Col>
@@ -443,6 +428,7 @@ const AdminOffers = () => {
                             <thead className="text-warning">
                                 <tr>
                                     <th className="text-center">Claimed</th>
+                                    <th className="text-center">Code</th> {/* New column header */}
                                     <th>Customer Name</th>
                                     <th>Phone</th>
                                     <th>Address</th>
@@ -461,18 +447,18 @@ const AdminOffers = () => {
                                                 onChange={() => handleToggleClaimed(r.id, r.claimed, r.offerText)}
                                             />
                                         </td>
+                                        {/* Security Code Cell */}
+                                        <td className="text-center">
+                                            <span className="badge bg-warning text-dark font-monospace" style={{ fontSize: '0.9rem' }}>
+                                                {r.securityCode || "N/A"}
+                                            </span>
+                                        </td>
                                         <td>{r.customerName}</td>
                                         <td>{r.customerPhone}</td>
                                         <td style={{ fontSize: '0.85rem' }}>{r.customerAddress}</td>
                                         <td>{r.redeemedAt?.toDate().toLocaleDateString('en-GB', { day: 'numeric', month: 'short', year: 'numeric' }) || "N/A"}</td>
                                         <td className="text-center">
-                                            <Button
-                                                variant="outline-danger"
-                                                size="sm"
-                                                onClick={() => handleDeleteRedemption(r.id, r.claimed, r.offerText)}
-                                            >
-                                                Delete Record
-                                            </Button>
+                                            <Button variant="outline-danger" size="sm" onClick={() => handleDeleteRedemption(r.id, r.claimed, r.offerText)}>Delete Record</Button>
                                         </td>
                                     </tr>
                                 ))}
