@@ -19,8 +19,8 @@ const VoucherTemplate = forwardRef(({ selectedOffer, customerData, formatDate, g
             <div ref={ref} className="premium-republic-voucher">
                 {/* Saffron Top Section */}
                 <div className="section saffron-bg">
-                    <div className="header-content">
-                        <img src={BakeryLogo} alt="Logo" className="brand-logo" />
+                    <div className="header-content d-flex justify-content-center">
+                        <img src={BakeryLogo} alt="Logo" className="brandlogoVoucher" />
                         <div className="brand-info">
                             <h2 className="brand-name">DE BAKER’S & MORE</h2>
                             <span className="brand-subtext">Premium Quality Since 2024</span>

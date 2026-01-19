@@ -1,174 +1,174 @@
 /* Core Container */
 .premium-republic-voucher {
-    width: 450px;
-    height: 650px;
-    background: #fff;
-    display: flex;
-    flex-direction: column;
-    font-family: 'Inter', 'Montserrat', sans-serif;
-    box-shadow: 0 20px 40px rgba(0, 0, 0, 0.2);
-    border: 1px solid #eee;
-    overflow: hidden;
+    width: 450px !important;
+    height: 650px !important;
+    background: #fff !important;
+    display: flex !important;
+    flex-direction: column !important;
+    font-family: 'Inter', 'Montserrat', sans-serif !important;
+    box-shadow: 0 20px 40px rgba(0, 0, 0, 0.2) !important;
+    border: 1px solid #eee !important;
+    overflow: hidden !important;
 }
 
 .section {
-    padding: 25px 35px;
-    position: relative;
-    display: flex;
-    flex-direction: column;
-    justify-content: center;
+    padding: 25px 35px !important;
+    position: relative !important;
+    display: flex !important;
+    flex-direction: column !important;
+    justify-content: center !important;
 }
 
 /* 1. Saffron Header (Top) */
 .saffron-bg {
-    flex: 0 0 15%;
-    background-color: #FF9933;
-    color: #fff;
-    border-bottom: 4px solid #e67e22;
+    flex: 0 0 15% !important;
+    background-color: #FF9933 !important;
+    color: #fff !important;
+    border-bottom: 4px solid #e67e22 !important;
 }
 
 .header-content {
-    display: flex;
-    align-items: center;
-    gap: 15px;
+    display: flex !important;
+    align-items: center !important;
+    gap: 20px !important;
 }
 
-.brand-logo {
-    height: 55px;
-    padding: 5px;
-    border-radius: 8px;
+.brandlogoVoucher {
+    height: 70px !important;
+    padding: 5px !important;
+    border-radius: 8px !important;
 }
 
 .brand-name {
-    margin: 0;
-    font-size: 1.1rem;
-    font-weight: 800;
-    letter-spacing: 1px;
-    color: #fff;
+    margin: 0 !important;
+    font-size: 1.1rem !important;
+    font-weight: 800 !important;
+    letter-spacing: 1px !important;
+    color: #fff !important;
 }
 
 .brand-subtext {
-    font-size: 0.6rem;
-    text-transform: uppercase;
-    letter-spacing: 1px;
-    opacity: 0.9;
+    font-size: 0.6rem !important;
+    text-transform: uppercase !important;
+    letter-spacing: 1px !important;
+    opacity: 0.9 !important;
 }
 
 /* 2. White Content (Middle) */
 .white-bg {
-    flex: 1;
-    background: #ffffff;
-    text-align: center;
+    flex: 1 !important;
+    background: #ffffff !important;
+    text-align: center !important;
 }
 
 /* Subtle Chakra Background */
 .chakra-watermark {
-    position: absolute;
-    top: 50%;
-    left: 50%;
-    transform: translate(-50%, -50%);
-    width: 750px;
-    height: 750px;
-    background-image: url('https://upload.wikimedia.org/wikipedia/commons/1/17/Ashoka_Chakra.svg');
-    background-repeat: no-repeat;
-    background-position: center;
-    opacity: 0.04;
-    z-index: 1;
+    position: absolute !important;
+    top: 50% !important;
+    left: 50% !important;
+    transform: translate(-50%, -50%) !important;
+    width: 750px !important;
+    height: 750px !important;
+    background-image: url('https://upload.wikimedia.org/wikipedia/commons/1/17/Ashoka_Chakra.svg') !important;
+    background-repeat: no-repeat !important;
+    background-position: center !important;
+    opacity: 0.04 !important;
+    z-index: 1 !important;
 }
 
 .offer-content {
-    position: relative;
-    z-index: 2;
+    position: relative !important;
+    z-index: 2 !important;
 }
 
 .offer-pill {
-    display: inline-block;
-    border: 2px solid #000080;
-    color: #000080;
-    padding: 5px 15px;
-    border-radius: 50px;
-    font-size: 0.75rem;
-    font-weight: 800;
-    margin-bottom: 20px;
+    display: inline-block !important;
+    border: 2px solid #000080 !important;
+    color: #000080 !important;
+    padding: 5px 15px !important;
+    border-radius: 50px !important;
+    font-size: 0.75rem !important;
+    font-weight: 800 !important;
+    margin-bottom: 20px !important;
 }
 
 .offer-title {
-    font-size: 2.25rem;
-    font-weight: 900;
-    color: #1a1a1a;
-    margin: 0;
-    line-height: 1.1;
-    letter-spacing: -1px;
+    font-size: 2.25rem !important;
+    font-weight: 900 !important;
+    color: #1a1a1a !important;
+    margin: 0 !important;
+    line-height: 1.1 !important;
+    letter-spacing: -1px !important;
 }
 
 .divider {
-    width: 60px;
-    height: 4px;
-    background: #FF9933;
-    margin: 20px auto;
+    width: 60px !important;
+    height: 4px !important;
+    background: #FF9933 !important;
+    margin: 20px auto !important;
 }
 
 .expiry-badge .label {
-    display: block;
-    font-size: 0.65rem;
-    color: #888;
-    font-weight: 700;
+    display: block !important;
+    font-size: 0.65rem !important;
+    color: #888 !important;
+    font-weight: 700 !important;
 }
 
 .expiry-date {
-    font-size: 1.2rem;
-    font-weight: 800;
-    color: #000080;
+    font-size: 1.2rem !important;
+    font-weight: 800 !important;
+    color: #000080 !important;
 }
 
 /* 3. Green Footer (Bottom) */
 .green-bg {
-    flex: 0 0 20%;
-    background-color: #138808;
-    color: #fff;
-    border-top: 4px solid #0e6b06;
+    flex: 0 0 20% !important;
+    background-color: #138808 !important;
+    color: #fff !important;
+    border-top: 4px solid #0e6b06 !important;
 }
 
 .footer-flex {
-    display: flex;
-    justify-content: space-between;
-    align-items: flex-end;
+    display: flex !important;
+    justify-content: space-between !important;
+    align-items: flex-end !important;
 }
 
 .label-light {
-    display: block;
-    font-size: 0.6rem;
-    font-weight: 600;
-    color: rgba(255, 255, 255, 0.7);
-    margin-bottom: 5px;
+    display: block !important;
+    font-size: 0.6rem !important;
+    font-weight: 600 !important;
+    color: rgba(255, 255, 255, 0.7) !important;
+    margin-bottom: 5px !important;
 }
 
 .customer-name {
-    display: block;
-    font-size: 1.2rem;
-    font-weight: 700;
+    display: block !important;
+    font-size: 1.2rem !important;
+    font-weight: 700 !important;
 }
 
 .customer-phone {
-    font-size: 0.85rem;
-    opacity: 0.8;
+    font-size: 0.85rem !important;
+    opacity: 0.8 !important;
 }
 
 .barcode-zone {
-    text-align: right;
+    text-align: right !important;
 }
 
 .security-code {
-    font-family: 'Courier New', monospace;
-    font-weight: 900;
-    font-size: 1.1rem;
-    background: rgba(255, 255, 255, 0.15);
-    padding: 5px 10px;
-    border-radius: 4px;
+    font-family: 'Courier New', monospace !important;
+    font-weight: 900 !important;
+    font-size: 1.1rem !important;
+    background: rgba(255, 255, 255, 0.15) !important;
+    padding: 5px 10px !important;
+    border-radius: 4px !important;
 }
 
 .issued-date {
-    font-size: 0.6rem;
-    margin-top: 5px;
-    opacity: 0.6;
+    font-size: 0.6rem !important;
+    margin-top: 5px !important;
+    opacity: 0.6 !important;
 }
