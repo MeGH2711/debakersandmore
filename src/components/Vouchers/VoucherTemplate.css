@@ -1,7 +1,6 @@
 /* Container Reset and Base */
-.premium-voucher {
+.voucher1-premium-voucher {
     width: 700px;
-    /* Widened for better balance */
     height: 350px;
     background: #0a0a0a;
     display: flex;
@@ -13,13 +12,13 @@
 }
 
 /* Vertical Gold Accent Strip */
-.accent-bar {
+.voucher1-accent-bar {
     width: 8px;
     height: 100%;
     background: linear-gradient(to bottom, #bf953f, #fcf6ba, #b38728, #fbf5b7, #aa771c);
 }
 
-.voucher-content {
+.voucher1-voucher-content {
     flex: 1;
     padding: 35px;
     display: flex;
@@ -29,24 +28,24 @@
 }
 
 /* Header Styling */
-.header-row {
+.voucher1-header-row {
     display: flex;
     justify-content: space-between;
     align-items: flex-start;
 }
 
-.brand-info {
+.voucher1-brand-info {
     display: flex;
     align-items: center;
     gap: 15px;
 }
 
-.brand-logo {
+.voucher1-brand-logo {
     height: 50px;
     filter: drop-shadow(0 0 5px rgba(212, 175, 55, 0.3));
 }
 
-.brand-name {
+.voucher1-brand-name {
     display: block;
     font-weight: 800;
     letter-spacing: 2px;
@@ -54,18 +53,18 @@
     color: #d4af37;
 }
 
-.brand-subtext {
+.voucher1-brand-subtext {
     font-size: 0.65rem;
     color: #777;
     text-transform: uppercase;
 }
 
 /* Hero Offer Section */
-.hero-section {
+.voucher1-hero-section {
     margin: 20px 0;
 }
 
-.exclusive-tag {
+.voucher1-exclusive-tag {
     font-size: 0.7rem;
     font-weight: 700;
     letter-spacing: 3px;
@@ -75,7 +74,7 @@
     border-radius: 50px;
 }
 
-.main-offer-title {
+.voucher1-main-offer-title {
     font-size: 2.8rem;
     font-weight: 900;
     margin-top: 15px;
@@ -83,7 +82,7 @@
 }
 
 /* Footer & Customer Info */
-.footer-details {
+.voucher1-footer-details {
     display: flex;
     justify-content: space-between;
     align-items: flex-end;
@@ -91,7 +90,7 @@
     padding-top: 20px;
 }
 
-.label {
+.voucher1-label {
     display: block;
     font-size: 0.6rem;
     font-weight: 600;
@@ -99,18 +98,18 @@
     margin-bottom: 5px;
 }
 
-.client-name {
+.voucher1-client-name {
     font-size: 1.1rem;
     font-weight: 700;
     display: block;
 }
 
-.client-phone {
+.voucher1-client-phone {
     font-size: 0.8rem;
     color: #888;
 }
 
-.date-badge {
+.voucher1-date-badge {
     text-align: right;
     background: rgba(212, 175, 55, 0.1);
     padding: 10px 15px;
@@ -118,12 +117,12 @@
     border: 1px solid rgba(212, 175, 55, 0.2);
 }
 
-.date-badge .value {
+.voucher1-date-badge .voucher1-value {
     color: #d4af37;
     font-weight: 700;
 }
 
-.verification-zone {
+.voucher1-verification-zone {
     text-align: right;
     font-family: monospace;
     font-size: 0.65rem;
@@ -131,7 +130,7 @@
 }
 
 /* Background Decoration */
-.background-glow {
+.voucher1-background-glow {
     position: absolute;
     bottom: -50px;
     right: -50px;

@@ -4,7 +4,7 @@ import { db } from "../firebase";
 import { Container, Row, Col, Button, Modal, Form } from "react-bootstrap";
 import html2canvas from "html2canvas";
 import PublicFooter from "../components/PublicFooter";
-import VoucherTemplate from "../components/Vouchers/RepublicDayVoucher";
+import VoucherTemplate from "../components/Vouchers/VoucherTemplate";
 import BakeryLogo from "../assets/images/logo.png";
 import "./OffersPage.css";
 import toast, { Toaster } from "react-hot-toast";

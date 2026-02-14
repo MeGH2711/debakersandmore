@@ -2,7 +2,7 @@ import React, { forwardRef } from "react";
 import "./VoucherTemplate.css";
 import BakeryLogo from "../../assets/images/logo.png";
 
-const VoucherTemplate = forwardRef(({ selectedOffer, customerData, formatDate, getTodayFormatted }, ref) => {
+const VoucherTemplate = forwardRef(({ selectedOffer, customerData, formatDate, getTodayFormatted, isPreview }, ref) => {
 
     // Extract the last 6 characters of offerId or default to 'XXXXXX'
     const offerCode = selectedOffer?.id
@@ -10,52 +10,51 @@ const VoucherTemplate = forwardRef(({ selectedOffer, customerData, formatDate, g
         : "XXXXXX";
 
     return (
-        <div style={{ position: "absolute", left: "-9999px" }}>
-            <div ref={ref} className="premium-voucher">
+        <div style={isPreview ? { position: "relative" } : { position: "absolute", left: "-9999px" }}>
+            <div ref={ref} className="voucher1-premium-voucher">
                 {/* Left Branding Strip */}
-                <div className="accent-bar"></div>
+                <div className="voucher1-accent-bar"></div>
 
-                <div className="voucher-content">
+                <div className="voucher1-voucher-content">
                     {/* Top Section: Header */}
-                    <div className="header-row">
-                        <div className="brand-info">
-                            <img src={BakeryLogo} alt="Logo" className="brand-logo" />
-                            <div className="brand-text">
-                                <span className="brand-name">DE BAKER’S & MORE</span>
-                                <span className="brand-subtext">Premium Quality Since 2024</span>
+                    <div className="voucher1-header-row">
+                        <div className="voucher1-brand-info">
+                            <img src={BakeryLogo} alt="Logo" className="voucher1-brand-logo" />
+                            <div className="voucher1-brand-text">
+                                <span className="voucher1-brand-name">DE BAKER’S & MORE</span>
+                                <span className="voucher1-brand-subtext">Premium Quality Since 2024</span>
                             </div>
                         </div>
-                        <div className="date-badge">
-                            <span className="label">EXPIRES</span>
-                            <span className="value">{formatDate(selectedOffer?.validUntil)}</span>
+                        <div className="voucher1-date-badge">
+                            <span className="voucher1-label">EXPIRES</span>
+                            <span className="voucher1-value">{formatDate(selectedOffer?.validUntil)}</span>
                         </div>
                     </div>
 
                     {/* Middle Section: Hero Offer */}
-                    <div className="hero-section">
-                        <div className="offer-container">
-                            <span className="exclusive-tag">LIMITED TIME OFFER</span>
-                            <h1 className="main-offer-title">{selectedOffer?.offerText}</h1>
+                    <div className="voucher1-hero-section">
+                        <div className="voucher1-offer-container">
+                            <span className="voucher1-exclusive-tag">LIMITED TIME OFFER</span>
+                            <h1 className="voucher1-main-offer-title">{selectedOffer?.offerText}</h1>
                         </div>
                     </div>
 
                     {/* Bottom Section: Footer Details */}
-                    <div className="footer-details">
-                        <div className="recipient-info">
-                            <span className="label">ISSUED TO</span>
-                            <span className="client-name">{customerData.name}</span>
-                            <span className="client-phone">{customerData.phone}</span>
+                    <div className="voucher1-footer-details">
+                        <div className="voucher1-recipient-info">
+                            <span className="voucher1-label">ISSUED TO</span>
+                            <span className="voucher1-client-name">{customerData.name}</span>
+                            <span className="voucher1-client-phone">{customerData.phone}</span>
                         </div>
-                        <div className="verification-zone">
-                            <div className="timestamp">Issued: {getTodayFormatted()}</div>
-                            {/* Updated security code logic here */}
-                            <div className="security-code">#DBM-{offerCode}</div>
+                        <div className="voucher1-verification-zone">
+                            <div className="voucher1-timestamp">Issued: {getTodayFormatted()}</div>
+                            <div className="voucher1-security-code">#DBM-{offerCode}</div>
                         </div>
                     </div>
                 </div>
 
                 {/* Modern Decorative Element */}
-                <div className="background-glow"></div>
+                <div className="voucher1-background-glow"></div>
             </div>
         </div>
     );

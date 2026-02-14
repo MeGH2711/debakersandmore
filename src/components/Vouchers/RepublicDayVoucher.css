@@ -1,5 +1,5 @@
 /* Core Container */
-.premium-republic-voucher {
+.voucher2-premium-republic-voucher {
     width: 450px !important;
     height: 650px !important;
     background: #fff !important;
@@ -11,7 +11,7 @@
     overflow: hidden !important;
 }
 
-.section {
+.voucher2-section {
     padding: 25px 35px !important;
     position: relative !important;
     display: flex !important;
@@ -20,26 +20,26 @@
 }
 
 /* 1. Saffron Header (Top) */
-.saffron-bg {
+.voucher2-saffron-bg {
     flex: 0 0 15% !important;
     background-color: #FF9933 !important;
     color: #fff !important;
     border-bottom: 4px solid #e67e22 !important;
 }
 
-.header-content {
+.voucher2-header-content {
     display: flex !important;
     align-items: center !important;
     gap: 20px !important;
 }
 
-.brandlogoVoucher {
+.voucher2-brandlogoVoucher {
     height: 70px !important;
     padding: 5px !important;
     border-radius: 8px !important;
 }
 
-.brand-name {
+.voucher2-brand-name {
     margin: 0 !important;
     font-size: 1.1rem !important;
     font-weight: 800 !important;
@@ -47,7 +47,7 @@
     color: #fff !important;
 }
 
-.brand-subtext {
+.voucher2-brand-subtext {
     font-size: 0.6rem !important;
     text-transform: uppercase !important;
     letter-spacing: 1px !important;
@@ -55,14 +55,14 @@
 }
 
 /* 2. White Content (Middle) */
-.white-bg {
+.voucher2-white-bg {
     flex: 1 !important;
     background: #ffffff !important;
     text-align: center !important;
 }
 
 /* Subtle Chakra Background */
-.chakra-watermark {
+.voucher2-chakra-watermark {
     position: absolute !important;
     top: 50% !important;
     left: 50% !important;
@@ -76,12 +76,12 @@
     z-index: 1 !important;
 }
 
-.offer-content {
+.voucher2-offer-content {
     position: relative !important;
     z-index: 2 !important;
 }
 
-.offer-pill {
+.voucher2-offer-pill {
     display: inline-block !important;
     border: 2px solid #000080 !important;
     color: #000080 !important;
@@ -92,7 +92,7 @@
     margin-bottom: 20px !important;
 }
 
-.offer-title {
+.voucher2-offer-title {
     font-size: 2.25rem !important;
     font-weight: 900 !important;
     color: #1a1a1a !important;
@@ -101,41 +101,41 @@
     letter-spacing: -1px !important;
 }
 
-.divider {
+.voucher2-divider {
     width: 60px !important;
     height: 4px !important;
     background: #FF9933 !important;
     margin: 20px auto !important;
 }
 
-.expiry-badge .label {
+.voucher2-expiry-badge .voucher2-label {
     display: block !important;
     font-size: 0.65rem !important;
     color: #888 !important;
     font-weight: 700 !important;
 }
 
-.expiry-date {
+.voucher2-expiry-date {
     font-size: 1.2rem !important;
     font-weight: 800 !important;
     color: #000080 !important;
 }
 
 /* 3. Green Footer (Bottom) */
-.green-bg {
+.voucher2-green-bg {
     flex: 0 0 20% !important;
     background-color: #138808 !important;
     color: #fff !important;
     border-top: 4px solid #0e6b06 !important;
 }
 
-.footer-flex {
+.voucher2-footer-flex {
     display: flex !important;
     justify-content: space-between !important;
     align-items: flex-end !important;
 }
 
-.label-light {
+.voucher2-label-light {
     display: block !important;
     font-size: 0.6rem !important;
     font-weight: 600 !important;
@@ -143,22 +143,22 @@
     margin-bottom: 5px !important;
 }
 
-.customer-name {
+.voucher2-customer-name {
     display: block !important;
     font-size: 1.2rem !important;
     font-weight: 700 !important;
 }
 
-.customer-phone {
+.voucher2-customer-phone {
     font-size: 0.85rem !important;
     opacity: 0.8 !important;
 }
 
-.barcode-zone {
+.voucher2-barcode-zone {
     text-align: right !important;
 }
 
-.security-code {
+.voucher2-security-code {
     font-family: 'Courier New', monospace !important;
     font-weight: 900 !important;
     font-size: 1.1rem !important;
@@ -167,7 +167,7 @@
     border-radius: 4px !important;
 }
 
-.issued-date {
+.voucher2-issued-date {
     font-size: 0.6rem !important;
     margin-top: 5px !important;
     opacity: 0.6 !important;
