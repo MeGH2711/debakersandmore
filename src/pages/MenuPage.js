@@ -144,6 +144,15 @@ function ProductList() {
                               </p>
                             </Card.Text>
                           </div>
+
+                          {/* ADD THIS BUTTON HERE */}
+                          <a
+                            href="tel:+919879718228"
+                            className="btn btn-outline-warning w-100 mt-3 fw-bold"
+                            style={{ borderRadius: "10px", textTransform: "uppercase", fontSize: "0.85rem" }}
+                          >
+                            Check For Availability
+                          </a>
                         </Card.Body>
                       </Card>
                     </Col>
@@ -208,6 +217,15 @@ function ProductList() {
                             )}
                           </div>
                         )}
+
+                        <a
+                          href="tel:+919879718228"
+                          className="btn btn-warning w-100 mt-3 fw-bold text-dark"
+                          style={{ borderRadius: "8px", fontSize: "0.9rem" }}
+                          onClick={(e) => e.stopPropagation()} // Prevents the accordion from toggling when calling
+                        >
+                          Check For Availability
+                        </a>
 
                       </div>
                     );
