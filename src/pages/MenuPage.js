@@ -57,6 +57,16 @@ function ProductList() {
     setExpandedIndex(expandedIndex === key ? null : key);
   };
 
+  const renderStatus = (status) => {
+    if (status === "true" || status === true)
+      return <span className="text-success fw-semibold">Available</span>;
+    if (status === "false" || status === false)
+      return <span className="text-danger fw-semibold">Unavailable</span>;
+    if (status === "check")
+      return <span className="text-warning fw-semibold">Check for Availability</span>;
+    return null;
+  };
+
   return (
     <>
       <div className="product-page">
@@ -135,13 +145,14 @@ function ProductList() {
                               )}
 
                               <p>
-                                <strong>Status:</strong>{" "}
-                                {p.available ? (
-                                  <span className="text-success fw-semibold">Available</span>
-                                ) : (
-                                  <span className="text-danger fw-semibold">Unavailable</span>
-                                )}
+                                <strong>Status:</strong> {renderStatus(p.available)}
                               </p>
+
+                              {p.available === "check" && (
+                                <a href="tel:+919879718228" className="btn btn-warning btn-sm w-100 mt-2 fw-bold">
+                                  Check for Availability
+                                </a>
+                              )}
                             </Card.Text>
                           </div>
                         </Card.Body>
@@ -179,16 +190,23 @@ function ProductList() {
                             <span className="mobile-product-name">
                               {p.name} ({p.weight} {p.measurement === "piece" ? "piece" : "gm"})
                             </span>
-                            <small
-                              className={`${p.available ? "text-success" : "text-danger"} fw-semibold mt-1`}
-                            >
-                              {p.available ? "Available" : "Unavailable"}
+                            <small className="mt-1">
+                              {renderStatus(p.available)}
                             </small>
                           </div>
 
                           <span className="mobile-product-price">₹ {p.price}</span>
-                        </div>
 
+                        </div>
+                        {p.available === "check" && (
+                          <a
+                            href="tel:+919879718228"
+                            className="btn btn-warning btn-sm mt-2 py-1 fw-bold w-100"
+                            onClick={(e) => e.stopPropagation()} // Prevents collapsing the row when clicking button
+                          >
+                            Check Availability
+                          </a>
+                        )}
                         {canExpand && isExpanded && (
                           <div className="mobile-ingredients mt-3">
                             {hasIngredients && (

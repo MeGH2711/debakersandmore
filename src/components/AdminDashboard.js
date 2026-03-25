@@ -410,23 +410,20 @@ const AdminDashboard = () => {
                       )}
                     </td>
                     <td className="text-center">
-                      <Form.Check
-                        type="checkbox"
-                        checked={prod.available}
-                        onChange={async () => {
+                      <Form.Select
+                        size="sm"
+                        className="bg-dark text-light border-secondary"
+                        value={String(prod.available)}
+                        onChange={async (e) => {
                           const productRef = doc(db, "products", prod.id);
-                          await updateDoc(productRef, { available: !prod.available });
+                          await updateDoc(productRef, { available: e.target.value });
                           fetchProducts();
                         }}
-                        label={
-                          prod.available ? (
-                            <span className="text-success fw-semibold">Available</span>
-                          ) : (
-                            <span className="text-danger fw-semibold">Unavailable</span>
-                          )
-                        }
-                        className=""
-                      />
+                      >
+                        <option value="true">Available</option>
+                        <option value="false">Unavailable</option>
+                        <option value="check">Check</option>
+                      </Form.Select>
                     </td>
                     <td className="text-center">
                       {prod.isOutsourced ? (
@@ -856,16 +853,17 @@ const AdminDashboard = () => {
                       <Form.Label className="text-info fw-semibold">Availability</Form.Label>
                       <Form.Select
                         className="bg-dark text-light border-info"
-                        value={selectedProduct.available ? "true" : "false"}
+                        value={String(selectedProduct.available)}
                         onChange={(e) =>
                           setSelectedProduct({
                             ...selectedProduct,
-                            available: e.target.value === "true"
+                            available: e.target.value
                           })
                         }
                       >
                         <option value="true">Available</option>
                         <option value="false">Unavailable</option>
+                        <option value="check">Check for Availability</option>
                       </Form.Select>
                     </Form.Group>
                   </div>
