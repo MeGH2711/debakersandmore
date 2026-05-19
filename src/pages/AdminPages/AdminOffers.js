@@ -14,14 +14,16 @@ import {
     Spinner,
     Modal
 } from "react-bootstrap";
-import AdminSidebar from "./AdminSidebar"; // Standardized with Dashboard naming
+import AdminSidebar from "./AdminSidebar";
 import { getAuth, onAuthStateChanged } from "firebase/auth";
 import { useNavigate } from "react-router-dom";
 import * as XLSX from "xlsx";
-import VoucherTemplate from "../../components/Vouchers/RepublicDayVoucher";
 import "bootstrap/dist/css/bootstrap.min.css";
-import "./AdminDashboard.css"; // Imports central design tokens & baseline table styles
+import "./AdminDashboard.css";
 import "./AdminOffers.css";
+
+import VoucherTemplate2 from "../../components/Vouchers/VoucherTemplate";
+import VoucherTemplate from "../../components/Vouchers/RepublicDayVoucher";
 
 // Icons replacement for emojis and text buttons
 import {
@@ -62,6 +64,8 @@ const AdminOffers = () => {
     const [viewingOffer, setViewingOffer] = useState(null);
     const [customerSearchQuery, setCustomerSearchQuery] = useState("");
     const [claimFilter, setClaimFilter] = useState("all");
+
+    const [selectedTemplate, setSelectedTemplate] = useState("RepublicDay");
 
     const [toastMsg, setToastMsg] = useState("");
     const [showToast, setShowToast] = useState(false);
@@ -143,6 +147,7 @@ const AdminOffers = () => {
         setNewOfferDescription("");
         setValidUntil("");
         setShowOfferModal(true);
+        setSelectedTemplate("RepublicDay");
     };
 
     const handleShowEdit = (offer) => {
@@ -152,6 +157,7 @@ const AdminOffers = () => {
         setNewOfferDescription(offer.description || "");
         setValidUntil(offer.validUntil);
         setShowOfferModal(true);
+        setSelectedTemplate(offer.template || "RepublicDay");
     };
 
     const handleSaveOffer = async () => {
@@ -163,6 +169,7 @@ const AdminOffers = () => {
             offerText: newOfferTitle,
             description: newOfferDescription,
             validUntil: validUntil,
+            template: selectedTemplate,
         };
 
         try {
@@ -497,20 +504,28 @@ const AdminOffers = () => {
             </div>
 
             {/* ── MODAL: Design Voucher Preview ───────────────── */}
-            <Modal show={showPreviewModal} onHide={() => setShowPreviewModal(false)} centered size="md">
+            <Modal className="vh-100" show={showPreviewModal} onHide={() => setShowPreviewModal(false)} centered size="xl">
                 <Modal.Header closeButton>
                     <Modal.Title>Design Voucher Configuration</Modal.Title>
                 </Modal.Header>
-                <Modal.Body className="d-flex justify-content-center py-4 bg-base-darkened" style={{ overflow: "hidden" }}>
-                    <div className="voucher-modal-wrapper">
+                <Modal.Body className="d-flex justify-content-center align-items-center py-4 bg-base-darkened voucher-preview-body">
+                    <div className="voucher-preview-scaler">
                         {previewOffer && (
-                            <VoucherTemplate
-                                selectedOffer={previewOffer}
-                                customerData={{ name: "John Doe", phone: "+91 9876543210", securityCode: "SAMPLE" }}
-                                formatDate={formatDate}
-                                getTodayFormatted={getTodayFormatted}
-                                isPreview={true}
-                            />
+                            previewOffer.template === "SecondTemplate"
+                                ? <VoucherTemplate2
+                                    selectedOffer={previewOffer}
+                                    customerData={{ name: "John Doe", phone: "+91 9876543210", securityCode: "SAMPLE" }}
+                                    formatDate={formatDate}
+                                    getTodayFormatted={getTodayFormatted}
+                                    isPreview={true}
+                                />
+                                : <VoucherTemplate
+                                    selectedOffer={previewOffer}
+                                    customerData={{ name: "John Doe", phone: "+91 9876543210", securityCode: "SAMPLE" }}
+                                    formatDate={formatDate}
+                                    getTodayFormatted={getTodayFormatted}
+                                    isPreview={true}
+                                />
                         )}
                     </div>
                 </Modal.Body>
@@ -528,6 +543,17 @@ const AdminOffers = () => {
                 </Modal.Header>
                 <Modal.Body>
                     <div className="row g-3">
+                        <div className="col-12">
+                            <label className="form-label-adm">Voucher Template *</label>
+                            <select
+                                className="adm-select w-100"
+                                value={selectedTemplate}
+                                onChange={(e) => setSelectedTemplate(e.target.value)}
+                            >
+                                <option value="RepublicDay">Republic Day Voucher</option>
+                                <option value="SecondTemplate">Regular Voucher</option>
+                            </select>
+                        </div>
                         <div className="col-12">
                             <label className="form-label-adm">Offer Title / Core Text *</label>
                             <input
@@ -574,7 +600,7 @@ const AdminOffers = () => {
                 <Modal.Header closeButton>
                     <Modal.Title>Redemption Registries: <span className="text-gold">{viewingOffer?.offerText}</span></Modal.Title>
                 </Modal.Header>
-                <Modal.Body>
+                <Modal.Body className="redemption-modal-body">
                     <div className="toolbar align-items-center mb-4">
                         <div className="toolbar-filters m-0">
                             <input
@@ -611,6 +637,7 @@ const AdminOffers = () => {
                         <div className="text-center py-5"><Spinner animation="border" variant="warning" /></div>
                     ) : filteredCustomers.length > 0 ? (
                         <div className="products-table-wrap border-0">
+                            <div className="table-scroll">
                             <table className="adm-table">
                                 <thead>
                                     <tr>
@@ -627,10 +654,11 @@ const AdminOffers = () => {
                                     {filteredCustomers.map((r) => (
                                         <tr key={r.id}>
                                             <td>
-                                                <div className="form-check-adm justify-content-center p-0">
+                                                <div className="custom-switch-container">
                                                     <input
                                                         type="checkbox"
-                                                        className="form-check-input m-0"
+                                                        role="switch"
+                                                        className="custom-toggle-input"
                                                         checked={r.claimed || false}
                                                         onChange={() => handleToggleClaimed(r.id, r.claimed, r.offerText)}
                                                     />
@@ -643,9 +671,7 @@ const AdminOffers = () => {
                                             </td>
                                             <td className="td-name text-start">{r.customerName}</td>
                                             <td className="font-monospace">{r.customerPhone}</td>
-                                            <td className="text-start small opacity-75" style={{ fontSize: '0.8rem', maxWidth: "220px", overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>
-                                                {r.customerAddress}
-                                            </td>
+                                            <td className="text-start td-address">{r.customerAddress}</td>
                                             <td style={{ fontSize: "0.8rem" }}>{r.redeemedAt?.toDate().toLocaleDateString('en-GB', { day: 'numeric', month: 'short', year: 'numeric' }) || "N/A"}</td>
                                             <td>
                                                 <button className="btn-danger-sm py-1 px-2" onClick={() => handleDeleteRedemption(r.id, r.claimed, r.offerText)}>
@@ -656,6 +682,7 @@ const AdminOffers = () => {
                                     ))}
                                 </tbody>
                             </table>
+                            </div>
                         </div>
                     ) : (
                         <div className="text-center py-4 text-muted small">No target customer redemptions match selection criteria.</div>

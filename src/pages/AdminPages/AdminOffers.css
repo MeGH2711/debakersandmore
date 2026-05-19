@@ -45,18 +45,72 @@
     background-color: var(--bg-base) !important;
 }
 
-/* Voucher Layout Viewport scaling optimizations */
-.voucher-modal-wrapper {
-    transform: scale(0.9);
-    transform-origin: center top;
-    height: 520px;
-    display: flex;
-    justify-content: center;
+/* REMOVE the old .voucher-modal-wrapper block and replace with: */
+
+/* Voucher Preview Modal — auto-fit to any voucher size */
+.voucher-preview-body {
+    min-height: 60vh;
+    overflow: auto;
 }
 
-@media (max-width: 576px) {
-    .voucher-modal-wrapper {
-        transform: scale(0.7);
-        height: 400px;
+.voucher-preview-scaler {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    width: 100%;
+    padding: 1rem;
+}
+
+.voucher-preview-scaler > * {
+    max-width: 100%;
+    height: auto;
+    display: block;
+}
+
+@media (max-width: 768px) {
+    .voucher-preview-scaler > * {
+        transform: scale(0.75);
+        transform-origin: center top;
     }
+
+    .voucher-preview-body {
+        min-height: 50vh;
+    }
+}
+
+@media (max-width: 480px) {
+    .voucher-preview-scaler > * {
+        transform: scale(0.55);
+        transform-origin: center top;
+    }
+
+    .voucher-preview-body {
+        min-height: 40vh;
+    }
+}
+
+/* ── Customer Breakdown Modal — table fixes ──────────────── */
+
+/* Scrollable modal body so long redemption lists don't overflow the viewport */
+.redemption-modal-body {
+    max-height: 70vh;
+    overflow-y: auto;
+}
+
+/* Address cell — truncate cleanly without inline styles */
+.td-address {
+    font-size: 0.8rem;
+    opacity: 0.75;
+    max-width: 220px;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+/* Ensure the custom toggle switch is centred inside its table cell */
+.adm-table td .custom-switch-container {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 100%;
 }
