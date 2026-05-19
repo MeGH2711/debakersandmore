@@ -7,9 +7,9 @@ import {
   deleteDoc,
   doc,
 } from "firebase/firestore";
-import { db } from "../firebase";
+import { db } from "../../firebase";
 import { Modal, Button, Form, Table, Badge } from "react-bootstrap";
-import AppNavbar from "./Navbar";
+import AppNavbar from "./AdminNavbar";
 import "bootstrap/dist/css/bootstrap.min.css";
 import "./AdminDashboard.css";
 import { getAuth, onAuthStateChanged } from "firebase/auth";

@@ -3,10 +3,10 @@ import { BrowserRouter as Router, Routes, Route, Navigate, useLocation } from "r
 import { getAuth, onAuthStateChanged } from "firebase/auth";
 
 // Admin Panel
-import Login from "./components/Login";
-import AdminDashboard from "./components/AdminDashboard";
-import AdminResponses from "./components/AdminResponses";
-import AdminOffers from "./components/AdminOffers";
+import Login from "./pages/AdminPages/Login";
+import AdminDashboard from "./pages/AdminPages/AdminDashboard";
+import AdminResponses from "./pages/AdminPages/AdminResponses";
+import AdminOffers from "./pages/AdminPages/AdminOffers";
 
 // Public Pages
 import NavbarPublic from "./components/NavbarPublic";
@@ -55,6 +55,8 @@ function App() {
         <Route path="/menu" element={<MenuPage />} />
         <Route path="/contact" element={<ContactUs />} />
         <Route path="/offers" element={<OffersPage />} />
+
+        {/* Admin Pages */}
         <Route
           path="/admin"
           element={isLoggedIn ? <AdminDashboard /> : <Navigate to="/login" replace />}
@@ -72,6 +74,7 @@ function App() {
           element={isLoggedIn ? <Navigate to="/admin" replace /> : <Login />}
         />
         <Route path="*" element={<Navigate to="/" replace />} />
+        
       </Routes>
       <Analytics />
     </Router>

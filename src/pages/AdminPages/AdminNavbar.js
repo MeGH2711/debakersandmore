@@ -2,9 +2,9 @@ import React, { useState } from "react";
 import { Navbar, Container, Nav, Image, Modal, Button } from "react-bootstrap";
 import { getAuth, signOut } from "firebase/auth";
 import { useNavigate } from "react-router-dom";
-import logo from "../assets/images/logo.png";
+import logo from '../../assets/images/logo.png';
 import "bootstrap/dist/css/bootstrap.min.css";
-import "./Navbar.css";
+import "./AdminNavbar.css";
 
 const AppNavbar = () => {
   const navigate = useNavigate();

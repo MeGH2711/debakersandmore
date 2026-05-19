@@ -9,7 +9,7 @@ import {
     query,
     where
 } from "firebase/firestore";
-import { db } from "../firebase";
+import { db } from "../../firebase";
 import {
     Table,
     Spinner,
@@ -19,11 +19,11 @@ import {
     Button,
     Modal
 } from "react-bootstrap";
-import AppNavbar from "./Navbar";
+import AppNavbar from "./AdminNavbar";
 import { getAuth, onAuthStateChanged } from "firebase/auth";
 import { useNavigate } from "react-router-dom";
 import * as XLSX from "xlsx";
-import VoucherTemplate from "./Vouchers/RepublicDayVoucher"; // Imported the Template
+import VoucherTemplate from "../../components/Vouchers/RepublicDayVoucher"; // Imported the Template
 import "bootstrap/dist/css/bootstrap.min.css";
 import "./AdminOffers.css";
 
