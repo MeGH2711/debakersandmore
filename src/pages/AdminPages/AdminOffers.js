@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useState, useCallback } from "react";
 import {
     collection,
     getDocs,
@@ -11,21 +11,32 @@ import {
 } from "firebase/firestore";
 import { db } from "../../firebase";
 import {
-    Table,
     Spinner,
-    Form,
-    Row,
-    Col,
-    Button,
     Modal
 } from "react-bootstrap";
-import AppNavbar from "./AdminNavbar";
+import AdminSidebar from "./AdminSidebar"; // Standardized with Dashboard naming
 import { getAuth, onAuthStateChanged } from "firebase/auth";
 import { useNavigate } from "react-router-dom";
 import * as XLSX from "xlsx";
-import VoucherTemplate from "../../components/Vouchers/RepublicDayVoucher"; // Imported the Template
+import VoucherTemplate from "../../components/Vouchers/RepublicDayVoucher";
 import "bootstrap/dist/css/bootstrap.min.css";
+import "./AdminDashboard.css"; // Imports central design tokens & baseline table styles
 import "./AdminOffers.css";
+
+// Icons replacement for emojis and text buttons
+import {
+    FiPlus,
+    FiPercent,
+    FiCheckSquare,
+    FiClock,
+    FiEye,
+    FiEdit2,
+    FiUsers,
+    FiTrash2,
+    FiDownload,
+    FiAlertCircle,
+    FiX
+} from "react-icons/fi";
 
 const AdminOffers = () => {
     const [offers, setOffers] = useState([]);
@@ -52,8 +63,16 @@ const AdminOffers = () => {
     const [customerSearchQuery, setCustomerSearchQuery] = useState("");
     const [claimFilter, setClaimFilter] = useState("all");
 
+    const [toastMsg, setToastMsg] = useState("");
+    const [showToast, setShowToast] = useState(false);
+
     const navigate = useNavigate();
     const auth = getAuth();
+
+    const triggerToast = (msg) => {
+        setToastMsg(msg);
+        setShowToast(true);
+    };
 
     const formatDate = (dateString) => {
         if (!dateString) return "N/A";
@@ -75,7 +94,7 @@ const AdminOffers = () => {
         return () => unsubscribe();
     }, [auth, navigate]);
 
-    const fetchData = async () => {
+    const fetchData = useCallback(async () => {
         setLoading(true);
         try {
             const [offersSnap, redemptionsSnap] = await Promise.all([
@@ -102,12 +121,15 @@ const AdminOffers = () => {
             setStats(counts);
         } catch (error) {
             console.error("Error fetching data:", error);
+            triggerToast("Failed to fetch data.");
         } finally {
             setLoading(false);
         }
-    };
+    }, []);
 
-    useEffect(() => { fetchData(); }, []);
+    useEffect(() => {
+        fetchData();
+    }, [fetchData]);
 
     const handleShowPreview = (offer) => {
         setPreviewOffer(offer);
@@ -134,7 +156,7 @@ const AdminOffers = () => {
 
     const handleSaveOffer = async () => {
         if (!newOfferTitle.trim() || !newOfferDescription.trim() || !validUntil) {
-            return alert("Please fill in all fields!");
+            return triggerToast("Please fill in all fields!");
         }
 
         const offerData = {
@@ -160,6 +182,7 @@ const AdminOffers = () => {
             setShowOfferModal(false);
         } catch (error) {
             console.error("Error saving offer:", error);
+            triggerToast("Error saving offer adjustments.");
         }
     };
 
@@ -250,7 +273,7 @@ const AdminOffers = () => {
     };
 
     const handleDelete = async (id) => {
-        if (!window.confirm("Delete this offer?")) return;
+        if (!window.confirm("Delete this offer permanently?")) return;
         try {
             await deleteDoc(doc(db, "offers", id));
             setOffers((prev) => prev.filter((o) => o.id !== id));
@@ -274,238 +297,381 @@ const AdminOffers = () => {
         return matchesSearch;
     });
 
+    // Aggregations for Offers Page Metrics
+    const totalOffersCount = offers.length;
+    const liveOffersCount = offers.filter(o => o.active).length;
+    const totalRedemptionsCount = Object.values(stats).reduce((acc, curr) => acc + (curr.redeemed || 0), 0);
+
+    const hasActiveFilters = searchQuery;
+
     return (
         <>
-            <AppNavbar />
-            <div className="min-vh-100 bg-dark text-light pt-4 pb-5 px-4" style={{ fontFamily: "Poppins, sans-serif" }}>
+            <AdminSidebar />
+            <div className="sidebar-page-wrapper pt-4 pb-5 px-4">
                 <div className="container-fluid">
-                    <Row className="mb-4 align-items-center">
-                        <Col md={6}>
-                            <Form.Control
-                                type="text"
-                                placeholder="Search offers..."
-                                value={searchQuery}
-                                onChange={(e) => setSearchQuery(e.target.value)}
-                                className="bg-dark text-light border-warning offerSearchBar"
-                            />
-                        </Col>
-                        <Col md={{ span: 3, offset: 3 }}>
-                            <Button variant="warning" className="w-100 fw-bold" onClick={handleShowAdd}>
-                                + Create New Offer
-                            </Button>
-                        </Col>
-                    </Row>
 
-                    <div className="card bg-secondary bg-opacity-25 border-0 shadow p-3 rounded-4">
-                        {loading ? (
-                            <div className="text-center py-5"><Spinner animation="border" variant="warning" /></div>
-                        ) : (
-                            <Table hover responsive variant="dark" className="align-middle mb-0">
-                                <thead className="text-warning">
-                                    <tr>
-                                        <th className="text-center">Display Status</th>
-                                        <th className="text-center">Sr. No.</th>
-                                        <th>Offer Details</th>
-                                        <th className="text-center">Claimed / Redeemed</th>
-                                        <th className="text-center">Valid Until</th>
-                                        <th className="text-center">Actions</th>
-                                    </tr>
-                                </thead>
-                                <tbody>
-                                    {filteredOffers.map((offer, index) => {
-                                        const redeemed = stats[offer.offerText]?.redeemed || 0;
-                                        const claimed = stats[offer.offerText]?.claimed || 0;
-                                        return (
-                                            <tr key={offer.id}>
-                                                <td className="text-center">
-                                                    <div className="d-flex flex-column align-items-center">
-                                                        <Form.Check
-                                                            type="switch"
-                                                            id={`display-switch-${offer.id}`}
-                                                            checked={offer.active}
-                                                            onChange={() => handleToggleDisplay(offer.id, offer.active)}
-                                                            className="mb-1"
-                                                        />
-                                                        <small style={{ fontSize: '0.7rem', color: offer.active ? '#ffc107' : '#6c757d' }}>
-                                                            {offer.active ? "DISPLAYING" : "HIDDEN"}
-                                                        </small>
-                                                    </div>
-                                                </td>
-                                                <td className="text-center">{index + 1}</td>
-                                                <td>
-                                                    <div className="text-warning fw-semibold">{offer.offerText}</div>
-                                                    <div className="text-light small opacity-75">{offer.description || "No description provided."}</div>
-                                                </td>
-                                                <td className="text-center fw-bold">
-                                                    {claimed} / <span className="text-warning">{redeemed}</span>
-                                                </td>
-                                                <td className="text-center">{formatDate(offer.validUntil)}</td>
-                                                <td className="text-center">
-                                                    <div className="d-flex justify-content-center gap-2">
-                                                        <Button variant="outline-info" size="sm" onClick={() => handleShowPreview(offer)}>Preview</Button>
-                                                        <Button variant="outline-warning" size="sm" onClick={() => handleShowEdit(offer)}>Edit</Button>
-                                                        <Button variant="info" size="sm" onClick={() => fetchRedemptions(offer)}>View Customers</Button>
-                                                        <Button variant="danger" size="sm" onClick={() => handleDelete(offer.id)}>Delete</Button>
-                                                    </div>
-                                                </td>
-                                            </tr>
-                                        );
-                                    })}
-                                </tbody>
-                            </Table>
-                        )}
+                    {/* ── Page Heading ─────────────────────────── */}
+                    <div className="mb-4">
+                        <h1 className="page-title mb-0">
+                            Promotions &amp; <span>Offers</span>
+                        </h1>
+                        <p className="page-subtitle mt-1">
+                            Create vouchers, manage customer redemptions &amp; configure display visibility
+                        </p>
                     </div>
+
+                    {/* ── Redesigned Theme Stats Cards ───────────────── */}
+                    <div className="row g-4 mb-5">
+                        <div className="col-12 col-sm-6 col-lg-4">
+                            <div className="stat-card unique-card-products">
+                                <div className="stat-card-body">
+                                    <div className="stat-content">
+                                        <p className="stat-label">Total Campaigns</p>
+                                        <div className="stat-value">{totalOffersCount}</div>
+                                    </div>
+                                    <div className="stat-icon-box box-gold">
+                                        <FiPercent size={24} />
+                                    </div>
+                                </div>
+                                <div className="stat-card-footer">
+                                    <span className="stat-trending-neutral">Historical voucher creations</span>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div className="col-12 col-sm-6 col-lg-4">
+                            <div className="stat-card unique-card-categories">
+                                <div className="stat-card-body">
+                                    <div className="stat-content">
+                                        <p className="stat-label">Active on Feed</p>
+                                        <div className="stat-value">
+                                            {liveOffersCount}
+                                            <span className="stat-value-sep">/</span>
+                                            <span className="stat-value-total">{totalOffersCount}</span>
+                                        </div>
+                                    </div>
+                                    <div className="stat-icon-box box-teal">
+                                        <FiCheckSquare size={24} />
+                                    </div>
+                                </div>
+                                <div className="stat-card-footer">
+                                    <span className="stat-trending-neutral">Currently visible to clients</span>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div className="col-12 col-sm-6 col-lg-4">
+                            <div className="stat-card unique-card-available">
+                                <div className="stat-card-body">
+                                    <div className="stat-content">
+                                        <p className="stat-label">Total Claimed Vouchers</p>
+                                        <div className="stat-value">{totalRedemptionsCount}</div>
+                                    </div>
+                                    <div className="stat-icon-box box-amber">
+                                        <FiClock size={24} />
+                                    </div>
+                                </div>
+                                <div className="stat-card-footer">
+                                    <span className="stat-trending-success">Generated customer rewards</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    {/* ── Toolbar ──────────────────────────────── */}
+                    <div className="toolbar">
+                        <div className="toolbar-filters">
+                            <div className="position-relative search-input-wrapper flex-grow-1">
+                                <input
+                                    type="text"
+                                    className="adm-input w-100"
+                                    placeholder="Search promotional campaigns..."
+                                    value={searchQuery}
+                                    onChange={(e) => setSearchQuery(e.target.value)}
+                                />
+                            </div>
+                            {hasActiveFilters && (
+                                <button className="btn-ghost" onClick={() => setSearchQuery("")}>
+                                    ✕ Reset
+                                </button>
+                            )}
+                        </div>
+                        <div className="toolbar-actions">
+                            <button className="btn-gold" onClick={handleShowAdd}>
+                                <FiPlus size={16} className="me-2" /> Create New Offer
+                            </button>
+                        </div>
+                    </div>
+
+                    {/* ── Products-style Offers Table ──────────────── */}
+                    {loading ? (
+                        <div className="text-center py-5">
+                            <Spinner animation="border" variant="warning" />
+                        </div>
+                    ) : (
+                        <div className="products-table-wrap">
+                            <div className="table-scroll">
+                                <table className="adm-table">
+                                    <thead>
+                                        <tr>
+                                            <th>Feed Status</th>
+                                            <th>#</th>
+                                            <th className="text-start">Campaign Details</th>
+                                            <th>Claimed / Redeemed</th>
+                                            <th>Valid Until</th>
+                                            <th>Actions</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        {filteredOffers.map((offer, index) => {
+                                            const redeemed = stats[offer.offerText]?.redeemed || 0;
+                                            const claimed = stats[offer.offerText]?.claimed || 0;
+                                            return (
+                                                <tr key={offer.id}>
+                                                    <td>
+                                                        <div className="d-flex flex-column align-items-center justify-content-center">
+                                                            <div className="form-check-adm p-0 m-0 custom-switch-container">
+                                                                <input
+                                                                    type="checkbox"
+                                                                    role="switch"
+                                                                    className="form-check-input m-0 custom-toggle-input"
+                                                                    id={`display-switch-${offer.id}`}
+                                                                    checked={offer.active}
+                                                                    onChange={() => handleToggleDisplay(offer.id, offer.active)}
+                                                                />
+                                                            </div>
+                                                            <small className="mt-1 font-monospace" style={{ fontSize: '0.65rem', color: offer.active ? 'var(--gold)' : 'var(--text-muted)' }}>
+                                                                {offer.active ? "LIVE FEED" : "HIDDEN"}
+                                                            </small>
+                                                        </div>
+                                                    </td>
+                                                    <td style={{ color: "var(--text-muted)", fontVariantNumeric: "tabular-nums" }}>{index + 1}</td>
+                                                    <td className="text-start">
+                                                        <div className="td-name text-gold fw-semibold">{offer.offerText}</div>
+                                                        <div className="text-secondary small opacity-75 mt-1" style={{ maxWidth: "340px" }}>
+                                                            {offer.description || "No strategic overview written."}
+                                                        </div>
+                                                    </td>
+                                                    <td className="td-price">
+                                                        <span className="text-primary">{claimed}</span>
+                                                        <span className="mx-1">/</span>
+                                                        <span className="text-gold">{redeemed}</span>
+                                                    </td>
+                                                    <td>
+                                                        <span className="ing-badge px-2 py-1">
+                                                            {formatDate(offer.validUntil)}
+                                                        </span>
+                                                    </td>
+                                                    <td>
+                                                        <div className="d-flex gap-2 justify-content-center">
+                                                            <button className="btn-ghost py-1 px-2" onClick={() => handleShowPreview(offer)}>
+                                                                <FiEye size={14} className="me-1" /> Preview
+                                                            </button>
+                                                            <button className="btn-teal py-1 px-2" onClick={() => handleShowEdit(offer)}>
+                                                                <FiEdit2 size={13} className="me-1" /> Edit
+                                                            </button>
+                                                            <button className="btn-gold-outline py-1 px-2" onClick={() => fetchRedemptions(offer)} style={{ fontSize: "0.78rem" }}>
+                                                                <FiUsers size={14} className="me-1" /> Customers
+                                                            </button>
+                                                            <button className="btn-danger-sm py-1 px-2" onClick={() => handleDelete(offer.id)}>
+                                                                <FiTrash2 size={13} />
+                                                            </button>
+                                                        </div>
+                                                    </td>
+                                                </tr>
+                                            );
+                                        })}
+                                        {filteredOffers.length === 0 && (
+                                            <tr className="empty-state">
+                                                <td colSpan={6}>No matching promotional offers documented.</td>
+                                            </tr>
+                                        )}
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+
+                    )}
+
                 </div>
             </div>
 
-            {/* MODAL: Voucher Preview */}
-            <Modal show={showPreviewModal} onHide={() => setShowPreviewModal(false)} centered size="md" contentClassName="bg-dark">
-                <Modal.Header closeButton closeVariant="white">
-                    <Modal.Title className="text-warning">Design Preview</Modal.Title>
+            {/* ── MODAL: Design Voucher Preview ───────────────── */}
+            <Modal show={showPreviewModal} onHide={() => setShowPreviewModal(false)} centered size="md">
+                <Modal.Header closeButton>
+                    <Modal.Title>Design Voucher Configuration</Modal.Title>
                 </Modal.Header>
-                <Modal.Body className="d-flex justify-content-center bg-secondary py-4" style={{ overflow: "hidden" }}>
+                <Modal.Body className="d-flex justify-content-center py-4 bg-base-darkened" style={{ overflow: "hidden" }}>
                     <div className="voucher-modal-wrapper">
                         {previewOffer && (
-                            <VoucherTemplate 
-                                selectedOffer={previewOffer} 
-                                customerData={{ name: "John Doe", phone: "+91 9876543210", securityCode: "SAMPLE" }} 
-                                formatDate={formatDate} 
+                            <VoucherTemplate
+                                selectedOffer={previewOffer}
+                                customerData={{ name: "John Doe", phone: "+91 9876543210", securityCode: "SAMPLE" }}
+                                formatDate={formatDate}
                                 getTodayFormatted={getTodayFormatted}
-                                isPreview={true} 
+                                isPreview={true}
                             />
                         )}
                     </div>
                 </Modal.Body>
-                <Modal.Footer className="border-0">
-                    <Button variant="warning" onClick={() => setShowPreviewModal(false)}>Close Preview</Button>
+                <Modal.Footer>
+                    <button className="btn-gold w-100" onClick={() => setShowPreviewModal(false)}>
+                        Dismiss Design Screen
+                    </button>
                 </Modal.Footer>
             </Modal>
 
-            {/* MODAL: Add/Edit Offer */}
-            <Modal show={showOfferModal} onHide={() => setShowOfferModal(false)} centered contentClassName="bg-dark text-light">
-                <Modal.Header closeButton closeVariant="white">
-                    <Modal.Title className="text-warning">{isEditing ? "Edit Offer" : "Create New Offer"}</Modal.Title>
+            {/* ── MODAL: Add/Edit Offer Component ────────────── */}
+            <Modal show={showOfferModal} onHide={() => setShowOfferModal(false)} centered size="lg">
+                <Modal.Header closeButton>
+                    <Modal.Title>{isEditing ? "Modify Campaign Layout" : "Configure New Marketing Campaign"}</Modal.Title>
                 </Modal.Header>
                 <Modal.Body>
-                    <Form>
-                        <Form.Group className="mb-3">
-                            <Form.Label>Offer Title</Form.Label>
-                            <Form.Control
+                    <div className="row g-3">
+                        <div className="col-12">
+                            <label className="form-label-adm">Offer Title / Core Text *</label>
+                            <input
                                 type="text"
-                                placeholder="e.g. 20% Off on Haircut"
+                                className="form-control-adm"
+                                placeholder="e.g., 20% Off flat discount on Bakery Goods"
                                 value={newOfferTitle}
                                 onChange={(e) => setNewOfferTitle(e.target.value)}
-                                className="bg-dark text-light border-secondary"
                             />
-                        </Form.Group>
-                        <Form.Group className="mb-3">
-                            <Form.Label>Offer Description</Form.Label>
-                            <Form.Control
-                                as="textarea"
-                                rows={3}
+                        </div>
+                        <div className="col-12">
+                            <label className="form-label-adm">Strategic Campaign Description *</label>
+                            <textarea
+                                className="form-control-adm"
+                                rows={4}
+                                placeholder="Detail structural rules, limits or customer eligibility guidelines..."
                                 value={newOfferDescription}
                                 onChange={(e) => setNewOfferDescription(e.target.value)}
-                                className="bg-dark text-light border-secondary"
                             />
-                        </Form.Group>
-                        <Form.Group className="mb-3">
-                            <Form.Label>Valid Until</Form.Label>
-                            <Form.Control
+                        </div>
+                        <div className="col-12">
+                            <label className="form-label-adm">Maturity / Validity Deadline *</label>
+                            <input
                                 type="date"
+                                className="form-control-adm"
                                 value={validUntil}
                                 onChange={(e) => setValidUntil(e.target.value)}
-                                className="bg-dark text-light border-secondary"
                             />
-                        </Form.Group>
-                    </Form>
+                        </div>
+                    </div>
                 </Modal.Body>
-                <Modal.Footer className="border-0">
-                    <Button variant="outline-light" onClick={() => setShowOfferModal(false)}>Cancel</Button>
-                    <Button variant="warning" onClick={handleSaveOffer}>{isEditing ? "Update Offer" : "Save Offer"}</Button>
+                <Modal.Footer>
+                    <button className="btn-ghost" onClick={() => setShowOfferModal(false)}>
+                        Cancel
+                    </button>
+                    <button className="btn-gold" onClick={handleSaveOffer}>
+                        {isEditing ? "Save Campaign Variables" : "Push Offer Live"}
+                    </button>
                 </Modal.Footer>
             </Modal>
 
-            {/* MODAL: View Redemptions */}
-            <Modal show={showRedemptionModal} onHide={() => setShowRedemptionModal(false)} size="xl" centered contentClassName="bg-dark text-light">
-                <Modal.Header closeButton closeVariant="white">
-                    <Modal.Title>Customer Details: {viewingOffer?.offerText}</Modal.Title>
+            {/* ── MODAL: Redemptions Customer Breakdown ─────────── */}
+            <Modal show={showRedemptionModal} onHide={() => setShowRedemptionModal(false)} size="xl" centered>
+                <Modal.Header closeButton>
+                    <Modal.Title>Redemption Registries: <span className="text-gold">{viewingOffer?.offerText}</span></Modal.Title>
                 </Modal.Header>
                 <Modal.Body>
-                    <Row className="mb-3 g-2">
-                        <Col md={5}>
-                            <Form.Control
+                    <div className="toolbar align-items-center mb-4">
+                        <div className="toolbar-filters m-0">
+                            <input
                                 type="text"
-                                placeholder="Search by name, phone, or code..."
+                                className="adm-input"
+                                placeholder="Filter ledger by name, code..."
                                 value={customerSearchQuery}
                                 onChange={(e) => setCustomerSearchQuery(e.target.value)}
-                                className="bg-dark text-light border-warning offerSearchBar"
+                                style={{ minWidth: "260px" }}
                             />
-                        </Col>
-                        <Col md={3}>
-                            <Form.Select
+                            <select
+                                className="adm-select"
                                 value={claimFilter}
                                 onChange={(e) => setClaimFilter(e.target.value)}
-                                className="bg-dark text-light border-warning"
                             >
-                                <option value="all">All Status</option>
-                                <option value="claimed">Claimed</option>
-                                <option value="pending">Pending</option>
-                            </Form.Select>
-                        </Col>
-                        <Col md={4}>
-                            <Button variant="success" className="w-100 fw-bold" onClick={exportToExcel} disabled={filteredCustomers.length === 0}>
-                                Download Excel ({filteredCustomers.length})
-                            </Button>
-                        </Col>
-                    </Row>
+                                <option value="all">Filter Claim Status: All</option>
+                                <option value="claimed">State: Claimed Only</option>
+                                <option value="pending">State: Pending Collection</option>
+                            </select>
+                        </div>
+                        <div className="toolbar-actions">
+                            <button
+                                className="btn-gold"
+                                onClick={exportToExcel}
+                                disabled={filteredCustomers.length === 0}
+                                style={{ background: "var(--teal) !important", color: "var(--bg-base) !important" }}
+                            >
+                                <FiDownload size={15} className="me-2" /> Extract Sheet ({filteredCustomers.length})
+                            </button>
+                        </div>
+                    </div>
 
                     {loadingRedemptions ? (
-                        <div className="text-center py-4"><Spinner animation="border" variant="warning" /></div>
+                        <div className="text-center py-5"><Spinner animation="border" variant="warning" /></div>
                     ) : filteredCustomers.length > 0 ? (
-                        <Table hover responsive variant="dark" className="align-middle">
-                            <thead className="text-warning">
-                                <tr>
-                                    <th className="text-center">Claimed</th>
-                                    <th className="text-center">Code</th>
-                                    <th>Customer Name</th>
-                                    <th>Phone</th>
-                                    <th>Address</th>
-                                    <th>Date Generated</th>
-                                    <th className="text-center">Actions</th>
-                                </tr>
-                            </thead>
-                            <tbody>
-                                {filteredCustomers.map((r) => (
-                                    <tr key={r.id}>
-                                        <td className="text-center">
-                                            <Form.Check
-                                                type="switch"
-                                                id={`custom-switch-${r.id}`}
-                                                checked={r.claimed || false}
-                                                onChange={() => handleToggleClaimed(r.id, r.claimed, r.offerText)}
-                                            />
-                                        </td>
-                                        <td className="text-center">
-                                            <span className="badge bg-warning text-dark font-monospace" style={{ fontSize: '0.9rem' }}>
-                                                {r.securityCode || "N/A"}
-                                            </span>
-                                        </td>
-                                        <td>{r.customerName}</td>
-                                        <td>{r.customerPhone}</td>
-                                        <td style={{ fontSize: '0.85rem' }}>{r.customerAddress}</td>
-                                        <td>{r.redeemedAt?.toDate().toLocaleDateString('en-GB', { day: 'numeric', month: 'short', year: 'numeric' }) || "N/A"}</td>
-                                        <td className="text-center">
-                                            <Button variant="outline-danger" size="sm" onClick={() => handleDeleteRedemption(r.id, r.claimed, r.offerText)}>Delete Record</Button>
-                                        </td>
+                        <div className="products-table-wrap border-0">
+                            <table className="adm-table">
+                                <thead>
+                                    <tr>
+                                        <th>Claim Swapped</th>
+                                        <th>Security Token</th>
+                                        <th className="text-start">Beneficiary Name</th>
+                                        <th>Contact Channel</th>
+                                        <th className="text-start">Demographic Address</th>
+                                        <th>Timestamp</th>
+                                        <th>Ledger Adjustment</th>
                                     </tr>
-                                ))}
-                            </tbody>
-                        </Table>
+                                </thead>
+                                <tbody>
+                                    {filteredCustomers.map((r) => (
+                                        <tr key={r.id}>
+                                            <td>
+                                                <div className="form-check-adm justify-content-center p-0">
+                                                    <input
+                                                        type="checkbox"
+                                                        className="form-check-input m-0"
+                                                        checked={r.claimed || false}
+                                                        onChange={() => handleToggleClaimed(r.id, r.claimed, r.offerText)}
+                                                    />
+                                                </div>
+                                            </td>
+                                            <td>
+                                                <span className="brand-badge font-monospace px-3 py-1 bg-dark" style={{ borderColor: 'var(--border-gold)', color: 'var(--gold-light)' }}>
+                                                    {r.securityCode || "VOID"}
+                                                </span>
+                                            </td>
+                                            <td className="td-name text-start">{r.customerName}</td>
+                                            <td className="font-monospace">{r.customerPhone}</td>
+                                            <td className="text-start small opacity-75" style={{ fontSize: '0.8rem', maxWidth: "220px", overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>
+                                                {r.customerAddress}
+                                            </td>
+                                            <td style={{ fontSize: "0.8rem" }}>{r.redeemedAt?.toDate().toLocaleDateString('en-GB', { day: 'numeric', month: 'short', year: 'numeric' }) || "N/A"}</td>
+                                            <td>
+                                                <button className="btn-danger-sm py-1 px-2" onClick={() => handleDeleteRedemption(r.id, r.claimed, r.offerText)}>
+                                                    Remove Record
+                                                </button>
+                                            </td>
+                                        </tr>
+                                    ))}
+                                </tbody>
+                            </table>
+                        </div>
                     ) : (
-                        <p className="text-center py-3">No matching records found.</p>
+                        <div className="text-center py-4 text-muted small">No target customer redemptions match selection criteria.</div>
                     )}
                 </Modal.Body>
             </Modal>
+
+            {/* ── Centralized System Feedback Notification Toast ── */}
+            {showToast && (
+                <div className="adm-toast">
+                    <span><FiAlertCircle size={16} className="me-2" /> {toastMsg}</span>
+                    <button className="toast-close" onClick={() => setShowToast(false)}>
+                        <FiX size={14} />
+                    </button>
+                </div>
+            )}
         </>
     );
 };
