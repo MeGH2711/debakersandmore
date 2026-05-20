@@ -22,14 +22,11 @@ import "bootstrap/dist/css/bootstrap.min.css";
 import "./AdminDashboard.css";
 import "./AdminOffers.css";
 
-// ── IMPORT ALL AVAILABLE VOUCHER TEMPLATES ──────────────────
-import RepublicDayVoucher from "../../components/Vouchers/RepublicDayVoucher";
+// Voucher Templates
 import RegularVoucher from "../../components/Vouchers/VoucherTemplate";
-// Import your new vouchers here as you build them:
-// import ChristmasVoucher from "../../components/Vouchers/ChristmasVoucher";
-// import BirthdayVoucher from "../../components/Vouchers/BirthdayVoucher";
+import RepublicDayVoucher from "../../components/Vouchers/RepublicDayVoucher";
 
-// Icons replacement for emojis and text buttons
+// Icons
 import {
     FiPlus,
     FiPercent,
@@ -44,18 +41,13 @@ import {
     FiX
 } from "react-icons/fi";
 
-// ── REGISTRY MAP FOR MULTIPLE VOUCHERS ───────────────────────
-// Easily add, rename, or update templates in one central place
+// Registry Map for Multiple Vouchers
 const VOUCHER_TEMPLATES = {
     RepublicDay: { label: "Republic Day Voucher", component: RepublicDayVoucher },
     SecondTemplate: { label: "Regular Voucher", component: RegularVoucher },
-    // New templates scale out cleanly like this:
-    // Christmas: { label: "Christmas Special Voucher", component: ChristmasVoucher },
-    // Birthday: { label: "Birthday Reward Voucher", component: BirthdayVoucher },
 };
 
-// Fallback template token if an offer points to a legacy or deleted template
-const DEFAULT_TEMPLATE_KEY = "RepublicDay";
+const DEFAULT_TEMPLATE_KEY = "RegularVoucher";
 
 const AdminOffers = () => {
     const [offers, setOffers] = useState([]);
