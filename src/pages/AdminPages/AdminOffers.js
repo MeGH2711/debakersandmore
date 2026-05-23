@@ -79,6 +79,14 @@ const AdminOffers = () => {
     const [toastMsg, setToastMsg] = useState("");
     const [showToast, setShowToast] = useState(false);
 
+    // Dynamic Confirmation Modal States
+    const [showConfirmModal, setShowConfirmModal] = useState(false);
+    const [confirmConfig, setConfirmConfig] = useState({
+        title: "",
+        message: "",
+        onConfirm: () => {}
+    });
+
     const navigate = useNavigate();
     const auth = getAuth();
 
@@ -166,7 +174,6 @@ const AdminOffers = () => {
         setNewOfferDescription(offer.description || "");
         setValidUntil(offer.validUntil);
         setShowOfferModal(true);
-        // Fallback to default safely if the DB value is missing or old
         setSelectedTemplate(offer.template && VOUCHER_TEMPLATES[offer.template] ? offer.template : DEFAULT_TEMPLATE_KEY);
     };
 
@@ -261,22 +268,31 @@ const AdminOffers = () => {
         }
     };
 
-    const handleDeleteRedemption = async (redemptionId, isClaimed, offerText) => {
-        if (!window.confirm("Are you sure you want to delete this customer record?")) return;
-        try {
-            await deleteDoc(doc(db, "redeemed_offers", redemptionId));
-            setRedemptions(prev => prev.filter(r => r.id !== redemptionId));
-            setStats(prev => ({
-                ...prev,
-                [offerText]: {
-                    ...prev[offerText],
-                    redeemed: Math.max(0, (prev[offerText]?.redeemed || 0) - 1),
-                    claimed: isClaimed ? Math.max(0, (prev[offerText]?.claimed || 0) - 1) : (prev[offerText]?.claimed || 0)
+    // Modified to use Custom Confirmation Modal
+    const handleDeleteRedemption = (redemptionId, isClaimed, offerText) => {
+        setConfirmConfig({
+            title: "Delete Customer Record",
+            message: "Are you sure you want to delete this customer record permanently from the ledger?",
+            onConfirm: async () => {
+                try {
+                    await deleteDoc(doc(db, "redeemed_offers", redemptionId));
+                    setRedemptions(prev => prev.filter(r => r.id !== redemptionId));
+                    setStats(prev => ({
+                        ...prev,
+                        [offerText]: {
+                            ...prev[offerText],
+                            redeemed: Math.max(0, (prev[offerText]?.redeemed || 0) - 1),
+                            claimed: isClaimed ? Math.max(0, (prev[offerText]?.claimed || 0) - 1) : (prev[offerText]?.claimed || 0)
+                        }
+                    }));
+                    setShowConfirmModal(false);
+                } catch (error) {
+                    console.error("Error deleting redemption:", error);
+                    triggerToast("Error adjusting ledger.");
                 }
-            }));
-        } catch (error) {
-            console.error("Error deleting redemption:", error);
-        }
+            }
+        });
+        setShowConfirmModal(true);
     };
 
     const handleToggleDisplay = async (id, currentStatus) => {
@@ -289,14 +305,23 @@ const AdminOffers = () => {
         }
     };
 
-    const handleDelete = async (id) => {
-        if (!window.confirm("Delete this offer permanently?")) return;
-        try {
-            await deleteDoc(doc(db, "offers", id));
-            setOffers((prev) => prev.filter((o) => o.id !== id));
-        } catch (error) {
-            console.error("Error deleting offer:", error);
-        }
+    // Modified to use Custom Confirmation Modal
+    const handleDelete = (id) => {
+        setConfirmConfig({
+            title: "Delete Promotional Offer",
+            message: "Are you sure you want to permanently delete this offer? This process cannot be undone.",
+            onConfirm: async () => {
+                try {
+                    await deleteDoc(doc(db, "offers", id));
+                    setOffers((prev) => prev.filter((o) => o.id !== id));
+                    setShowConfirmModal(false);
+                } catch (error) {
+                    console.error("Error deleting offer:", error);
+                    triggerToast("Error discarding promotional campaign.");
+                }
+            }
+        });
+        setShowConfirmModal(true);
     };
 
     const filteredOffers = offers.filter((o) =>
@@ -320,7 +345,6 @@ const AdminOffers = () => {
 
     const hasActiveFilters = searchQuery;
 
-    // Resolve which template component should render inside the preview modal
     const getPreviewComponent = () => {
         if (!previewOffer) return null;
         const targetTemplate = VOUCHER_TEMPLATES[previewOffer.template] || VOUCHER_TEMPLATES[DEFAULT_TEMPLATE_KEY];
@@ -560,7 +584,6 @@ const AdminOffers = () => {
                                 value={selectedTemplate}
                                 onChange={(e) => setSelectedTemplate(e.target.value)}
                             >
-                                {/* Maps out options directly from registry keys */}
                                 {Object.keys(VOUCHER_TEMPLATES).map((key) => (
                                     <option key={key} value={key}>
                                         {VOUCHER_TEMPLATES[key].label}
@@ -702,6 +725,26 @@ const AdminOffers = () => {
                         <div className="text-center py-4 text-muted small">No target customer redemptions match selection criteria.</div>
                     )}
                 </Modal.Body>
+            </Modal>
+
+            {/* ── MODAL: Centralized Action Confirmation System ── */}
+            <Modal show={showConfirmModal} onHide={() => setShowConfirmModal(false)} centered size="md" className="confirm-action-modal">
+                <Modal.Header closeButton>
+                    <Modal.Title className="text-danger-custom d-flex align-items-center">
+                        <FiAlertCircle className="me-2" size={20} /> {confirmConfig.title}
+                    </Modal.Title>
+                </Modal.Header>
+                <Modal.Body>
+                    <p className="m-0 confirm-modal-text">{confirmConfig.message}</p>
+                </Modal.Body>
+                <Modal.Footer>
+                    <button className="btn-ghost" onClick={() => setShowConfirmModal(false)}>
+                        Cancel
+                    </button>
+                    <button className="btn-danger-action" onClick={confirmConfig.onConfirm}>
+                        Confirm Delete
+                    </button>
+                </Modal.Footer>
             </Modal>
 
             {/* ── Centralized System Feedback Notification Toast ── */}

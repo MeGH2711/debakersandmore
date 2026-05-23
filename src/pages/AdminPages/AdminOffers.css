@@ -114,3 +114,35 @@
     align-items: center;
     height: 100%;
 }
+
+/* ── Centralized Action Confirmation Modal Styling ── */
+.confirm-action-modal .modal-content {
+    border: 1px solid var(--border) !important;
+}
+
+.text-danger-custom {
+    color: #ef4444;
+    font-size: 1.15rem;
+    font-weight: 600;
+}
+
+.confirm-modal-text {
+    color: var(--text-secondary);
+    font-size: 0.95rem;
+    line-height: 1.5;
+}
+
+.btn-danger-action {
+    background-color: #ef4444 !important;
+    color: #fff !important;
+    border: none;
+    padding: 0.45rem 1.2rem;
+    border-radius: 4px;
+    font-size: 0.85rem;
+    font-weight: 500;
+    transition: background-color 0.2s ease;
+}
+
+.btn-danger-action:hover {
+    background-color: #dc2626 !important;
+}
