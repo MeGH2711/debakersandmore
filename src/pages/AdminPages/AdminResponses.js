@@ -312,7 +312,7 @@ const AdminResponses = () => {
                                                             <div className="date-string">
                                                                 <FiCalendar size={12} className="me-1" /> {date}
                                                             </div>
-                                                            <div className="time-string text-muted">
+                                                            <div className="time-string">
                                                                 <FiClock size={12} className="me-1" /> {time}
                                                             </div>
                                                         </div>
@@ -332,8 +332,8 @@ const AdminResponses = () => {
                                     </tbody>
                                 </table>
                             ) : (
-                                <div className="text-center py-5 text-muted empty-state-box">
-                                    <FiMessageSquare size={40} className="mb-3 text-muted opacity-25" />
+                                <div className="text-center py-5 empty-state-box">
+                                    <FiMessageSquare size={40} className="mb-3 opacity-25" />
                                     <p className="mb-0">No matching user submissions found.</p>
                                 </div>
                             )}
