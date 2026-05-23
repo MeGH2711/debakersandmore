@@ -99,7 +99,7 @@
 .voucher1-exclusive-tag {
     display: inline-block; /* FIX: prevent full-width stretch */
     align-self: flex-start;
-    font-size: 0.7rem;
+    font-size: 0.5rem;
     font-weight: 700;
     letter-spacing: 3px;
     color: #d4af37;
@@ -109,7 +109,7 @@
 }
 
 .voucher1-main-offer-title {
-    font-size: 2.4rem; /* FIX: reduced from 2.8rem to prevent overflow */
+    font-size: 2rem; /* FIX: reduced from 2.8rem to prevent overflow */
     font-weight: 900;
     margin: 0;
     letter-spacing: -1px;
@@ -118,6 +118,7 @@
     overflow: hidden;
     display: -webkit-box;
     -webkit-line-clamp: 2;
+    line-clamp: 2;
     -webkit-box-orient: vertical;
 }
 
