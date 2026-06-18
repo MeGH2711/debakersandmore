@@ -143,6 +143,222 @@
     transition: background-color 0.2s ease;
 }
 
-.btn-danger-action:hover {
-    background-color: #dc2626 !important;
+/* ── Offer Modal — Two-Column Layout ──────────────────────────── */
+.offer-modal-layout {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 1.5rem;
+    align-items: start;
+}
+
+.offer-modal-fields {
+    display: flex;
+    flex-direction: column;
+}
+
+.offer-modal-calendar {
+    display: flex;
+    flex-direction: column;
+}
+
+@media (max-width: 640px) {
+    .offer-modal-layout {
+        grid-template-columns: 1fr;
+    }
+}
+
+/* ── Inline Calendar Widget ────────────────────────────────────── */
+.cal-wrap {
+    background-color: var(--bg-elevated);
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    padding: 0.85rem;
+    user-select: none;
+}
+
+/* Header nav row */
+.cal-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 0.5rem;
+}
+
+.cal-month-label {
+    font-size: 0.9rem;
+    font-weight: 600;
+    color: var(--text-primary);
+    letter-spacing: 0.02em;
+}
+
+.cal-nav-btn {
+    background: none;
+    border: 1px solid var(--border);
+    border-radius: 6px;
+    color: var(--text-secondary);
+    cursor: pointer;
+    font-size: 1.1rem;
+    line-height: 1;
+    padding: 0.2rem 0.55rem;
+    transition: border-color 0.15s, color 0.15s;
+}
+
+.cal-nav-btn:hover {
+    border-color: var(--gold);
+    color: var(--gold);
+}
+
+/* Year quick-jump chips */
+.cal-year-row {
+    display: flex;
+    gap: 0.35rem;
+    flex-wrap: wrap;
+    margin-bottom: 0.65rem;
+}
+
+.cal-year-chip {
+    background: none;
+    border: 1px solid var(--border);
+    border-radius: 20px;
+    color: var(--text-secondary);
+    cursor: pointer;
+    font-size: 0.72rem;
+    padding: 0.18rem 0.6rem;
+    transition: border-color 0.15s, color 0.15s, background-color 0.15s;
+}
+
+.cal-year-chip:hover {
+    border-color: var(--gold);
+    color: var(--gold);
+}
+
+.cal-year-chip.active {
+    background-color: var(--gold);
+    border-color: var(--gold);
+    color: var(--bg-base);
+    font-weight: 600;
+}
+
+/* 7-column grid for days */
+.cal-grid {
+    display: grid;
+    grid-template-columns: repeat(7, 1fr);
+    grid-template-rows: repeat(6, 1fr); /* Forces exactly 6 rows structurally */
+    gap: 3px;
+}
+
+.cal-day-hdr {
+    font-size: 0.65rem;
+    font-weight: 600;
+    color: var(--text-muted);
+    text-align: center;
+    padding: 0.2rem 0;
+    letter-spacing: 0.04em;
+}
+
+.cal-day {
+    aspect-ratio: 1;
+    background: none;
+    border: 1px solid transparent;
+    border-radius: 6px;
+    color: var(--text-secondary);
+    cursor: pointer;
+    font-size: 0.78rem;
+    font-weight: 500;
+    transition: background-color 0.12s, border-color 0.12s, color 0.12s;
+    width: 100%;
+}
+
+.cal-day:hover:not(:disabled) {
+    background-color: var(--bg-base);
+    border-color: var(--border-gold, var(--gold));
+    color: var(--gold);
+}
+
+.cal-day.today {
+    border-color: var(--gold);
+    color: var(--gold);
+    font-weight: 700;
+}
+
+.cal-day.selected {
+    background-color: var(--gold) !important;
+    border-color: var(--gold) !important;
+    color: var(--bg-base) !important;
+    font-weight: 700;
+}
+
+.cal-day.past {
+    color: var(--text-muted);
+    cursor: not-allowed;
+    opacity: 0.35;
+}
+
+/* Footer — selected date display */
+.cal-footer {
+    border-top: 1px solid var(--border);
+    margin-top: 0.65rem;
+    padding-top: 0.55rem;
+    text-align: center;
+}
+
+.cal-selected-label {
+    color: var(--gold);
+    font-size: 0.8rem;
+    font-weight: 600;
+}
+
+.cal-selected-placeholder {
+    color: var(--text-muted);
+    font-size: 0.78rem;
+}
+/* Manual date input row inside calendar footer */
+.cal-manual-row {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    margin-bottom: 0.45rem;
+}
+
+.cal-manual-input {
+    flex: 1;
+    background-color: var(--bg-base);
+    border: 1px solid var(--border);
+    border-radius: 6px;
+    color: var(--text-primary);
+    font-size: 0.8rem;
+    padding: 0.3rem 0.55rem;
+    outline: none;
+    transition: border-color 0.15s;
+    width: 100%;
+    color-scheme: dark;
+}
+
+.cal-manual-input:focus {
+    border-color: var(--gold);
+}
+
+.cal-manual-input.cal-input-error {
+    border-color: #ef4444 !important;
+}
+
+.cal-input-err-msg {
+    color: #ef4444;
+    font-size: 0.72rem;
+    white-space: nowrap;
+}
+
+/* Ensure the manual date input match modal theme styling perfectly */
+.offer-modal-fields input[type="date"].form-control-adm {
+    background-color: var(--bg-elevated) !important;
+    border: 1px solid var(--border) !important;
+    color: var(--text-primary) !important;
+    border-radius: 6px;
+    padding: 0.45rem 0.75rem;
+    outline: none;
+    transition: border-color 0.15s ease;
+}
+
+.offer-modal-fields input[type="date"].form-control-adm:focus {
+    border-color: var(--gold) !important;
 }

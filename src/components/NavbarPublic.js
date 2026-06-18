@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useState, useRef } from "react";
 import { Navbar, Container, Nav } from "react-bootstrap";
 import { NavLink } from "react-router-dom";
 import "./NavbarPublic.css";
@@ -8,6 +8,7 @@ function NavbarPublic() {
   const [showNavbar, setShowNavbar] = useState(true);
   const [lastScrollY, setLastScrollY] = useState(0);
   const [openMenu, setOpenMenu] = useState(false);
+  const collapseRef = useRef(null);
 
   // Hide Navbar on Scroll
   useEffect(() => {
@@ -24,15 +25,28 @@ function NavbarPublic() {
     return () => window.removeEventListener("scroll", handleScroll);
   }, [lastScrollY]);
 
+  // Close menu on outside click
+  useEffect(() => {
+    if (!openMenu) return;
+    const handler = (e) => {
+      if (collapseRef.current && !collapseRef.current.contains(e.target)) {
+        setOpenMenu(false);
+      }
+    };
+    document.addEventListener("mousedown", handler);
+    return () => document.removeEventListener("mousedown", handler);
+  }, [openMenu]);
+
   return (
     <>
       <Navbar
         expand="lg"
         className={`public-navbar shadow-sm ${showNavbar ? "slide-down" : "slide-up"}`}
+        ref={collapseRef}
       >
         <Container>
           <Navbar.Brand className="d-flex align-items-center">
-            <img src={logo} alt="De Baker’s & More Logo" className="brand-logo" />
+            <img src={logo} alt="De Baker's & More Logo" className="brand-logo" />
           </Navbar.Brand>
 
           <div
@@ -60,6 +74,9 @@ function NavbarPublic() {
               </NavLink>
               <NavLink to="/menu" className="nav-link-custom" onClick={() => setOpenMenu(false)}>
                 Menu
+              </NavLink>
+              <NavLink to="/cakes" className="nav-link-custom" onClick={() => setOpenMenu(false)}>
+                Cakes
               </NavLink>
               <NavLink to="/contact" className="nav-link-custom" onClick={() => setOpenMenu(false)}>
                 Contact Us

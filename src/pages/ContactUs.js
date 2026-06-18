@@ -1,29 +1,55 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
+import { Link } from "react-router-dom";
 import "./ContactUs.css";
 import PublicFooter from "../components/PublicFooter";
 import { db } from "../firebase";
 import { collection, addDoc, serverTimestamp } from "firebase/firestore";
-// Added FaGoogle and FaStar to imports
-import { FaFacebookF, FaInstagram, FaYoutube, FaWhatsapp, FaClock, FaMapMarkerAlt, FaPhoneAlt, FaEnvelope, FaGoogle, FaStar } from "react-icons/fa";
+import {
+  FaFacebookF,
+  FaInstagram,
+  FaYoutube,
+  FaWhatsapp,
+  FaClock,
+  FaMapMarkerAlt,
+  FaPhoneAlt,
+  FaEnvelope,
+  FaGoogle,
+  FaStar,
+} from "react-icons/fa";
+
+/* ── Scroll reveal hook (same as Home) ── */
+function useScrollReveal() {
+  useEffect(() => {
+    const els = document.querySelectorAll(".contactUsPage-reveal");
+    if (!els.length) return;
+    const obs = new IntersectionObserver(
+      (entries) =>
+        entries.forEach((e) => e.isIntersecting && e.target.classList.add("contactUsPage-visible")),
+      { threshold: 0.12 }
+    );
+    els.forEach((el) => obs.observe(el));
+    return () => obs.disconnect();
+  }, []);
+}
 
 function ContactUs() {
+  useScrollReveal();
+
   const [formData, setFormData] = useState({
     name: "",
     phone: "",
     email: "",
     message: "",
   });
-
   const [status, setStatus] = useState("");
   const [fadeOut, setFadeOut] = useState(false);
 
-  const handleChange = (e) => {
+  const handleChange = (e) =>
     setFormData({ ...formData, [e.target.name]: e.target.value });
-  };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    setStatus("Submitting...");
+    setStatus("Submitting…");
     setFadeOut(false);
 
     if (!formData.name || !formData.phone || !formData.message) {
@@ -37,9 +63,8 @@ function ContactUs() {
         reviewed: false,
         timestamp: serverTimestamp(),
       });
-      setStatus("Thank you! Your message has been submitted successfully.");
+      setStatus("Thank you — your message has been received.");
       setFormData({ name: "", phone: "", email: "", message: "" });
-
       setTimeout(() => setFadeOut(true), 4500);
       setTimeout(() => setStatus(""), 5000);
     } catch (error) {
@@ -50,154 +75,277 @@ function ContactUs() {
 
   return (
     <>
-      <div className="contact-page">
-        {/* 1. Hero Section */}
-        <section className="contact-hero text-center">
-          <h1 className="contact-heading">Bake Your Connection</h1>
-          <p className="contact-subtext">
-            For custom orders, collaborations, or a simple hello, we’re ready to connect. Use the form or find our details below.
-          </p>
+      <div className="contactUsPage-contact-page">
+
+        {/* ─── HERO ─── */}
+        <section className="contactUsPage-contact-hero">
+          <div className="contactUsPage-contact-hero-bg-text" aria-hidden="true">Connect</div>
+          <div className="contactUsPage-contact-hero-inner">
+            <p className="contactUsPage-contact-eyebrow">De Bakers & More</p>
+            <h1 className="contactUsPage-contact-heading">
+              Bake Your <em>Connection</em>
+            </h1>
+            <p className="contactUsPage-contact-subtext">
+              For custom orders, collaborations, or a simple hello — we're ready
+              to connect. Use the form or find our details below.
+            </p>
+          </div>
         </section>
 
-        {/* 2. Main Content Grid */}
-        <div className="contact-main-grid">
+        <div className="contactUsPage-contact-divider" />
 
-          {/* A. LEFT COLUMN WRAPPER (Form + Review Card) */}
-          <div className="contact-left-column">
+        {/* ─── MAIN BODY GRID ─── */}
+        <div className="contactUsPage-contact-body">
 
-            {/* Contact Form Section */}
-            <section className="contact-form-section">
-              <h2 className="section-title-new">Send Us a Message</h2>
-              <form className="contact-form-new" onSubmit={handleSubmit}>
-                <div className="form-group-new">
-                  <input type="text" name="name" placeholder="Full Name *" value={formData.name} onChange={handleChange} required />
+          {/* LEFT — Form + Review Strip */}
+          <div className="contactUsPage-contact-left">
+
+            {/* Section label */}
+            <div className="contactUsPage-reveal">
+              <p className="contactUsPage-c-label">Get In Touch</p>
+              <h2 className="contactUsPage-c-title">Send Us a <em>Message</em></h2>
+            </div>
+
+            {/* Glass Form Panel */}
+            <div className="contactUsPage-contact-form-panel contactUsPage-reveal contactUsPage-reveal-delay-1">
+              <form className="contactUsPage-contact-form" onSubmit={handleSubmit} noValidate>
+
+                <div className="contactUsPage-form-row">
+                  <div className="contactUsPage-form-field">
+                    <input
+                      type="text"
+                      name="name"
+                      placeholder="Full Name *"
+                      value={formData.name}
+                      onChange={handleChange}
+                      required
+                    />
+                  </div>
+                  <div className="contactUsPage-form-field">
+                    <input
+                      type="tel"
+                      name="phone"
+                      placeholder="Phone Number *"
+                      value={formData.phone}
+                      onChange={handleChange}
+                      required
+                    />
+                  </div>
                 </div>
 
-                <div className="form-group-new">
-                  <input type="tel" name="phone" placeholder="Phone Number *" value={formData.phone} onChange={handleChange} required />
+                <div className="contactUsPage-form-field">
+                  <input
+                    type="email"
+                    name="email"
+                    placeholder="Email Address (optional)"
+                    value={formData.email}
+                    onChange={handleChange}
+                  />
                 </div>
 
-                <div className="form-group-new">
-                  <input type="email" name="email" placeholder="Email ID (Optional)" value={formData.email} onChange={handleChange} />
+                <div className="contactUsPage-form-field">
+                  <textarea
+                    name="message"
+                    placeholder="Your message, custom order idea, or enquiry *"
+                    rows="6"
+                    value={formData.message}
+                    onChange={handleChange}
+                    required
+                  />
                 </div>
 
-                <div className="form-group-new">
-                  <textarea name="message" placeholder="Your Sweet Message *" rows="5" value={formData.message} onChange={handleChange} required></textarea>
-                </div>
-
-                <button type="submit" className="submit-btn-new">
-                  Send Message
+                <button type="submit" className="contactUsPage-contact-submit">
+                  <span>Send Message</span>
                 </button>
 
                 {status && (
-                  <p className={`form-status ${fadeOut ? "fade-out" : ""}`}>
+                  <p className={`contactUsPage-form-status ${fadeOut ? "contactUsPage-fade-out" : ""}`}>
                     {status}
                   </p>
                 )}
               </form>
-            </section>
+            </div>
 
-            {/* NEW: Google Review Card */}
-            <section className="google-review-card">
-              <div className="review-content">
-                <div className="review-text">
-                  <h3>Loved our Bakes?</h3>
-                  <div className="stars">
-                    <FaStar /><FaStar /><FaStar /><FaStar /><FaStar />
-                  </div>
-                  <p>Rate us on Google and help others find us!</p>
+            {/* Google Review Strip */}
+            <div className="contactUsPage-google-review-strip contactUsPage-reveal contactUsPage-reveal-delay-2">
+              <div className="contactUsPage-google-review-left">
+                <h4>Loved our Bakes?</h4>
+                <div className="contactUsPage-google-review-stars">
+                  {[...Array(5)].map((_, i) => <FaStar key={i} />)}
                 </div>
-                <a
-                  href="https://g.page/r/CYngCkd3rft1EBM/review"
-                  target="_blank"
-                  rel="noreferrer"
-                  className="google-btn"
-                >
-                  <FaGoogle className="btn-icon" /> Write a Review
-                </a>
+                <p>Share your experience and help others find us.</p>
               </div>
-            </section>
+              <a
+                href="https://g.page/r/CYngCkd3rft1EBM/review"
+                target="_blank"
+                rel="noreferrer"
+                className="contactUsPage-google-btn-outline"
+              >
+                <FaGoogle /> Write a Review
+              </a>
+            </div>
 
           </div>
 
-          {/* B. Details and Location (Right/Bottom) */}
-          <div className="contact-details-location-group">
+          {/* RIGHT — Details + Map */}
+          <div className="contactUsPage-contact-right">
 
-            {/* Contact Details Cards */}
-            <section className="contact-details-compact">
-              <h3 className="section-title-small">Our Details</h3>
+            <div className="contactUsPage-reveal">
+              <p className="contactUsPage-c-label">Our Details</p>
+              <h2 className="contactUsPage-c-title">Find & <em>Reach Us</em></h2>
+            </div>
 
-              <div className="contact-card-compact">
-                <FaMapMarkerAlt className="card-icon" />
-                <div className="card-content">
-                  <h4>Address</h4>
-                  <a href="https://maps.app.goo.gl/XZTJqPGctiB9j5C88" target="_blank" rel="noreferrer">
-                    De Baker’s & More, Ahmedabad, Gujarat, India
+            {/* Detail Cards */}
+            <div className="contactUsPage-contact-details-panel contactUsPage-reveal contactUsPage-reveal-delay-1">
+
+              <div className="contactUsPage-contact-detail-item">
+                <div className="contactUsPage-detail-icon-wrap">
+                  <FaMapMarkerAlt />
+                </div>
+                <div className="contactUsPage-detail-body">
+                  <h5>Address</h5>
+                  <a
+                    href="https://maps.app.goo.gl/XZTJqPGctiB9j5C88"
+                    target="_blank"
+                    rel="noreferrer"
+                  >
+                    De Baker's & More, Ahmedabad, Gujarat, India
                   </a>
                 </div>
               </div>
 
-              <div className="contact-card-compact">
-                <FaPhoneAlt className="card-icon" />
-                <div className="card-content">
-                  <h4>Call</h4>
+              <div className="contactUsPage-contact-detail-item">
+                <div className="contactUsPage-detail-icon-wrap">
+                  <FaPhoneAlt />
+                </div>
+                <div className="contactUsPage-detail-body">
+                  <h5>Call Us</h5>
                   <a href="tel:+919879718228">+91 98797 18228</a>
                 </div>
               </div>
 
-              <div className="contact-card-compact">
-                <FaEnvelope className="card-icon" />
-                <div className="card-content">
-                  <h4>Email</h4>
-                  <a href="mailto:debakersandmore@gmail.com">debakersandmore@gmail.com</a>
+              <div className="contactUsPage-contact-detail-item">
+                <div className="contactUsPage-detail-icon-wrap">
+                  <FaEnvelope />
+                </div>
+                <div className="contactUsPage-detail-body">
+                  <h5>Email</h5>
+                  <a href="mailto:debakersandmore@gmail.com">
+                    debakersandmore@gmail.com
+                  </a>
                 </div>
               </div>
 
-              <div className="contact-card-compact timing-card">
-                <FaClock className="card-icon" />
-                <div className="card-content">
-                  <h4>Hours</h4>
-                  <span>Mon – Sun: 9:00 AM – 11:00 PM</span>
+              <div className="contactUsPage-contact-detail-item">
+                <div className="contactUsPage-detail-icon-wrap">
+                  <FaClock />
+                </div>
+                <div className="contactUsPage-detail-body">
+                  <h5>Hours</h5>
+                  <span>Mon – Sun  ·  9:00 AM – 11:00 PM</span>
                 </div>
               </div>
-            </section>
 
-            {/* Map Section */}
-            <section className="map-section-new">
-              <h3 className="section-title-small">Find Us</h3>
-              <div className="map-container-new">
-                <iframe
-                  title="De Baker’s & More Location"
-                  src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3669.8748128583193!2d72.53305487477262!3d23.10167811337247!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x395e832d7734dec1%3A0x75fbad77470ae089!2sDe%20Baker's%20%26%20more!5e0!3m2!1sen!2sin!4v1761582919686!5m2!1sen!2sin"
-                  allowFullScreen=""
-                  loading="lazy"
-                  referrerPolicy="no-referrer-when-downgrade"
-                ></iframe>
+            </div>
+
+            {/* Map */}
+            <div className="contactUsPage-contact-map-panel contactUsPage-reveal contactUsPage-reveal-delay-2">
+              <div className="contactUsPage-contact-map-label">
+                <span>Find Us</span>
+                <a
+                  href="https://maps.app.goo.gl/XZTJqPGctiB9j5C88"
+                  target="_blank"
+                  rel="noreferrer"
+                >
+                  Open in Maps ↗
+                </a>
               </div>
-            </section>
+              <iframe
+                title="De Baker's & More Location"
+                src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3669.8748128583193!2d72.53305487477262!3d23.10167811337247!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x395e832d7734dec1%3A0x75fbad77470ae089!2sDe%20Baker's%20%26%20more!5e0!3m2!1sen!2sin!4v1761582919686!5m2!1sen!2sin"
+                allowFullScreen=""
+                loading="lazy"
+                referrerPolicy="no-referrer-when-downgrade"
+              />
+            </div>
 
           </div>
         </div>
 
-        {/* 3. Social Media Section */}
-        <section className="social-section-new text-center">
-          <h2 className="customSectionHeading">Connect with Sweetness</h2>
-          <p className="social-subtext">Stay updated with our newest creations and special offers!</p>
-          <div className="social-icons-new">
-            <a href="https://www.youtube.com/@VimalDeBakers" target="_blank" rel="noreferrer" className="social-icon youtube"><FaYoutube /></a>
-            <a href="https://www.facebook.com/debakersandmore" target="_blank" rel="noreferrer" className="social-icon facebook"><FaFacebookF /></a>
-            <a href="https://www.instagram.com/de.bakers.and.more" target="_blank" rel="noreferrer" className="social-icon instagram"><FaInstagram /></a>
-            <a href="https://wa.me/919879718228" target="_blank" rel="noreferrer" className="social-icon whatsapp"><FaWhatsapp /></a>
+        {/* ─── SOCIAL SECTION ─── */}
+        <section className="contactUsPage-contact-social-section">
+          <p className="contactUsPage-c-label contactUsPage-reveal">Stay Connected</p>
+          <h2 className="contactUsPage-social-heading contactUsPage-reveal contactUsPage-reveal-delay-1">
+            Connect with <em>Sweetness</em>
+          </h2>
+          <div className="contactUsPage-divider-line" />
+          <p className="contactUsPage-social-sub contactUsPage-reveal contactUsPage-reveal-delay-2">
+            Stay updated with our newest creations and special offers.
+          </p>
+
+          <div className="contactUsPage-social-icons-row contactUsPage-reveal contactUsPage-reveal-delay-3">
+            <a
+              href="https://www.youtube.com/@VimalDeBakers"
+              target="_blank"
+              rel="noreferrer"
+              className="contactUsPage-social-icon-link contactUsPage-youtube"
+              aria-label="YouTube"
+            >
+              <FaYoutube />
+            </a>
+            <a
+              href="https://www.facebook.com/debakersandmore"
+              target="_blank"
+              rel="noreferrer"
+              className="contactUsPage-social-icon-link contactUsPage-facebook"
+              aria-label="Facebook"
+            >
+              <FaFacebookF />
+            </a>
+            <a
+              href="https://www.instagram.com/de.bakers.and.more"
+              target="_blank"
+              rel="noreferrer"
+              className="contactUsPage-social-icon-link contactUsPage-instagram"
+              aria-label="Instagram"
+            >
+              <FaInstagram />
+            </a>
+            <a
+              href="https://wa.me/919879718228"
+              target="_blank"
+              rel="noreferrer"
+              className="contactUsPage-social-icon-link contactUsPage-whatsapp"
+              aria-label="WhatsApp"
+            >
+              <FaWhatsapp />
+            </a>
           </div>
         </section>
 
-        {/* 4. Footer Message */}
-        <section className="message-section-new text-center">
-          <h2 className="customSectionHeading">Got a Custom Cake Idea?</h2>
-          <p>
-            Every great celebration deserves a perfect cake. Tell us your vision—we’d be delighted to bake something unique just for you!
-          </p>
+        {/* ─── CLOSING CTA ─── */}
+        <section className="contactUsPage-contact-cta-strip">
+          <div className="contactUsPage-contact-cta-bg-text" aria-hidden="true">Custom</div>
+          <div className="contactUsPage-contact-cta-inner">
+            <p className="contactUsPage-c-label contactUsPage-reveal">Celebrate in Style</p>
+            <h2 className="contactUsPage-contact-cta-title contactUsPage-reveal contactUsPage-reveal-delay-1">
+              Got a Custom <em>Cake Idea?</em>
+            </h2>
+            <p className="contactUsPage-contact-cta-sub contactUsPage-reveal contactUsPage-reveal-delay-2">
+              Every great celebration deserves a perfect cake. Tell us your
+              vision — we'd be delighted to bake something unique just for you.
+            </p>
+            <div className="contactUsPage-cta-btn-row contactUsPage-reveal contactUsPage-reveal-delay-3">
+              <a href="tel:+919879718228" className="contactUsPage-BtnPrimaryGold">
+                <span>Call Us Now</span>
+              </a>
+              <Link to="/menu" className="contactUsPage-BtnGhost">
+                Browse Menu
+              </Link>
+            </div>
+          </div>
         </section>
+
       </div>
 
       <PublicFooter />

@@ -1,25 +1,96 @@
+import { useEffect, useRef, useState } from "react";
+import { Link } from "react-router-dom";
 import { collection, getDocs } from "firebase/firestore";
 import { db } from "../firebase";
-import { useEffect, useState } from "react";
-import { Card, Col, Row, Spinner, Container } from "react-bootstrap";
 import "./MenuPage.css";
 import PublicFooter from "../components/PublicFooter";
 
-function ProductList() {
+/* ─── Status renderer ─── */
+function StatusBadge({ status }) {
+  if (status === true || status === "true")
+    return <span className="menuPageStatusAvailable">Available</span>;
+  if (status === false || status === "false")
+    return <span className="menuPageStatusUnavailable">Unavailable</span>;
+  if (status === "check")
+    return <span className="menuPageStatusCheck">On Request</span>;
+  return null;
+}
+
+/* ─── Single product card ─── */
+function ProductCard({ p }) {
+  const hasIngredients =
+    p.ingredients &&
+    ((Array.isArray(p.ingredients) && p.ingredients.join("").trim() !== "") ||
+      (typeof p.ingredients === "string" && p.ingredients.trim() !== ""));
+
+  const hasBrand = p.isOutsourced && p.brandName && p.brandName.trim() !== "";
+
+  return (
+    <div className="menuPageMenuProductCard">
+      {/* Top row: name + price */}
+      <div className="menuPageCardTop">
+        <h4 className="menuPageCardName">{p.name}</h4>
+        <span className="menuPageCardPrice">₹{p.price}</span>
+      </div>
+
+      {/* Weight pill */}
+      <span className="menuPageCardWeightPill">
+        {p.weight}&nbsp;{p.measurement === "piece" ? "pc" : "gm"}
+      </span>
+
+      {/* Ingredients */}
+      {hasIngredients && (
+        <p className="menuPageCardIngredients">
+          <strong>Ingredients - </strong>
+          {Array.isArray(p.ingredients)
+            ? p.ingredients.join(", ")
+            : p.ingredients}
+        </p>
+      )}
+
+      {/* Brand */}
+      {hasBrand && (
+        <p className="menuPageCardBrand">
+          Brand: <span>{p.brandName}</span>
+        </p>
+      )}
+
+      {/* Footer: status + CTA */}
+      <div className="menuPageCardFooter">
+        <StatusBadge status={p.available} />
+      </div>
+
+      {p.available === "check" && (
+        <a href="tel:+919879718228" className="menuPageCheckAvailBtn">
+          Check Availability
+        </a>
+      )}
+    </div>
+  );
+}
+
+/* ─── Main Page ─── */
+function MenuPage() {
   const [productsByCategory, setProductsByCategory] = useState({});
   const [sortedCategories, setSortedCategories] = useState([]);
-  const [expandedIndex, setExpandedIndex] = useState(null);
   const [loading, setLoading] = useState(true);
   const [searchQuery, setSearchQuery] = useState("");
+  const [activeFilters, setActiveFilters] = useState({
+    available: false,
+    unavailable: false,
+    onRequest: false,
+  });
+  const [activeCategory, setActiveCategory] = useState(null);
+  const [sidebarOpen, setSidebarOpen] = useState(false);
+  const categoryRefs = useRef({});
 
+  /* ─── Fetch data ─── */
   useEffect(() => {
     const fetchData = async () => {
       try {
-        // 🔹 Fetch all products
         const productSnapshot = await getDocs(collection(db, "products"));
         const products = productSnapshot.docs.map((doc) => doc.data());
 
-        // 🔹 Group products by category
         const grouped = products.reduce((acc, item) => {
           const category = item.category || "Uncategorized";
           if (!acc[category]) acc[category] = [];
@@ -27,219 +98,213 @@ function ProductList() {
           return acc;
         }, {});
 
-        // 🔹 Sort products inside each category
         Object.keys(grouped).forEach((cat) => {
           grouped[cat].sort((a, b) => a.price - b.price);
         });
 
         setProductsByCategory(grouped);
 
-        // 🔹 Fetch and sort categories
         const categorySnapshot = await getDocs(collection(db, "categories"));
         const categoryData = categorySnapshot.docs.map((doc) => ({
           id: doc.id,
           ...doc.data(),
         }));
-
         categoryData.sort((a, b) => a.order - b.order);
         setSortedCategories(categoryData);
+        if (categoryData.length > 0) setActiveCategory(categoryData[0].name);
       } catch (error) {
         console.error("Error fetching data:", error);
       } finally {
-        setLoading(false); // 🔹 Hide loader once data is fetched
+        setLoading(false);
       }
     };
-
     fetchData();
   }, []);
 
-  const toggleExpand = (key) => {
-    setExpandedIndex(expandedIndex === key ? null : key);
+  /* ─── Filter logic ─── */
+  const anyFilterActive = activeFilters.available || activeFilters.unavailable || activeFilters.onRequest;
+
+  const matchesFilter = (p) => {
+    if (!anyFilterActive) return true;
+    if (activeFilters.available && (p.available === true || p.available === "true")) return true;
+    if (activeFilters.unavailable && (p.available === false || p.available === "false")) return true;
+    if (activeFilters.onRequest && p.available === "check") return true;
+    return false;
   };
 
-  const renderStatus = (status) => {
-    if (status === "true" || status === true)
-      return <span className="text-success fw-semibold">Available</span>;
-    if (status === "false" || status === false)
-      return <span className="text-danger fw-semibold">Unavailable</span>;
-    if (status === "check")
-      return <span className="text-warning fw-semibold">Check for Availability</span>;
-    return null;
+  const getFilteredProducts = (categoryName) => {
+    const all = productsByCategory[categoryName] || [];
+    return all.filter((p) => {
+      const nameMatch = p.name.toLowerCase().includes(searchQuery.toLowerCase());
+      return nameMatch && matchesFilter(p);
+    });
+  };
+
+  /* ─── Total visible count ─── */
+  const totalVisible = sortedCategories.reduce((sum, cat) => {
+    return sum + getFilteredProducts(cat.name).length;
+  }, 0);
+
+  /* ─── Scroll to category ─── */
+  const scrollToCategory = (catName) => {
+    setActiveCategory(catName);
+    setSidebarOpen(false);
+    const el = categoryRefs.current[catName];
+    if (el) el.scrollIntoView({ behavior: "smooth", block: "start" });
+  };
+
+  /* ─── Toggle availability filter ─── */
+  const toggleFilter = (key) => {
+    setActiveFilters((prev) => ({ ...prev, [key]: !prev[key] }));
   };
 
   return (
-    <>
-      <div className="product-page">
-        <h2 className="heading">Our Delicious Menu</h2>
+    <div className="menuPageMenuPage">
 
-        <div className="search-wrapper text-center mb-4">
-          <input
-            type="text"
-            className="form-control w-75 mx-auto search-input"
-            placeholder="Search for a product..."
-            value={searchQuery}
-            onChange={(e) => setSearchQuery(e.target.value.toLowerCase())}
-          />
-        </div>
+      {/* ─── BREADCRUMBS ─── */}
+      <nav className="menuPageBreadcrumbs" aria-label="Breadcrumb">
+        <Link to="/" className="crumbLink">Home</Link>
+        <span className="crumbSeparator">/</span>
+        <span className="crumbCurrent" aria-current="page">Menu</span>
+      </nav>
 
-        {loading ? (
-          <Container className="d-flex justify-content-center align-items-center" style={{ minHeight: "60vh" }}>
-            <div className="text-center">
-              <Spinner animation="border" role="status" variant="warning" style={{ width: "4rem", height: "4rem" }}>
-                <span className="visually-hidden">Loading...</span>
-              </Spinner>
-              <p className="mt-3 fw-semibold">Fetching delicious items...</p>
-            </div>
-          </Container>
-        ) : (
-          sortedCategories.map((cat, index) => {
-            const category = cat.name;
-            if (!productsByCategory[category]) return null;
+      {/* ─── MOBILE FILTER TOGGLE ─── */}
+      <button
+        className="menuPageMobileFilterToggle"
+        onClick={() => setSidebarOpen((v) => !v)}
+        aria-expanded={sidebarOpen}
+      >
+        <span>Filter &amp; Browse</span>
+        <svg width="14" height="14" viewBox="0 0 14 14" fill="none" xmlns="http://www.w3.org/2000/svg" style={{ transform: sidebarOpen ? "rotate(180deg)" : "none", transition: "transform 0.25s" }}>
+          <path d="M2 5l5 5 5-5" stroke="currentColor" strokeWidth="1.4" strokeLinecap="round" strokeLinejoin="round" />
+        </svg>
+      </button>
 
-            // 🔎 Filter products by search text
-            const filteredProducts = productsByCategory[category].filter((p) =>
-              p.name.toLowerCase().includes(searchQuery)
-            );
+      {/* ─── BODY ─── */}
+      <div className="menuPageMenuBody">
 
-            // If no match in this category → hide the whole category
-            if (filteredProducts.length === 0) return null;
+        {/* ─── SIDEBAR ─── */}
+        <aside className={`menuPageMenuSidebar ${sidebarOpen ? "menuPageOpen" : ""}`}>
 
-            return (
-              <div key={index} className="category-section">
-                <h3 className="category-title">{category}</h3>
+          {/* Search */}
+          <div className="menuPageSidebarSearchWrap">
+            <svg className="menuPageSidebarSearchIcon" width="14" height="14" viewBox="0 0 14 14" fill="none" xmlns="http://www.w3.org/2000/svg">
+              <circle cx="6" cy="6" r="4.5" stroke="currentColor" strokeWidth="1.2" />
+              <path d="M10 10l2.5 2.5" stroke="currentColor" strokeWidth="1.2" strokeLinecap="round" />
+            </svg>
+            <input
+              type="text"
+              className="menuPageSidebarSearch"
+              placeholder="Search menu…"
+              value={searchQuery}
+              onChange={(e) => setSearchQuery(e.target.value)}
+            />
+          </div>
 
-                {/* ===== Desktop View ===== */}
-                <Row className="desktop-view">
-                  {filteredProducts.map((p, i) => (
-                    <Col md={4} key={i} className="mb-4">
-                      <Card className="product-card h-100">
-                        <Card.Body className="product-body d-flex flex-column justify-content-between">
-                          <div>
-                            <div className="card-header-section">
-                              <Card.Title className="product-title">{p.name}</Card.Title>
-                              <span className="price-tag">₹ {p.price}</span>
-                            </div>
-
-                            <Card.Text as="div" className="product-info mt-3">
-                              <p>
-                                <strong>{p.measurement === "piece" ? "Units:" : "Weight:"}</strong>{" "}
-                                {p.weight} {p.measurement === "piece" ? "piece" : "gm"}
-                              </p>
-
-                              {p.ingredients &&
-                                p.ingredients.length > 0 &&
-                                (Array.isArray(p.ingredients)
-                                  ? p.ingredients.join("").trim() !== ""
-                                  : p.ingredients.trim() !== "") && (
-                                  <p>
-                                    <strong>Ingredients:</strong>{" "}
-                                    {Array.isArray(p.ingredients) ? p.ingredients.join(", ") : p.ingredients}
-                                  </p>
-                                )}
-
-                              {p.isOutsourced && p.brandName && (
-                                <p>
-                                  <strong>Brand:</strong>{" "}
-                                  <span className="fw-semibold">{p.brandName}</span>
-                                </p>
-                              )}
-
-                              <p>
-                                <strong>Status:</strong> {renderStatus(p.available)}
-                              </p>
-
-                              {p.available === "check" && (
-                                <a href="tel:+919879718228" className="btn btn-warning btn-sm w-100 mt-2 fw-bold">
-                                  Check for Availability
-                                </a>
-                              )}
-                            </Card.Text>
-                          </div>
-                        </Card.Body>
-                      </Card>
-                    </Col>
-                  ))}
-                </Row>
-
-                {/* ===== Mobile View ===== */}
-                <div className="mobile-view">
-                  {filteredProducts.map((p, i) => {
-                    const key = `${category}-${i}`;
-                    const hasIngredients =
-                      p.ingredients &&
-                      ((Array.isArray(p.ingredients) && p.ingredients.join("").trim() !== "") ||
-                        (typeof p.ingredients === "string" && p.ingredients.trim() !== ""));
-
-                    const hasBrand = p.isOutsourced && p.brandName && p.brandName.trim() !== "";
-
-                    const canExpand = hasIngredients || hasBrand;
-
-                    const isExpanded = expandedIndex === key;
-
-                    return (
-                      <div
-                        key={i}
-                        className={`mobile-product-row ${isExpanded ? "expanded" : ""}`}
-                        onClick={() => {
-                          if (canExpand) toggleExpand(key);
-                        }}
-                        style={{ cursor: canExpand ? "pointer" : "default" }}
-                      >
-                        <div className="d-flex justify-content-between align-items-center w-100">
-                          <div className="d-flex flex-column">
-                            <span className="mobile-product-name">
-                              {p.name} ({p.weight} {p.measurement === "piece" ? "piece" : "gm"})
-                            </span>
-                            <small className="mt-1">
-                              {renderStatus(p.available)}
-                            </small>
-                          </div>
-
-                          <span className="mobile-product-price">₹ {p.price}</span>
-
-                        </div>
-                        {p.available === "check" && (
-                          <a
-                            href="tel:+919879718228"
-                            className="btn btn-warning btn-sm mt-2 py-1 fw-bold w-100"
-                            onClick={(e) => e.stopPropagation()} // Prevents collapsing the row when clicking button
-                          >
-                            Check Availability
-                          </a>
-                        )}
-                        {canExpand && isExpanded && (
-                          <div className="mobile-ingredients mt-3">
-                            {hasIngredients && (
-                              <p className="mb-1">
-                                <strong>Ingredients:</strong>{" "}
-                                {Array.isArray(p.ingredients)
-                                  ? p.ingredients.join(", ")
-                                  : p.ingredients}
-                              </p>
-                            )}
-
-                            {hasBrand && (
-                              <p className="mb-0">
-                                <strong>Brand:</strong>{" "}
-                                <span className="fw-semibold">{p.brandName}</span>
-                              </p>
-                            )}
-                          </div>
-                        )}
-
-                      </div>
-                    );
-                  })}
+          {/* Availability filter */}
+          <span className="menuPageSidebarSectionLabel">Availability</span>
+          <div className="menuPageSidebarFilterGroup">
+            {[
+              { key: "available", label: "Available" },
+              { key: "unavailable", label: "Unavailable" },
+              { key: "onRequest", label: "On Request" },
+            ].map(({ key, label }) => (
+              <div
+                key={key}
+                className={`menuPageFilterOption ${activeFilters[key] ? "menuPageActive" : ""}`}
+                onClick={() => toggleFilter(key)}
+                role="checkbox"
+                aria-checked={activeFilters[key]}
+              >
+                <div className="menuPageFilterCheck">
+                  <div className="menuPageFilterCheckTick" />
                 </div>
+                {label}
               </div>
-            );
-          })
-        )}
+            ))}
+          </div>
+
+          <div className="menuPageSidebarDivider" />
+
+          {/* Category nav */}
+          {!loading && (
+            <>
+              <span className="menuPageSidebarSectionLabel">Categories</span>
+              <nav className="menuPageSidebarCatNav">
+                {sortedCategories.map((cat) => {
+                  const count = getFilteredProducts(cat.name).length;
+                  return (
+                    <div
+                      key={cat.id}
+                      className={`menuPageCatNavItem ${activeCategory === cat.name ? "menuPageActive" : ""}`}
+                      onClick={() => scrollToCategory(cat.name)}
+                      role="button"
+                      tabIndex={0}
+                      onKeyDown={(e) => e.key === "Enter" && scrollToCategory(cat.name)}
+                    >
+                      <span>{cat.name}</span>
+                      <span className="menuPageCatNavCount">{count}</span>
+                    </div>
+                  );
+                })}
+              </nav>
+            </>
+          )}
+
+          {/* Results summary */}
+          {!loading && (
+            <div className="menuPageSidebarResultsSummary">
+              <div className="menuPageResultsCountNum">{totalVisible}</div>
+              <div className="menuPageResultsCountLabel">items shown</div>
+            </div>
+          )}
+        </aside>
+
+        {/* ─── MAIN CONTENT ─── */}
+        <main className="menuPageMenuContent">
+          {loading ? (
+            <div className="menuPageMenuLoader">
+              <div className="menuPageLoaderRing" />
+              <p className="menuPageLoaderText">Fetching delicious items…</p>
+            </div>
+          ) : totalVisible === 0 ? (
+            <div className="menuPageMenuEmpty">
+              <p className="menuPageMenuEmptyTitle">Nothing found</p>
+              <p className="menuPageMenuEmptySub">Try adjusting your search or filters.</p>
+            </div>
+          ) : (
+            sortedCategories.map((cat) => {
+              const filteredProducts = getFilteredProducts(cat.name);
+              if (filteredProducts.length === 0) return null;
+              return (
+                <section
+                  key={cat.id}
+                  className="menuPageMenuCategory"
+                  ref={(el) => (categoryRefs.current[cat.name] = el)}
+                >
+                  <div className="menuPageMenuCategoryHeader">
+                    <h2 className="menuPageMenuCategoryName">{cat.name}</h2>
+                    <div className="menuPageMenuCategoryLine" />
+                    <span className="menuPageMenuCategoryCount">
+                      {filteredProducts.length} {filteredProducts.length === 1 ? "item" : "items"}
+                    </span>
+                  </div>
+
+                  <div className="menuPageMenuProductGrid">
+                    {filteredProducts.map((p, i) => (
+                      <ProductCard key={i} p={p} />
+                    ))}
+                  </div>
+                </section>
+              );
+            })
+          )}
+        </main>
       </div>
 
       <PublicFooter />
-    </>
+    </div>
   );
 }
 
-export default ProductList;
+export default MenuPage;

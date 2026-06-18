@@ -1,194 +1,853 @@
-/* Full Width Card Design */
-.full-width-offer-card {
-    display: flex;
-    background: #222;
-    border-radius: 16px;
+@import url('https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,600;1,400&family=Outfit:wght@300;400;500;600;700&display=swap');
+
+:root {
+  --cream: #F5EDD8;
+  --warm-white: #FAF6EE;
+  --amber: #C8861A;
+  --amber-light: #E8A832;
+  --amber-dark: #8B5A0A;
+  --charcoal: #1A1612;
+  --ink: #0E0C09;
+  --stone: #2C2520;
+  --muted: #9A8E82;
+  --border: rgba(200, 134, 26, 0.18);
+}
+
+/* ─── PAGE ─── */
+.offersPage {
+  background: var(--ink);
+  min-height: 100vh;
+  font-family: 'Outfit', sans-serif;
+  color: var(--cream);
+}
+
+/* Responsive View Switchers */
+.offersPageDesktopView {
+  display: block;
+}
+
+.offersPageMobileView {
+  display: none;
+}
+
+/* ─── HERO ─── */
+.offersPageOffersHero {
+  position: relative;
+  padding: 7rem 2rem 4.5rem;
+  text-align: center;
+  overflow: hidden;
+}
+
+.offersPageOffersHero::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: radial-gradient(ellipse 65% 55% at 50% 50%, rgba(200, 134, 26, 0.10) 0%, transparent 70%);
+  pointer-events: none;
+}
+
+.offersPageOffersHeroBgWord {
+  position: absolute;
+  top: 55%;
+  /* Dropped down slightly to prevent title overlap */
+  left: 50%;
+  transform: translate(-50%, -50%);
+  font-family: 'Cormorant Garamond', serif;
+  font-size: clamp(4rem, 15vw, 11rem);
+  /* Reduced slightly for mobile safety */
+  font-weight: 300;
+  color: rgba(200, 134, 26, 0.03);
+  white-space: nowrap;
+  pointer-events: none;
+  user-select: none;
+  letter-spacing: -0.02em;
+}
+
+.offersPageOffersHeroInner {
+  position: relative;
+  z-index: 1;
+  max-width: 580px;
+  margin: 0 auto;
+}
+
+.offersPageOffersEyebrow {
+  display: inline-flex;
+  align-items: center;
+  gap: 12px;
+  font-size: 0.65rem;
+  letter-spacing: 0.36em;
+  text-transform: uppercase;
+  color: var(--amber);
+  font-weight: 600;
+  margin-bottom: 1.1rem;
+  opacity: 0;
+  animation: offersPageOfferFadeUp 0.7s 0.05s ease forwards;
+}
+
+.offersPageOffersEyebrow::before,
+.offersPageOffersEyebrow::after {
+  content: '';
+  width: 28px;
+  height: 1px;
+  background: var(--amber);
+  display: block;
+}
+
+.offersPageOffersHeroTitle {
+  font-family: 'Cormorant Garamond', serif;
+  font-size: clamp(2.6rem, 6vw, 4rem);
+  font-weight: 300;
+  line-height: 1.06;
+  color: var(--warm-white);
+  letter-spacing: -0.01em;
+  margin-bottom: 0.9rem;
+  opacity: 0;
+  animation: offersPageOfferFadeUp 0.7s 0.15s ease forwards;
+}
+
+.offersPageOffersHeroTitle em {
+  font-style: italic;
+  color: var(--amber-light);
+}
+
+.offersPageOffersHeroSub {
+  font-size: 0.88rem;
+  font-weight: 300;
+  color: rgba(245, 237, 216, 0.6);
+  /* Enhanced contrast */
+  letter-spacing: 0.04em;
+  line-height: 1.9;
+  opacity: 0;
+  animation: offersPageOfferFadeUp 0.7s 0.25s ease forwards;
+}
+
+.offersPageOffersDivider {
+  width: 40px;
+  height: 1px;
+  background: var(--amber);
+  margin: 1.6rem auto 0;
+  opacity: 0;
+  animation: offersPageOfferFadeUp 0.7s 0.3s ease forwards;
+}
+
+/* ─── BODY / LIST AREA ─── */
+.offersPageOffersBody {
+  padding: 0 clamp(1.25rem, 4vw, 3rem) 6rem;
+  max-width: 1000px;
+  margin: 0 auto;
+}
+
+.offersPageOffersCountBar {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 1rem 0 1.5rem;
+  border-bottom: 1px solid rgba(200, 134, 26, 0.1);
+  margin-bottom: 2rem;
+  opacity: 0;
+  animation: offersPageOfferFadeUp 0.6s 0.4s ease forwards;
+}
+
+.offersPageOffersCountLabel {
+  font-size: 0.65rem;
+  letter-spacing: 0.3em;
+  text-transform: uppercase;
+  color: rgba(154, 142, 130, 0.7);
+  /* Enhanced contrast */
+}
+
+.offersPageOffersCountNum {
+  font-family: 'Cormorant Garamond', serif;
+  font-size: 1.2rem;
+  font-weight: 300;
+  color: var(--amber-light);
+  letter-spacing: 0.05em;
+}
+
+/* ─── TICKET CARD ─── */
+.offersPageOfferTicket {
+  display: flex;
+  background: var(--charcoal);
+  border: 1px solid var(--border);
+  border-radius: 14px;
+  overflow: visible;
+  position: relative;
+  margin-bottom: 18px;
+  transition: border-color 0.35s ease, transform 0.35s ease, box-shadow 0.35s ease;
+  opacity: 0;
+  transform: translateY(16px);
+}
+
+.offersPageOfferTicket.offersPageTicketVisible {
+  opacity: 1;
+  transform: translateY(0);
+}
+
+.offersPageOfferTicket:not(.offersPageTicketExpired):hover {
+  border-color: var(--amber);
+  transform: translateY(-3px);
+  box-shadow: 0 12px 40px rgba(0, 0, 0, 0.45);
+}
+
+.offersPageOfferTicket.offersPageTicketExpired {
+  opacity: 0.38;
+  filter: grayscale(0.75);
+  cursor: not-allowed;
+}
+
+/* Left accent strip */
+.offersPageTicketStubLeft {
+  width: 72px;
+  flex-shrink: 0;
+  border-radius: 13px 0 0 13px;
+  background: var(--amber);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  position: relative;
+  overflow: hidden;
+  transition: background 0.35s;
+}
+
+.offersPageTicketExpired .offersPageTicketStubLeft {
+  background: var(--stone);
+}
+
+.offersPageTicketStubLeft::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: repeating-linear-gradient(-45deg,
+      transparent,
+      transparent 7px,
+      rgba(0, 0, 0, 0.065) 7px,
+      rgba(0, 0, 0, 0.065) 8px);
+}
+
+.offersPageTicketStubWord {
+  writing-mode: vertical-rl;
+  transform: rotate(180deg);
+  font-size: 0.55rem;
+  font-weight: 700;
+  letter-spacing: 0.32em;
+  text-transform: uppercase;
+  color: rgba(14, 12, 9, 0.65);
+  position: relative;
+  z-index: 1;
+}
+
+.offersPageTicketExpired .offersPageTicketStubWord {
+  color: rgba(154, 142, 130, 0.45);
+}
+
+/* Dashed perforation */
+.offersPageTicketPerf {
+  position: absolute;
+  left: 72px;
+  top: 14px;
+  bottom: 14px;
+  border-left: 2px dashed rgba(200, 134, 26, 0.2);
+  z-index: 2;
+  pointer-events: none;
+}
+
+/* Ticket Punch Notches */
+.offersPageTicketNotch {
+  position: absolute;
+  width: 22px;
+  height: 22px;
+  background: var(--ink);
+  /* Matches the outer page background */
+  border-radius: 50%;
+  z-index: 5;
+  border: 1px solid var(--border);
+}
+
+.offersPageTicketNotchTop {
+  top: -12px;
+  left: 61px;
+  /* Centers seamlessly with perforation line */
+  box-shadow: inset 0 -3px 5px rgba(0, 0, 0, 0.3);
+}
+
+.offersPageTicketNotchBot {
+  bottom: -12px;
+  left: 61px;
+  box-shadow: inset 0 3px 5px rgba(0, 0, 0, 0.3);
+}
+
+/* Main content area */
+.offersPageTicketBody {
+  flex: 1;
+  padding: 1.75rem 1.75rem 1.6rem 2rem;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  gap: 0.45rem;
+}
+
+.offersPageTicketTagRow {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-bottom: 4px;
+}
+
+.offersPageTicketCategory {
+  font-size: 0.6rem;
+  letter-spacing: 0.3em;
+  text-transform: uppercase;
+  color: var(--amber);
+  font-weight: 600;
+}
+
+.offersPageTicketBadge {
+  font-size: 0.58rem;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  font-weight: 700;
+  padding: 2px 8px;
+  border-radius: 3px;
+}
+
+.offersPageBadgeEndsToday {
+  background: rgba(200, 134, 26, 0.12);
+  color: var(--amber-light);
+  border: 1px solid rgba(200, 134, 26, 0.28);
+  animation: offersPageTicketPulse 2s ease-in-out infinite;
+}
+
+.offersPageBadgeExpired {
+  background: rgba(255, 70, 70, 0.07);
+  color: #ff6b6b;
+  border: 1px solid rgba(255, 70, 70, 0.2);
+}
+
+@keyframes offersPageTicketPulse {
+
+  0%,
+  100% {
+    opacity: 1;
+  }
+
+  50% {
+    opacity: 0.45;
+  }
+}
+
+.offersPageTicketHeadline {
+  font-family: 'Cormorant Garamond', serif;
+  font-size: clamp(1.3rem, 2.5vw, 1.75rem);
+  font-weight: 400;
+  color: var(--warm-white);
+  line-height: 1.2;
+  letter-spacing: -0.015em;
+}
+
+.offersPageTicketDesc {
+  font-size: 0.82rem;
+  font-weight: 300;
+  color: rgba(245, 237, 216, 0.7);
+  /* Boosted opacity for readability text accessibility */
+  line-height: 1.65;
+  max-width: 50ch;
+}
+
+.offersPageTicketMeta {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin-top: 4px;
+}
+
+.offersPageTicketMetaLabel {
+  font-size: 0.6rem;
+  letter-spacing: 0.22em;
+  text-transform: uppercase;
+  color: rgba(154, 142, 130, 0.55);
+}
+
+.offersPageTicketMetaSep {
+  width: 1px;
+  height: 10px;
+  background: rgba(200, 134, 26, 0.2);
+}
+
+.offersPageTicketMetaDate {
+  font-size: 0.75rem;
+  font-weight: 500;
+  color: var(--amber-light);
+  letter-spacing: 0.04em;
+}
+
+.offersPageTicketExpired .offersPageTicketMetaDate {
+  color: #ff6b6b;
+}
+
+/* Right CTA stub */
+.offersPageTicketStubRight {
+  width: 150px;
+  flex-shrink: 0;
+  border-radius: 0 13px 13px 0;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  padding: 1.5rem 1.1rem;
+}
+
+.offersPageTicketClaimBtn {
+  width: 100%;
+  padding: 0.72rem 0.5rem;
+  background: var(--amber);
+  border: none;
+  border-radius: 7px;
+  color: var(--ink);
+  font-family: 'Outfit', sans-serif;
+  font-size: 0.65rem;
+  font-weight: 700;
+  letter-spacing: 0.22em;
+  text-transform: uppercase;
+  cursor: pointer;
+  position: relative;
+  overflow: hidden;
+  transition: background 0.25s ease, color 0.25s ease, transform 0.15s ease;
+}
+
+.offersPageTicketClaimBtn::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: var(--amber-dark);
+  transform: translateX(-102%);
+  transition: transform 0.38s cubic-bezier(0.77, 0, 0.175, 1);
+  border-radius: 7px;
+}
+
+.offersPageTicketClaimBtn:hover::after {
+  transform: translateX(0);
+}
+
+.offersPageTicketClaimBtn:hover {
+  color: var(--cream);
+}
+
+.offersPageTicketClaimBtn span {
+  position: relative;
+  z-index: 1;
+}
+
+.offersPageTicketExpiredBtn {
+  width: 100%;
+  padding: 0.72rem 0.5rem;
+  background: transparent;
+  border: 1px solid rgba(255, 255, 255, 0.07);
+  border-radius: 7px;
+  color: rgba(154, 142, 130, 0.4);
+  font-family: 'Outfit', sans-serif;
+  font-size: 0.65rem;
+  font-weight: 600;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  cursor: not-allowed;
+  text-align: center;
+}
+
+.offersPageTicketId {
+  font-size: 0.62rem;
+  color: rgba(154, 142, 130, 0.3);
+  letter-spacing: 0.12em;
+  font-family: 'Outfit', monospace;
+}
+
+/* ─── EMPTY STATE ─── */
+.offersPageOffersEmpty {
+  text-align: center;
+  padding: 5rem 2rem;
+}
+
+.offersPageOffersEmptyGlyph {
+  font-family: 'Cormorant Garamond', serif;
+  font-size: 4rem;
+  color: rgba(200, 134, 26, 0.15);
+  margin-bottom: 1rem;
+  line-height: 1;
+}
+
+.offersPageOffersEmpty p {
+  font-size: 0.9rem;
+  font-weight: 300;
+  color: var(--muted);
+  letter-spacing: 0.08em;
+}
+
+/* ─── MODAL ─── */
+.offersPageOffersModal .modal-content {
+  background: var(--charcoal);
+  border: 1px solid var(--border);
+  border-radius: 14px;
+  color: var(--cream);
+  font-family: 'Outfit', sans-serif;
+}
+
+.offersPageOffersModal .modal-header {
+  border-bottom: 1px solid rgba(200, 134, 26, 0.12);
+  padding: 1.5rem 1.75rem 1.25rem;
+}
+
+.offersPageOffersModal .modal-title {
+  font-family: 'Cormorant Garamond', serif;
+  font-size: 1.6rem;
+  font-weight: 300;
+  color: var(--warm-white);
+  letter-spacing: 0.01em;
+}
+
+.offersPageOffersModal .modal-body {
+  padding: 1.75rem;
+}
+
+.offersPageModalOfferChip {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 0.65rem;
+  letter-spacing: 0.2em;
+  text-transform: uppercase;
+  color: var(--amber);
+  font-weight: 600;
+  margin-bottom: 1.5rem;
+  padding-bottom: 1.25rem;
+  border-bottom: 1px solid rgba(200, 134, 26, 0.12);
+  width: 100%;
+}
+
+.offersPageModalOfferChip::before {
+  content: '';
+  width: 20px;
+  height: 1px;
+  background: var(--amber);
+  flex-shrink: 0;
+}
+
+.offersPageOffersModal .form-label {
+  font-size: 0.63rem;
+  letter-spacing: 0.22em;
+  text-transform: uppercase;
+  color: rgba(154, 142, 130, 0.65);
+  font-weight: 500;
+  margin-bottom: 0.4rem;
+  display: block;
+}
+
+.offersPageOffersModal .form-control {
+  background: rgba(44, 37, 32, 0.6);
+  border: 1px solid rgba(200, 134, 26, 0.14);
+  border-radius: 8px;
+  color: var(--cream);
+  font-family: 'Outfit', sans-serif;
+  font-size: 0.88rem;
+  font-weight: 300;
+  padding: 0.7rem 0.9rem;
+  transition: border-color 0.3s, background 0.3s;
+}
+
+.offersPageOffersModal .form-control:focus {
+  background: rgba(44, 37, 32, 0.9);
+  border-color: var(--amber);
+  color: var(--cream);
+  box-shadow: 0 0 0 3px rgba(200, 134, 26, 0.08);
+  outline: none;
+}
+
+.offersPageOffersModal .form-control::placeholder {
+  color: rgba(154, 142, 130, 0.35);
+}
+
+.offersPageOffersModal .form-text {
+  font-size: 0.68rem;
+  color: rgba(154, 142, 130, 0.5);
+  margin-top: 0.3rem;
+  letter-spacing: 0.02em;
+}
+
+.offersPageModalSubmitBtn {
+  width: 100%;
+  padding: 0.88rem;
+  background: var(--amber);
+  border: none;
+  border-radius: 8px;
+  color: var(--ink);
+  font-family: 'Outfit', sans-serif;
+  font-size: 0.7rem;
+  font-weight: 700;
+  letter-spacing: 0.22em;
+  text-transform: uppercase;
+  cursor: pointer;
+  position: relative;
+  overflow: hidden;
+  margin-top: 0.5rem;
+  transition: color 0.3s;
+}
+
+.offersPageModalSubmitBtn::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: var(--amber-dark);
+  transform: translateX(-102%);
+  transition: transform 0.38s cubic-bezier(0.77, 0, 0.175, 1);
+}
+
+.offersPageModalSubmitBtn:hover {
+  color: var(--cream);
+}
+
+.offersPageModalSubmitBtn:hover::after {
+  transform: translateX(0);
+}
+
+.offersPageModalSubmitBtn span {
+  position: relative;
+  z-index: 1;
+}
+
+/* ─── MOBILE ROW CONTAINER ─── */
+.offersPageMobileProductRow {
+  background: var(--charcoal);
+  border: 1px solid var(--border);
+  border-radius: 14px;
+  padding: 1.1rem 1.15rem;
+  margin-bottom: 12px;
+  cursor: pointer;
+  transition: border-color 0.25s ease, transform 0.2s ease;
+  position: relative;
+  overflow: hidden;
+}
+
+.offersPageMobileProductRow::before {
+  content: '';
+  position: absolute;
+  left: 0;
+  top: 0;
+  bottom: 0;
+  width: 4px;
+  background: var(--amber);
+  border-radius: 14px 0 0 14px;
+}
+
+.offersPageMobileProductRow.offersPageExpiredRow::before {
+  background: var(--stone);
+}
+
+.offersPageMobileProductRow:not(.offersPageExpiredRow):active {
+  border-color: var(--amber);
+  transform: scale(0.985);
+}
+
+.offersPageMobileProductRow:last-child {
+  margin-bottom: 0;
+}
+
+.offersPageMobileRowTop {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  width: 100%;
+  gap: 10px;
+  margin-bottom: 6px;
+}
+
+.offersPageMobileProductName {
+  font-family: 'Cormorant Garamond', serif;
+  font-size: 1.15rem;
+  font-weight: 400;
+  color: var(--warm-white);
+  line-height: 1.25;
+  flex: 1;
+}
+
+.offersPageMobileRowArrow {
+  width: 28px;
+  height: 28px;
+  border-radius: 50%;
+  background: rgba(200, 134, 26, 0.12);
+  border: 1px solid rgba(200, 134, 26, 0.22);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  color: var(--amber);
+  transition: background 0.2s;
+}
+
+.offersPageMobileProductRow:not(.offersPageExpiredRow):active .offersPageMobileRowArrow {
+  background: rgba(200, 134, 26, 0.25);
+}
+
+.offersPageMobileRowExpiredIcon {
+  width: 28px;
+  height: 28px;
+  border-radius: 50%;
+  background: rgba(255, 107, 107, 0.08);
+  border: 1px solid rgba(255, 107, 107, 0.15);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  font-size: 0.75rem;
+  color: #ff6b6b;
+}
+
+.offersPageMobileRowDesc {
+  font-size: 0.78rem;
+  font-weight: 300;
+  color: rgba(245, 237, 216, 0.6);
+  /* Boosted opacity */
+  line-height: 1.55;
+  margin-bottom: 8px;
+}
+
+.offersPageMobileRowFooter {
+  display: flex;
+  align-items: center;
+  width: 100%;
+  justify-content: end;
+  gap: 8px;
+}
+
+.offersPageMobileRowDate {
+  font-size: 0.68rem;
+  font-weight: 500;
+  letter-spacing: 0.04em;
+  color: rgba(232, 168, 50, 0.7);
+}
+
+.offersPageMobileRowDate.offersPageDateExpired {
+  color: #ff6b6b;
+}
+
+.offersPageMobileRowBadge {
+  font-size: 0.58rem;
+  font-weight: 700;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  padding: 2px 8px;
+  border-radius: 3px;
+  background: rgba(200, 134, 26, 0.12);
+  color: var(--amber-light);
+  border: 1px solid rgba(200, 134, 26, 0.28);
+  animation: offersPageTicketPulse 2s ease-in-out infinite;
+}
+
+.offersPageMobileRowCategory {
+  font-size: 0.58rem;
+  letter-spacing: 0.26em;
+  text-transform: uppercase;
+  color: var(--amber);
+  font-weight: 600;
+}
+
+/* ─── ANIMATIONS ─── */
+@keyframes offersPageOfferFadeUp {
+  from {
+    opacity: 0;
+    transform: translateY(14px);
+  }
+
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* ─── RESPONSIVE BREAKPOINTS ─── */
+@media (max-width: 768px) {
+
+  /* Dynamic view switcher toggles */
+  .offersPageDesktopView {
+    display: none !important;
+  }
+
+  .offersPageMobileView {
+    display: block !important;
+  }
+
+  .offersPageOfferTicket {
+    flex-direction: column;
+    border-radius: 12px;
     overflow: hidden;
-    border: 1px solid #333;
-    transition: transform 0.3s ease, border-color 0.3s ease;
-    min-height: 180px;
-    position: relative;
-}
+  }
 
-.full-width-offer-card:hover {
-    transform: translateY(-5px);
-    border-color: #f7b731;
-}
-
-/* Left Visual Block */
-.offer-visual {
-    background: #f7b731;
-    width: 150px;
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    justify-content: center;
-    position: relative;
-}
-
-.promo-badge {
-    position: absolute;
-    top: 10px;
-    left: 10px;
-    font-size: 0.6rem;
-    font-weight: 900;
-    color: #000;
-    border: 1px solid #000;
-    padding: 2px 6px;
-    border-radius: 4px;
-}
-
-.offer-mini-logo {
-    width: 70px;
-}
-
-/* Content Area */
-.offer-content {
-    flex: 1;
-    padding: 25px 30px;
-    display: flex;
-    flex-direction: column;
-    justify-content: center;
-}
-
-.offer-main-text {
-    font-size: 1.6rem;
-    font-weight: 800;
-    color: #fff;
-    margin-bottom: 8px;
-    letter-spacing: -0.5px;
-}
-
-.offer-expiry {
-    font-size: 0.9rem;
-    margin-bottom: 15px;
-}
-
-.offer-expiry .label {
-    color: #888;
-    margin-right: 8px;
-}
-
-.offer-expiry .date {
-    color: #f7b731;
-    font-weight: 600;
-}
-
-/* Action Area (Ticket Stub) */
-.offer-action {
-    width: 220px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    padding: 20px;
-    position: relative;
-}
-
-.dash-divider {
-    position: absolute;
-    left: 0;
-    top: 15%;
-    bottom: 15%;
-    border-left: 2px dashed #444;
-}
-
-.redeem-btn {
+  .offersPageTicketStubLeft {
     width: 100%;
-    height: 60px;
-    font-weight: 900 !important;
-    letter-spacing: 1px;
-    border-radius: 12px !important;
-    font-size: 1.1rem !important;
-}
+    height: 44px;
+    border-radius: 11px 11px 0 0;
+    flex-direction: row;
+    justify-content: flex-start;
+    padding: 0 1.25rem;
+  }
 
-/* Status Pill */
-.status-pill {
-    background: rgba(220, 53, 69, 0.2);
-    color: #ff4d4d;
-    padding: 4px 12px;
-    border-radius: 20px;
-    font-size: 0.7rem;
-    font-weight: 700;
-    border: 1px solid #ff4d4d;
-}
-
-/* Expired State */
-.full-width-offer-card.expired {
-    opacity: 0.6;
-    filter: grayscale(1);
-    cursor: not-allowed;
-}
-
-.full-width-offer-card.expired:hover {
+  .offersPageTicketStubWord {
+    writing-mode: horizontal-tb;
     transform: none;
-    border-color: #333;
+    letter-spacing: 0.28em;
+  }
+
+  .offersPageTicketPerf {
+    left: 14px;
+    right: 14px;
+    top: 44px;
+    bottom: auto;
+    height: 0;
+    border-left: none;
+    border-top: 2px dashed rgba(200, 134, 26, 0.2);
+  }
+
+  /* Fixed Responsive Ticket Punches */
+  .offersPageTicketNotchTop {
+    left: 24px;
+    top: -11px;
+  }
+
+  .offersPageTicketNotchBot {
+    right: 24px;
+    bottom: -11px;
+    left: auto;
+  }
+
+  .offersPageTicketBody {
+    padding: 1.25rem 1.25rem 0.75rem;
+  }
+
+  .offersPageTicketStubRight {
+    width: 100% !important;
+    /* Forces layout to fill the full container block width */
+    border-radius: 0 0 11px 11px;
+    flex-direction: row;
+    justify-content: space-between;
+    padding: 0.9rem 1.25rem;
+    border-top: 1px dashed rgba(200, 134, 26, 0.2);
+    gap: 12px;
+  }
+
+  .offersPageTicketClaimBtn,
+  .offersPageTicketExpiredBtn {
+    width: auto;
+    padding: 0.65rem 1.5rem;
+    flex-shrink: 0;
+  }
 }
 
-/* Mobile Responsiveness for the full-width card */
-@media (max-width: 992px) {
-    .full-width-offer-card {
-        flex-direction: column;
-    }
+@media (max-width: 480px) {
+  .offersPageOffersHero {
+    padding: 5rem 1.25rem 3rem;
+  }
 
-    .offer-visual {
-        width: 100%;
-        height: 60px;
-    }
-
-    .offer-action {
-        width: 100%;
-        padding-top: 0;
-    }
-
-    .dash-divider {
-        display: none;
-    }
-
-    .offer-main-text {
-        font-size: 1.3rem;
-    }
-}
-
-.offer-description-text {
-    font-size: 0.9rem;
-    color: #bbb;
-    margin-bottom: 12px;
-    line-height: 1.4;
-    max-width: 90%;
-}
-
-@media (max-width: 992px) {
-    .offer-description-text {
-        font-size: 0.9rem;
-        margin-bottom: 10px;
-    }
-}
-
-/* Styling for the Last Day Pill */
-.last-day-pill {
-    background: rgba(247, 183, 49, 0.2) !important;
-    color: #f7b731 !important;
-    border: 1px solid #f7b731 !important;
-    animation: pulse 2s infinite;
-}
-
-.last-day-text {
-    color: #f7b731;
-    font-weight: bold;
-    font-size: 0.7rem;
-    text-transform: uppercase;
-}
-
-@keyframes pulse {
-    0% {
-        opacity: 1;
-    }
-
-    50% {
-        opacity: 0.6;
-    }
-
-    100% {
-        opacity: 1;
-    }
+  .offersPageOffersBody {
+    padding: 0 1.25rem 4rem;
+  }
 }

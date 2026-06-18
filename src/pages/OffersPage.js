@@ -1,13 +1,14 @@
 import React, { useEffect, useState, useRef } from "react";
 import { collection, getDocs, query, where, addDoc, serverTimestamp } from "firebase/firestore";
 import { db } from "../firebase";
-import { Container, Row, Col, Button, Modal, Form } from "react-bootstrap";
+import { Modal, Form } from "react-bootstrap";
 import html2canvas from "html2canvas";
 import PublicFooter from "../components/PublicFooter";
 import VoucherTemplate from "../components/Vouchers/VoucherTemplate";
-import BakeryLogo from "../assets/images/logo.png";
 import "./OffersPage.css";
 import toast, { Toaster } from "react-hot-toast";
+import { FiArrowRight } from "react-icons/fi";
+import { RxCross1 } from "react-icons/rx";
 
 const OffersPage = () => {
     const [offers, setOffers] = useState([]);
@@ -15,15 +16,11 @@ const OffersPage = () => {
     const [selectedOffer, setSelectedOffer] = useState(null);
     const [customerData, setCustomerData] = useState({ name: "", phone: "", address: "", securityCode: "" });
     const voucherRef = useRef(null);
+    const ticketRefs = useRef([]);
 
-    // Helper to generate a unique 6-digit alphanumeric code
     const generateSecurityCode = () => {
         const chars = "ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789";
-        let result = "";
-        for (let i = 0; i < 6; i++) {
-            result += chars.charAt(Math.floor(Math.random() * chars.length));
-        }
-        return result;
+        return Array.from({ length: 6 }, () => chars[Math.floor(Math.random() * chars.length)]).join("");
     };
 
     const formatDate = (dateString) => {
@@ -39,32 +36,40 @@ const OffersPage = () => {
         return `${today.getDate()} ${months[today.getMonth()]} ${today.getFullYear()}`;
     };
 
+    /* Fetch offers */
     useEffect(() => {
         const fetchOffers = async () => {
-            const today = new Date().toLocaleDateString('en-CA');
-            const q = query(
-                collection(db, "offers"),
-                where("active", "==", true)
-            );
-            const querySnapshot = await getDocs(q);
-            const allToDisplay = querySnapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
-
-            const sortedOffers = allToDisplay.sort((a, b) => {
-                const aExpired = a.validUntil < today;
-                const bExpired = b.validUntil < today;
-                return aExpired - bExpired;
-            });
-
-            setOffers(sortedOffers);
+            const today = new Date().toLocaleDateString("en-CA");
+            const q = query(collection(db, "offers"), where("active", "==", true));
+            const snap = await getDocs(q);
+            const all = snap.docs.map(doc => ({ id: doc.id, ...doc.data() }));
+            const sorted = all.sort((a, b) => (a.validUntil < today) - (b.validUntil < today));
+            setOffers(sorted);
         };
         fetchOffers();
     }, []);
 
+    /* Scroll-reveal for ticket cards */
+    useEffect(() => {
+        if (!offers.length) return;
+        const obs = new IntersectionObserver(
+            (entries) => entries.forEach((e) => {
+                if (e.isIntersecting) e.target.classList.add("offersPageTicketVisible");
+            }),
+            { threshold: 0.08 }
+        );
+        ticketRefs.current.forEach((el, i) => {
+            if (!el) return;
+            el.style.transitionDelay = `${i * 0.08}s`;
+            el.style.transition = "opacity 0.65s ease, transform 0.65s ease, border-color 0.35s ease, box-shadow 0.35s ease";
+            obs.observe(el);
+        });
+        return () => obs.disconnect();
+    }, [offers]);
+
     const handleRedeem = async (e) => {
         e.preventDefault();
-
         const loadingToast = toast.loading("Verifying your details...");
-
         try {
             const redeemedRef = collection(db, "redeemed_offers");
             const q = query(
@@ -72,72 +77,69 @@ const OffersPage = () => {
                 where("offerId", "==", selectedOffer.id),
                 where("customerPhone", "==", customerData.phone)
             );
-
-            const querySnapshot = await getDocs(q);
-
-            if (!querySnapshot.empty) {
+            const snap = await getDocs(q);
+            if (!snap.empty) {
                 toast.dismiss(loadingToast);
-                toast.error("This mobile number has already redeemed this specific voucher!", {
+                toast.error("This number has already redeemed this voucher.", {
                     duration: 4000,
-                    style: { background: '#333', color: '#fff' }
+                    style: { background: "#1A1612", color: "#F5EDD8", border: "1px solid rgba(200,134,26,0.25)", borderRadius: "8px" }
                 });
                 return;
             }
-
-            // 1. Generate the unique code
             const newSecurityCode = generateSecurityCode();
-
-            // 2. Save to Firestore with the security code
             await addDoc(collection(db, "redeemed_offers"), {
                 offerId: selectedOffer.id,
                 customerName: customerData.name,
                 customerPhone: customerData.phone,
                 customerAddress: customerData.address,
                 offerText: selectedOffer.offerText,
-                securityCode: newSecurityCode, // Stored in DB
+                securityCode: newSecurityCode,
                 redeemedAt: serverTimestamp(),
             });
-
-            // 3. Update local state so the voucher template can see the code
             setCustomerData(prev => ({ ...prev, securityCode: newSecurityCode }));
-
-            toast.success("Voucher generated! Starting download...", { id: loadingToast });
-
-            // Small delay to ensure state update is reflected in the DOM before capture
+            toast.success("Voucher generated! Downloading...", {
+                id: loadingToast,
+                style: { background: "#1A1612", color: "#F5EDD8", border: "1px solid rgba(200,134,26,0.25)", borderRadius: "8px" }
+            });
             setTimeout(async () => {
                 const element = voucherRef.current;
                 if (!element) return;
-
-                const canvas = await html2canvas(element, {
-                    backgroundColor: "#ffffff",
-                    scale: 3,
-                    useCORS: true,
-                    logging: false,
-                });
-
+                const canvas = await html2canvas(element, { backgroundColor: "#ffffff", scale: 3, useCORS: true, logging: false });
                 const image = canvas.toDataURL("image/png");
                 const link = document.createElement("a");
                 link.href = image;
-                link.download = `DB_Voucher_${customerData.name.replace(/\s+/g, '_')}.png`;
+                link.download = `DB_Voucher_${customerData.name.replace(/\s+/g, "_")}.png`;
                 link.click();
-
                 setShowModal(false);
                 setCustomerData({ name: "", phone: "", address: "", securityCode: "" });
             }, 600);
-
-        } catch (error) {
-            console.error("Redemption error:", error);
+        } catch (err) {
+            console.error("Redemption error:", err);
             toast.error("Error generating voucher. Please try again.", { id: loadingToast });
         }
     };
 
-    const todayStr = new Date().toLocaleDateString('en-CA');
+    const todayStr = new Date().toLocaleDateString("en-CA");
+    const activeCount = offers.filter(o => o.validUntil >= todayStr).length;
 
     return (
         <>
-            <Toaster position="top-center" reverseOrder={false} />
-            <div className="product-page">
+            <Toaster
+                position="top-center"
+                toastOptions={{
+                    style: {
+                        background: "#1A1612",
+                        color: "#F5EDD8",
+                        border: "1px solid rgba(200,134,26,0.22)",
+                        borderRadius: "8px",
+                        fontFamily: "'Outfit', sans-serif",
+                        fontSize: "0.85rem",
+                    }
+                }}
+            />
 
+            <div className="offersPage">
+                {/* Hidden voucher for screenshot */}
                 <VoucherTemplate
                     ref={voucherRef}
                     selectedOffer={selectedOffer}
@@ -146,141 +148,214 @@ const OffersPage = () => {
                     getTodayFormatted={getTodayFormatted}
                 />
 
-                <Container>
-                    <h2 className="heading">Exclusive Offers</h2>
+                {/* ── HERO ── */}
+                <section className="offersPageOffersHero">
+                    <div className="offersPageOffersHeroBgWord">Offers</div>
+                    <div className="offersPageOffersHeroInner">
+                        <p className="offersPageOffersEyebrow">De Bakers &amp; More</p>
+                        <h1 className="offersPageOffersHeroTitle">
+                            Exclusive <em>Offers</em><br />for You
+                        </h1>
+                        <p className="offersPageOffersHeroSub">
+                            Claim your voucher · Freshly baked savings · Limited time only
+                        </p>
+                        <div className="offersPageOffersDivider" />
+                    </div>
+                </section>
 
-                    <Row className="desktop-view">
-                        {offers.map((offer) => {
-                            const isExpired = offer.validUntil < todayStr;
-                            const isLastDay = offer.validUntil === todayStr;
-                            return (
-                                <Col md={12} key={offer.id} className="mb-4">
-                                    <div className={`full-width-offer-card ${isExpired ? "expired" : ""}`}>
-                                        <div className="offer-visual">
-                                            <div className="promo-badge">PROMO</div>
-                                            <img src={BakeryLogo} alt="Bakery" className="offer-mini-logo" />
-                                        </div>
+                {/* ── LIST ── */}
+                <div className="offersPageOffersBody">
 
-                                        <div className="offer-content">
-                                            <div className="d-flex justify-content-between align-items-start">
-                                                <div>
-                                                    <h3 className="offer-main-text">{offer.offerText}</h3>
-                                                    <p className="offer-description-text">{offer.description}</p>
-                                                    <p className="offer-expiry">
-                                                        <span className="label">VALID UNTIL:</span>
-                                                        <span className="date">{formatDate(offer.validUntil)}</span>
-                                                    </p>
-                                                </div>
-                                                <div className="d-flex flex-column align-items-end gap-2">
-                                                    {isExpired && <span className="status-pill">OFFER ENDED</span>}
-                                                    {isLastDay && <span className="status-pill last-day-pill">ENDS TODAY</span>}
-                                                </div>
-                                            </div>
-                                        </div>
+                    {/* Count bar */}
+                    <div className="offersPageOffersCountBar">
+                        <span className="offersPageOffersCountLabel">Available Offers</span>
+                        <span className="offersPageOffersCountNum">
+                            {activeCount > 0 ? `${activeCount} active` : "None right now"}
+                        </span>
+                    </div>
 
-                                        <div className="offer-action">
-                                            <div className="dash-divider"></div>
-                                            <Button
-                                                variant={isExpired ? "secondary" : "warning"}
-                                                className="redeem-btn"
-                                                disabled={isExpired}
-                                                onClick={() => { setSelectedOffer(offer); setShowModal(true); }}
-                                            >
-                                                {isExpired ? "EXPIRED" : "CLAIM NOW"}
-                                            </Button>
-                                        </div>
-                                    </div>
-                                </Col>
-                            );
-                        })}
-                    </Row>
+                    {/* ── DESKTOP TICKET LIST ── */}
+                    <div className="offersPageDesktopView">
+                        {offers.length === 0 && (
+                            <div className="offersPageOffersEmpty">
+                                <div className="offersPageOffersEmptyGlyph">◇</div>
+                                <p>No offers available at the moment. Check back soon.</p>
+                            </div>
+                        )}
 
-                    <div className="mobile-view">
                         {offers.map((offer, i) => {
                             const isExpired = offer.validUntil < todayStr;
                             const isLastDay = offer.validUntil === todayStr;
+                            const offerCode = `#DB-${String(1000 + i).slice(1)}`;
 
                             return (
                                 <div
-                                    key={i}
-                                    className={`mobile-product-row ${isExpired ? "opacity-50" : ""}`}
-                                    onClick={() => { if (!isExpired) { setSelectedOffer(offer); setShowModal(true); } }}
-                                    style={{ cursor: isExpired ? "not-allowed" : "pointer" }}
+                                    key={offer.id}
+                                    className={`offersPageOfferTicket${isExpired ? " offersPageTicketExpired" : ""}`}
+                                    ref={el => ticketRefs.current[i] = el}
                                 >
-                                    <div className="d-flex justify-content-between align-items-center w-100">
-                                        <div className="d-flex flex-column">
-                                            <span className={`mobile-product-name ${isExpired ? "text-decoration-line-through" : ""}`}>
-                                                {offer.offerText}
-                                            </span>
-                                            {isLastDay && <small className="last-day-text">Ends Tonight!</small>}
-                                            <small className="text-light opacity-50 d-block mt-1" style={{ fontSize: '0.75rem' }}>
-                                                {offer.description}
-                                            </small>
-                                            <small className={`${isExpired ? "text-danger" : "text-warning"} mt-1`}>
-                                                {isExpired ? "Expired: " : "Valid: "} {formatDate(offer.validUntil)}
-                                            </small>
-                                        </div>
-                                        <span className="mobile-product-price text-warning">
-                                            {isExpired ? "✕" : "➔"}
+
+                                    {/* Gold left strip */}
+                                    <div className="offersPageTicketStubLeft">
+                                        <span className="offersPageTicketStubWord">
+                                            {isExpired ? "Expired" : "Promo"}
                                         </span>
+                                    </div>
+
+                                    {/* Perforation line */}
+                                    <div className="offersPageTicketPerf" />
+
+                                    {/* Main body */}
+                                    <div className="offersPageTicketBody">
+                                        <div className="offersPageTicketTagRow">
+                                            <span className="offersPageTicketCategory">Special Offer</span>
+                                            {!isExpired && isLastDay && (
+                                                <span className="offersPageTicketBadge offersPageBadgeEndsToday">Ends Today</span>
+                                            )}
+                                            {isExpired && (
+                                                <span className="offersPageTicketBadge offersPageBadgeExpired">Offer Ended</span>
+                                            )}
+                                        </div>
+
+                                        <h2 className="offersPageTicketHeadline">{offer.offerText}</h2>
+
+                                        {offer.description && (
+                                            <p className="offersPageTicketDesc">{offer.description}</p>
+                                        )}
+
+                                        <div className="offersPageTicketMeta">
+                                            <span className="offersPageTicketMetaLabel">
+                                                {isExpired ? "Expired On" : "Valid Until"}
+                                            </span>
+                                            <span className="offersPageTicketMetaSep" />
+                                            <span className="offersPageTicketMetaDate">{formatDate(offer.validUntil)}</span>
+                                        </div>
+                                    </div>
+
+                                    {/* CTA stub */}
+                                    <div className="offersPageTicketStubRight">
+                                        {isExpired ? (
+                                            <div className="offersPageTicketExpiredBtn">Expired</div>
+                                        ) : (
+                                            <button
+                                                className="offersPageTicketClaimBtn"
+                                                onClick={() => { setSelectedOffer(offer); setShowModal(true); }}
+                                            >
+                                                <span>Claim Now</span>
+                                            </button>
+                                        )}
+                                        <span className="offersPageTicketId">{offerCode}</span>
                                     </div>
                                 </div>
                             );
                         })}
                     </div>
-                </Container>
 
-                <Modal show={showModal} onHide={() => setShowModal(false)} centered contentClassName="bg-dark text-light">
-                    <Modal.Header closeButton closeVariant="white">
-                        <Modal.Title>Claim Your Voucher</Modal.Title>
-                    </Modal.Header>
-                    <Modal.Body>
-                        <Form onSubmit={handleRedeem}>
-                            <Form.Group className="mb-3">
-                                <Form.Label>Your Full Name</Form.Label>
-                                <Form.Control
-                                    type="text"
-                                    className="bg-dark text-light border-secondary"
-                                    required
-                                    value={customerData.name}
-                                    onChange={(e) => setCustomerData({ ...customerData, name: e.target.value })}
-                                />
-                            </Form.Group>
-                            <Form.Group className="mb-3">
-                                <Form.Label>Phone Number</Form.Label>
-                                <Form.Control
-                                    type="text"
-                                    inputMode="numeric"
-                                    className="bg-dark text-light border-secondary"
-                                    required
-                                    placeholder="10-digit mobile number"
-                                    value={customerData.phone}
-                                    onInput={(e) => {
-                                        e.target.value = e.target.value.replace(/\D/g, '').slice(0, 10);
-                                        setCustomerData({ ...customerData, phone: e.target.value });
-                                    }}
-                                />
-                                <Form.Text className="text-warning">
-                                    Enter 10 digits without spaces or country code.
-                                </Form.Text>
-                            </Form.Group>
-                            <Form.Group className="mb-3">
-                                <Form.Label>Area / Address</Form.Label>
-                                <Form.Control
-                                    as="textarea"
-                                    rows={2}
-                                    className="bg-dark text-light border-secondary"
-                                    required
-                                    placeholder="Enter your area or address"
-                                    value={customerData.address}
-                                    onChange={(e) => setCustomerData({ ...customerData, address: e.target.value })}
-                                />
-                            </Form.Group>
-                            <Button variant="warning" type="submit" className="w-100 fw-bold">Download Your Voucher</Button>
-                        </Form>
-                    </Modal.Body>
-                </Modal>
+                    {/* ── MOBILE LIST ── */}
+                    <div className="offersPageMobileView">
+                        {offers.map((offer, i) => {
+                            const isExpired = offer.validUntil < todayStr;
+                            const isLastDay = offer.validUntil === todayStr;
+                            return (
+                                <div
+                                    key={i}
+                                    className={`offersPageMobileProductRow ${isExpired ? "offersPageExpiredRow opacity-50" : ""}`}
+                                    onClick={() => { if (!isExpired) { setSelectedOffer(offer); setShowModal(true); } }}
+                                    style={{ cursor: isExpired ? "not-allowed" : "pointer" }}
+                                >
+                                    <div className="offersPageMobileRowTop">
+                                        <span className="offersPageMobileProductName">{offer.offerText}</span>
+                                        {isExpired
+                                            ? <div className="offersPageMobileRowExpiredIcon">
+                                                <RxCross1 size={14} />
+                                            </div>
+                                            : <div className="offersPageMobileRowArrow">
+                                                <FiArrowRight size={14} />
+                                            </div>
+                                        }
+                                    </div>
+
+                                    {offer.description && (
+                                        <p className="offersPageMobileRowDesc">{offer.description}</p>
+                                    )}
+
+                                    <div className="offersPageMobileRowFooter">
+                                        <span className={`offersPageMobileRowDate ${isExpired ? "offersPageDateExpired" : ""}`}>
+                                            {isExpired ? "Expired: " : "Valid until: "}
+                                            {formatDate(offer.validUntil)}
+                                        </span>
+                                        <div style={{ display: "flex", alignItems: "center", gap: 6 }}>
+                                            {!isExpired && <span className="offersPageMobileRowCategory">Special Offer</span>}
+                                            {isLastDay && !isExpired && (
+                                                <span className="offersPageMobileRowBadge">Ends Tonight</span>
+                                            )}
+                                        </div>
+                                    </div>
+                                </div>
+                            );
+                        })}
+                    </div>
+                </div>
             </div>
+
+            {/* ── CLAIM MODAL ── */}
+            <Modal
+                show={showModal}
+                onHide={() => setShowModal(false)}
+                centered
+                className="offersPageOffersModal"
+            >
+                <Modal.Header closeButton closeVariant="white">
+                    <Modal.Title>Claim Your Voucher</Modal.Title>
+                </Modal.Header>
+                <Modal.Body>
+                    {selectedOffer && (
+                        <div className="offersPageModalOfferChip">{selectedOffer.offerText}</div>
+                    )}
+                    <Form onSubmit={handleRedeem}>
+                        <Form.Group className="mb-3">
+                            <Form.Label>Full Name</Form.Label>
+                            <Form.Control
+                                type="text"
+                                required
+                                placeholder="Your full name"
+                                value={customerData.name}
+                                onChange={(e) => setCustomerData({ ...customerData, name: e.target.value })}
+                            />
+                        </Form.Group>
+                        <Form.Group className="mb-3">
+                            <Form.Label>Phone Number</Form.Label>
+                            <Form.Control
+                                type="text"
+                                inputMode="numeric"
+                                required
+                                placeholder="10-digit mobile number"
+                                value={customerData.phone}
+                                onInput={(e) => {
+                                    e.target.value = e.target.value.replace(/\D/g, "").slice(0, 10);
+                                    setCustomerData({ ...customerData, phone: e.target.value });
+                                }}
+                            />
+                            <Form.Text>Without spaces or country code.</Form.Text>
+                        </Form.Group>
+                        <Form.Group className="mb-4">
+                            <Form.Label>Area / Address</Form.Label>
+                            <Form.Control
+                                as="textarea"
+                                rows={2}
+                                required
+                                placeholder="Your area or address"
+                                value={customerData.address}
+                                onChange={(e) => setCustomerData({ ...customerData, address: e.target.value })}
+                            />
+                        </Form.Group>
+                        <button type="submit" className="offersPageModalSubmitBtn">
+                            <span>Download Your Voucher</span>
+                        </button>
+                    </Form>
+                </Modal.Body>
+            </Modal>
+
             <PublicFooter />
         </>
     );

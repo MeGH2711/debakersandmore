@@ -49,6 +49,120 @@ const VOUCHER_TEMPLATES = {
 
 const DEFAULT_TEMPLATE_KEY = "RegularVoucher";
 
+/* ── Inline Calendar Component ───────────────────────────────── */
+const InlineCalendar = ({ value, onChange }) => {
+    const today = new Date();
+    const todayStr = `${today.getFullYear()}-${String(today.getMonth() + 1).padStart(2, "0")}-${String(today.getDate()).padStart(2, "0")}`;
+
+    const [viewYear, setViewYear] = useState(value ? parseInt(value.split("-")[0]) : today.getFullYear());
+    const [viewMonth, setViewMonth] = useState(value ? parseInt(value.split("-")[1]) - 1 : today.getMonth());
+
+    // Keep view in sync if parent changes value (e.g. opening edit modal)
+    useEffect(() => {
+        if (value) {
+            const [y, m] = value.split("-");
+            setViewYear(parseInt(y));
+            setViewMonth(parseInt(m) - 1);
+        }
+    }, [value]);
+
+    const MONTHS = ["January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"];
+    const DAYS = ["Su", "Mo", "Tu", "We", "Th", "Fr", "Sa"];
+
+    const toStr = (y, m, d) => `${y}-${String(m + 1).padStart(2, "0")}-${String(d).padStart(2, "0")}`;
+
+    const firstDay = new Date(viewYear, viewMonth, 1).getDay();
+    const daysInMonth = new Date(viewYear, viewMonth + 1, 0).getDate();
+
+    const prevMonth = () => {
+        if (viewMonth === 0) { setViewMonth(11); setViewYear(y => y - 1); }
+        else setViewMonth(m => m - 1);
+    };
+    const nextMonth = () => {
+        if (viewMonth === 11) { setViewMonth(0); setViewYear(y => y + 1); }
+        else setViewMonth(m => m + 1);
+    };
+
+    const handleDayClick = (dateStr) => {
+        onChange(dateStr);
+    };
+
+    // 1. Generate the initial grid layout
+    const cells = [];
+    for (let i = 0; i < firstDay; i++) cells.push(null);
+    for (let d = 1; d <= daysInMonth; d++) cells.push(d);
+
+    // 2. Pad the array with trailing nulls so it always contains exactly 42 elements (6 rows)
+    const TOTAL_CELLS = 42;
+    while (cells.length < TOTAL_CELLS) {
+        cells.push(null);
+    }
+
+    return (
+        <div className="cal-wrap">
+            {/* Header */}
+            <div className="cal-header">
+                <button type="button" className="cal-nav-btn" onClick={prevMonth}>&#8249;</button>
+                <span className="cal-month-label">{MONTHS[viewMonth]} {viewYear}</span>
+                <button type="button" className="cal-nav-btn" onClick={nextMonth}>&#8250;</button>
+            </div>
+
+            {/* Year quick-jump */}
+            <div className="cal-year-row">
+                {[0, 1, 2, 3].map(offset => {
+                    const yr = today.getFullYear() + offset;
+                    return (
+                        <button
+                            key={yr}
+                            type="button"
+                            className={`cal-year-chip${viewYear === yr ? " active" : ""}`}
+                            onClick={() => setViewYear(yr)}
+                        >{yr}</button>
+                    );
+                })}
+            </div>
+
+            {/* Day headers + grid */}
+            <div className="cal-grid">
+                {DAYS.map(d => <div key={d} className="cal-day-hdr">{d}</div>)}
+                {cells.map((day, i) => {
+                    if (!day) return <div key={`e-${i}`} />;
+                    const dateStr = toStr(viewYear, viewMonth, day);
+                    const isSelected = dateStr === value;
+                    const isToday = dateStr === todayStr;
+                    const isPast = dateStr < todayStr;
+                    return (
+                        <button
+                            key={dateStr}
+                            type="button"
+                            disabled={isPast}
+                            onClick={() => handleDayClick(dateStr)}
+                            className={[
+                                "cal-day",
+                                isSelected ? "selected" : "",
+                                isToday ? "today" : "",
+                                isPast ? "past" : "",
+                            ].filter(Boolean).join(" ")}
+                        >{day}</button>
+                    );
+                })}
+            </div>
+
+            {/* Footer — readable label only */}
+            <div className="cal-footer">
+                {value && (
+                    <div className="cal-selected-label">
+                        {new Date(value + "T00:00:00").toLocaleDateString("en-GB", { day: "numeric", month: "long", year: "numeric" })}
+                    </div>
+                )}
+                {!value && (
+                    <div className="cal-selected-placeholder">No deadline selected</div>
+                )}
+            </div>
+        </div>
+    );
+};
+
 const AdminOffers = () => {
     const [offers, setOffers] = useState([]);
     const [loading, setLoading] = useState(true);
@@ -84,7 +198,7 @@ const AdminOffers = () => {
     const [confirmConfig, setConfirmConfig] = useState({
         title: "",
         message: "",
-        onConfirm: () => {}
+        onConfirm: () => { }
     });
 
     const navigate = useNavigate();
@@ -576,49 +690,65 @@ const AdminOffers = () => {
                     <Modal.Title>{isEditing ? "Modify Campaign Layout" : "Configure New Marketing Campaign"}</Modal.Title>
                 </Modal.Header>
                 <Modal.Body>
-                    <div className="row g-3">
-                        <div className="col-12">
-                            <label className="form-label-adm">Voucher Template *</label>
-                            <select
-                                className="adm-select w-100"
-                                value={selectedTemplate}
-                                onChange={(e) => setSelectedTemplate(e.target.value)}
-                            >
-                                {Object.keys(VOUCHER_TEMPLATES).map((key) => (
-                                    <option key={key} value={key}>
-                                        {VOUCHER_TEMPLATES[key].label}
-                                    </option>
-                                ))}
-                            </select>
+                    <div className="offer-modal-layout">
+                        {/* ── Left column: form fields ── */}
+                        <div className="offer-modal-fields">
+                            <div className="row g-3">
+                                <div className="col-12">
+                                    <label className="form-label-adm">Voucher Template *</label>
+                                    <select
+                                        className="adm-select w-100"
+                                        value={selectedTemplate}
+                                        onChange={(e) => setSelectedTemplate(e.target.value)}
+                                    >
+                                        {Object.keys(VOUCHER_TEMPLATES).map((key) => (
+                                            <option key={key} value={key}>
+                                                {VOUCHER_TEMPLATES[key].label}
+                                            </option>
+                                        ))}
+                                    </select>
+                                </div>
+                                <div className="col-12">
+                                    <label className="form-label-adm">Offer Title / Core Text *</label>
+                                    <input
+                                        type="text"
+                                        className="form-control-adm"
+                                        placeholder="e.g., 20% Off flat discount on Bakery Goods"
+                                        value={newOfferTitle}
+                                        onChange={(e) => setNewOfferTitle(e.target.value)}
+                                    />
+                                </div>
+                                <div className="col-12">
+                                    <label className="form-label-adm">Strategic Campaign Description *</label>
+                                    <textarea
+                                        className="form-control-adm"
+                                        rows={5}
+                                        placeholder="Detail structural rules, limits or customer eligibility guidelines..."
+                                        value={newOfferDescription}
+                                        onChange={(e) => setNewOfferDescription(e.target.value)}
+                                    />
+                                </div>
+                                {/* Standalone Validity Deadline Manual Input Field Added Here */}
+                                <div className="col-12 mt-3">
+                                    <label className="form-label-adm">Validity Deadline (Manual Input) *</label>
+                                    <div className="d-flex align-items-center gap-2">
+                                        <input
+                                            type="date"
+                                            className="form-control-adm w-100"
+                                            value={validUntil}
+                                            min={`${new Date().getFullYear()}-${String(new Date().getMonth() + 1).padStart(2, "0")}-${String(new Date().getDate()).padStart(2, "0")}`}
+                                            onChange={(e) => setValidUntil(e.target.value)}
+                                            style={{ colorScheme: "dark" }}
+                                        />
+                                    </div>
+                                </div>
+                            </div>
                         </div>
-                        <div className="col-12">
-                            <label className="form-label-adm">Offer Title / Core Text *</label>
-                            <input
-                                type="text"
-                                className="form-control-adm"
-                                placeholder="e.g., 20% Off flat discount on Bakery Goods"
-                                value={newOfferTitle}
-                                onChange={(e) => setNewOfferTitle(e.target.value)}
-                            />
-                        </div>
-                        <div className="col-12">
-                            <label className="form-label-adm">Strategic Campaign Description *</label>
-                            <textarea
-                                className="form-control-adm"
-                                rows={4}
-                                placeholder="Detail structural rules, limits or customer eligibility guidelines..."
-                                value={newOfferDescription}
-                                onChange={(e) => setNewOfferDescription(e.target.value)}
-                            />
-                        </div>
-                        <div className="col-12">
-                            <label className="form-label-adm">Maturity / Validity Deadline *</label>
-                            <input
-                                type="date"
-                                className="form-control-adm"
-                                value={validUntil}
-                                onChange={(e) => setValidUntil(e.target.value)}
-                            />
+
+                        {/* ── Right column: inline calendar ── */}
+                        <div className="offer-modal-calendar">
+                            <label className="form-label-adm mb-2">Maturity / Validity Deadline *</label>
+                            <InlineCalendar value={validUntil} onChange={setValidUntil} />
                         </div>
                     </div>
                 </Modal.Body>

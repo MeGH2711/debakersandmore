@@ -1,125 +1,195 @@
 import React, { useEffect, useState, useMemo } from "react";
+import { Link } from "react-router-dom";
 import "./OurStory.css";
 import PublicFooter from "../components/PublicFooter";
 import OpeningImage from "../assets/images/landingpageimage.jpeg";
 
+/* ─── Scroll reveal hook (mirrors Home.js) ─── */
+function useScrollReveal() {
+  useEffect(() => {
+    const els = document.querySelectorAll(".reveal");
+    if (!els.length) return;
+    const obs = new IntersectionObserver(
+      (entries) => entries.forEach((e) => e.isIntersecting && e.target.classList.add("visible")),
+      { threshold: 0.15 }
+    );
+    els.forEach((el) => obs.observe(el));
+    return () => obs.disconnect();
+  }, []);
+}
+
 function OurStory() {
+  useScrollReveal();
+
   const startDate = useMemo(() => new Date("2023-06-04T00:00:00"), []);
   const [timeElapsed, setTimeElapsed] = useState({
-    years: 0,
-    months: 0,
-    days: 0,
-    hours: 0,
-    minutes: 0,
-    seconds: 0,
+    years: 0, months: 0, days: 0, hours: 0, minutes: 0, seconds: 0,
   });
 
   useEffect(() => {
-    const timer = setInterval(() => {
+    const tick = () => {
       const now = new Date();
 
       let years = now.getFullYear() - startDate.getFullYear();
       let months = now.getMonth() - startDate.getMonth();
       let days = now.getDate() - startDate.getDate();
 
-      // 1. Adjust for days (if current day is before start day)
       if (days < 0) {
         months -= 1;
-        // Get the last day of the previous month
-        const lastMonth = new Date(now.getFullYear(), now.getMonth(), 0);
-        days += lastMonth.getDate();
+        days += new Date(now.getFullYear(), now.getMonth(), 0).getDate();
       }
+      if (months < 0) { years -= 1; months += 12; }
 
-      // 2. Adjust for months (if current month is before start month)
-      if (months < 0) {
-        years -= 1;
-        months += 12;
-      }
-
-      // 3. Calculate time remainders for hours/mins/secs
-      const diffInMs = now - startDate;
-
-      const remainingHours = Math.floor((diffInMs / (1000 * 60 * 60)) % 24);
-      const remainingMinutes = Math.floor((diffInMs / (1000 * 60)) % 60);
-      const remainingSeconds = Math.floor((diffInMs / 1000) % 60);
-
+      const diff = now - startDate;
       setTimeElapsed({
         years,
         months,
         days,
-        hours: remainingHours,
-        minutes: remainingMinutes,
-        seconds: remainingSeconds,
+        hours: Math.floor((diff / (1000 * 60 * 60)) % 24),
+        minutes: Math.floor((diff / (1000 * 60)) % 60),
+        seconds: Math.floor((diff / 1000) % 60),
       });
-    }, 1000);
+    };
 
-    return () => clearInterval(timer);
+    tick();
+    const id = setInterval(tick, 1000);
+    return () => clearInterval(id);
   }, [startDate]);
 
-  return (
-    <div className="our-story-page">
-      <section className="hero-section text-center">
-        <div className="hero-content">
-          <h1 className="hero-heading">Our Story</h1>
-          <p className="hero-subtext">
-            Every slice tells a story — baked with love, passion, and tradition.
-          </p>
+  const counterItems = [
+    { num: timeElapsed.years, lbl: "Years" },
+    { num: timeElapsed.months, lbl: "Months" },
+    { num: timeElapsed.days, lbl: "Days" },
+    { num: timeElapsed.hours, lbl: "Hours" },
+    { num: timeElapsed.minutes, lbl: "Minutes" },
+    { num: timeElapsed.seconds, lbl: "Seconds" },
+  ];
 
-          <div className="since-counter">
-            <h4 className="since-title">Serving Happiness Since</h4>
-            <p className="since-date">June 4, 2023</p>
-            <div className="counter-box">
-              <span>{timeElapsed.years} <small>Years</small></span>
-              <span>{timeElapsed.months} <small>Months</small></span>
-              <span>{timeElapsed.days} <small>Days</small></span>
-              <span>{timeElapsed.hours} <small>Hrs</small></span>
-              <span>{timeElapsed.minutes} <small>Min</small></span>
-              <span>{timeElapsed.seconds} <small>Sec</small></span>
+  return (
+    <div className="ourStoryPage">
+
+      {/* ─── HERO ─── */}
+      <section className="ourStoryHero">
+        <div className="ourStoryHeroBgText" aria-hidden="true">Story</div>
+
+        <div className="ourStoryHeroContent">
+          <div className="ourStoryHeroLayout">
+
+            {/* LEFT CONTENT */}
+            <div className="ourStoryHeroCopy">
+              <p className="ourStoryHeroEyebrow">De Bakers &amp; More</p>
+
+              <h1 className="ourStoryHeroTitle">
+                Our <em>Story</em>
+              </h1>
+
+              <p className="ourStoryHeroSub">
+                Every slice tells a story, baked with love, passion, and
+                tradition in the heart of Ahmedabad.
+              </p>
             </div>
+
+            {/* RIGHT COUNTER */}
+            <div className="ourStoryHeroCounterPanel">
+
+              <div className="ourStoryHeroCounterHeading">
+                <span className="ourStoryHeroCounterMini">Since</span>
+                <h3>June 4, 2023</h3>
+              </div>
+
+              <div className="ourStoryHeroCounterGrid">
+                {counterItems.map(({ num, lbl }) => (
+                  <div key={lbl} className="ourStoryHeroCounterCard">
+                    <span className="ourStoryHeroCounterNum">
+                      {String(num).padStart(2, "0")}
+                    </span>
+                    <span className="ourStoryHeroCounterLbl">{lbl}</span>
+                  </div>
+                ))}
+              </div>
+
+            </div>
+
           </div>
         </div>
       </section>
 
-      <section className="story-section">
-        <div className="content-container">
-          <h2 className="section-heading">Where It All Began</h2>
-          <p>
-            De Baker’s & More started as a small dream — a cozy corner filled with
-            the aroma of freshly baked bread and the laughter of people who loved
-            food. What began as a single oven and a passion for perfection soon
-            turned into a journey of love, flavors, and endless creativity.
-          </p>
-        </div>
+      {/* ─── WHERE IT BEGAN, VISUAL SPLIT ─── */}
+      <section className="ourStoryOriginSection">
+        <div className="ourStoryOriginGrid">
+          <div className="ourStoryOriginVisual">
+            <img src={OpeningImage} alt="De Baker's & More, Grand Opening" loading="lazy" />
+            <div className="ourStoryOriginOverlay" />
+          </div>
 
-        <div className="story-image-container">
-          <img src={OpeningImage} alt="De Baker’s & More Opening Day" className="story-image" />
-          <p className="image-caption">Our Grand Opening Day — the start of something sweet!</p>
+          <div className="ourStoryOriginContent">
+            <span className="ourStoryCaption reveal">Where It All Began</span>
+            <p className="ourStorySectionLabel reveal" style={{ letterSpacing: "0" }}>
+              {/* spacer, kept in document flow intentionally empty */}
+            </p>
+            <h2 className="ourStorySectionTitle reveal reveal-delay-1">
+              A Small Dream, <em>A Big Heart</em>
+            </h2>
+            <div className="ourStoryDividerLine reveal reveal-delay-2" />
+
+            <p className="ourStoryBodyText reveal reveal-delay-2">
+              <strong>De Baker's &amp; More</strong> started as a small dream, a cozy corner
+              filled with the aroma of freshly baked bread and the laughter of people who loved
+              food. What began as a single oven and a passion for perfection soon turned into
+              a journey of love, flavors, and endless creativity.
+            </p>
+            <p className="ourStoryBodyText reveal reveal-delay-3">
+              Nestled in the heart of <strong>Gota, Ahmedabad</strong>, we have grown from a
+              neighborhood favourite into a beloved destination for those who seek freshness,
+              quality, and the unmistakable warmth that only a genuine artisan bakery can offer.
+            </p>
+          </div>
         </div>
       </section>
 
-      <section className="story-section alt">
-        <div className="content-container">
-          <h2 className="section-heading">Baked with Passion</h2>
-          <p>
-            Every recipe we create is a reflection of care and craftsmanship.
-            From the gentle kneading of dough to the final golden crust, we pour
-            our hearts into every bake. Our goal is simple — to make every bite
-            feel like home.
-          </p>
+      {/* ─── FOUNDER QUOTE ─── */}
+      <section className="ourStoryFounderSection">
+        <div className="ourStoryFounderInner">
+          <blockquote className="ourStoryFounderQuoteText reveal">
+            For us, baking is not just about bread and cakes, it's about creating
+            moments that <em>connect people.</em> Each creation from our oven carries
+            a bit of joy, a pinch of nostalgia, and a whole lot of love.
+          </blockquote>
+
+          <div className="ourStoryFounderDivider reveal reveal-delay-1">
+            <span className="ourStoryFounderDividerLine" />
+            <span className="ourStoryFounderDividerDiamond" />
+            <span className="ourStoryFounderDividerLine" />
+          </div>
+
+          <span className="ourStoryFounderName reveal reveal-delay-2">Vimal Patel</span>
+          <span className="ourStoryFounderRole reveal reveal-delay-3">Founder, De Bakers &amp; More</span>
         </div>
       </section>
 
-      <section className="story-section">
-        <div className="content-container text-center">
-          <h2 className="customSectionHeading">A Taste of Happiness</h2>
-          <p>
-            For us, baking is not just about bread and cakes — it’s about creating
-            moments that connect people. Each creation from our oven carries a bit
-            of joy, a pinch of nostalgia, and a whole lot of love.
+      {/* ─── CTA ─── */}
+      <section className="ourStoryCtaSection">
+        <div className="ourStoryCtaBgText" aria-hidden="true">Baked</div>
+        <div className="ourStoryCtaContent">
+          <p className="ourStorySectionLabel reveal">Come Visit Us</p>
+          <h2 className="ourStoryCtaTitle reveal reveal-delay-1">
+            Taste the <em>Story</em><br />Yourself
+          </h2>
+          <p className="ourStoryCtaSub reveal reveal-delay-2">
+            Visit us in Gota, Ahmedabad, or explore our full range of handcrafted
+            biscuits, breads, and pastries. Baked fresh every morning, just for you.
           </p>
-          <p className="signature">– Vimal Patel (Owner)</p>
+          <div className="ourStoryHeroCtaGroup reveal reveal-delay-3">
+            <Link to="/menu" className="btn-primary-gold ourStoryBtnPrimaryGold">
+              <span>Explore Menu</span>
+            </Link>
+            <Link to="/contact" className="ourStoryBtnGhost">
+              Visit Us
+            </Link>
+          </div>
         </div>
       </section>
+
       <PublicFooter />
     </div>
   );

@@ -1,189 +1,767 @@
-.our-story-page {
-  background: linear-gradient(160deg, #0e0e0e 0%, #181818 100%);
-  color: #f5f5f5;
-  font-family: "Montserrat", sans-serif;
+@import url('https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,600;1,300;1,400&family=Outfit:wght@300;400;500;600&display=swap');
+
+/* ─── DESIGN TOKENS ─── */
+:root {
+  --cream: #F5EDD8;
+  --warm-white: #FAF6EE;
+  --amber: #C8861A;
+  --amber-light: #E8A832;
+  --amber-dark: #8B5A0A;
+  --charcoal: #1A1612;
+  --ink: #0E0C09;
+  --stone: #2C2520;
+  --muted: #9A8E82;
+  --border: rgba(200, 134, 26, 0.2);
+}
+
+/* ─── BASE ─── */
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+.ourStoryPage {
+  background: var(--ink);
+  color: var(--cream);
+  font-family: 'Outfit', sans-serif;
   line-height: 1.8;
   min-height: 100vh;
 }
 
-/* Hero Section */
-.hero-section {
-  height: 80vh;
+/* ─── SHARED TOKENS ─── */
+.ourStorySectionLabel {
+  font-size: 0.68rem;
+  letter-spacing: 0.32em;
+  text-transform: uppercase;
+  color: var(--amber);
+  font-weight: 500;
+  margin-bottom: 1rem;
+  display: block;
+}
+
+.ourStorySectionTitle {
+  font-family: 'Cormorant Garamond', serif;
+  font-size: clamp(2.2rem, 5vw, 3.8rem);
+  font-weight: 300;
+  line-height: 1.1;
+  color: var(--warm-white);
+}
+
+.ourStorySectionTitle em {
+  font-style: italic;
+  color: var(--amber-light);
+}
+
+.ourStoryDividerLine {
+  width: 48px;
+  height: 1px;
+  background: var(--amber);
+  margin: 1.5rem 0;
+}
+
+/* ─── SCROLL REVEAL ─── */
+.reveal {
+  opacity: 0;
+  transform: translateY(28px);
+  transition: opacity 0.8s ease, transform 0.8s ease;
+}
+
+.reveal.visible {
+  opacity: 1;
+  transform: translateY(0);
+}
+
+.reveal-delay-1 {
+  transition-delay: 0.1s;
+}
+
+.reveal-delay-2 {
+  transition-delay: 0.22s;
+}
+
+.reveal-delay-3 {
+  transition-delay: 0.34s;
+}
+
+.reveal-delay-4 {
+  transition-delay: 0.46s;
+}
+
+/* ─── HERO ─── */
+.ourStoryHero {
+  position: relative;
+  min-height: 90vh;
   display: flex;
   align-items: center;
   justify-content: center;
   text-align: center;
-  background: radial-gradient(circle at center, #1a1a1a 0%, #0b0b0b 100%);
-  padding: 0 20px;
+  overflow: hidden;
+  background: var(--ink);
 }
 
-.hero-content {
-  max-width: 700px;
+.ourStoryHero::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background:
+    radial-gradient(ellipse 90% 70% at 50% 40%,
+      rgba(200, 134, 26, 0.12) 0%,
+      transparent 65%),
+    radial-gradient(ellipse 60% 50% at 20% 80%,
+      rgba(26, 22, 18, 0.8) 0%,
+      transparent 70%);
+  z-index: 1;
+  pointer-events: none;
 }
 
-.hero-heading {
-  font-size: 3rem;
-  font-weight: 700;
-  color: #fff;
-  text-transform: uppercase;
-  letter-spacing: 1px;
-  margin-bottom: 20px;
+.ourStoryHeroBgText {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -48%);
+  font-family: 'Cormorant Garamond', serif;
+  font-size: clamp(7rem, 22vw, 22rem);
+  font-weight: 300;
+  color: rgba(200, 134, 26, 0.05);
+  white-space: nowrap;
+  pointer-events: none;
+  user-select: none;
+  letter-spacing: -0.04em;
+  line-height: 1;
+  z-index: 0;
 }
 
-.hero-subtext {
-  font-size: 1.2rem;
-  color: #d0d0d0;
+.ourStoryHeroContent {
+  position: relative;
+  z-index: 2;
+  max-width: 1200px;
+  width: 100%;
+  padding: 0 1.5rem;
 }
 
-/* Story Sections */
-.story-section {
-  padding: 80px 20px;
+.ourStoryHeroGlass {
+  background: rgba(26, 22, 18, 0.45);
+  backdrop-filter: blur(14px);
+  -webkit-backdrop-filter: blur(14px);
+
+  border: 1px solid rgba(245, 237, 216, 0.1);
+
+  box-shadow:
+    0 20px 50px rgba(0, 0, 0, 0.4),
+    inset 0 1px 0 rgba(255, 255, 255, 0.08);
+
+  border-radius: 22px;
+
+  padding: 3rem;
+
+  opacity: 0;
+  transform: translateY(22px);
+
+  animation:
+    glassIntro 1.2s cubic-bezier(0.16, 1, 0.3, 1) 0.3s forwards;
+}
+
+@keyframes glassIntro {
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* ─── HERO SPLIT LAYOUT ─── */
+.ourStoryHeroLayout {
+  display: grid;
+  grid-template-columns: 1.15fr 0.85fr;
+  align-items: center;
+  gap: 3rem;
+}
+
+.ourStoryHeroCopy {
   text-align: left;
-  transition: background 0.5s ease;
 }
 
-.story-section.alt {
-  background: rgba(255, 255, 255, 0.03);
+.ourStoryHeroEyebrow {
+  display: inline-flex;
+  align-items: center;
+  gap: 12px;
+
+  font-family: 'Outfit', sans-serif;
+  font-weight: 500;
+  font-size: 0.72rem;
+
+  letter-spacing: 0.3em;
+  text-transform: uppercase;
+
+  color: var(--amber-light);
+
+  margin-bottom: 1.5rem;
 }
 
-.content-container {
-  max-width: 800px;
+.ourStoryHeroEyebrow::before,
+.ourStoryHeroEyebrow::after {
+  content: '';
+  display: block;
+  width: 36px;
+  height: 1px;
+  background: var(--amber);
+}
+
+.ourStoryHeroTitle {
+  font-family: 'Cormorant Garamond', serif;
+  font-size: clamp(2.6rem, 7vw, 5rem);
+  font-weight: 300;
+  line-height: 1.05;
+  color: var(--warm-white);
+  letter-spacing: -0.01em;
+  margin-bottom: 1.25rem;
+}
+
+.ourStoryHeroTitle em {
+  font-style: italic;
+  color: var(--amber-light);
+}
+
+.ourStoryHeroSub {
+  font-size: 1rem;
+  font-weight: 300;
+  color: rgba(245, 237, 216, 0.8);
+  letter-spacing: 0.04em;
+  line-height: 1.8;
+  max-width: 520px;
+}
+
+/* ─── COUNTER PANEL ─── */
+.ourStoryHeroCounterPanel {
+  position: relative;
+
+  background:
+    linear-gradient(180deg,
+      rgba(255, 255, 255, 0.05) 0%,
+      rgba(255, 255, 255, 0.015) 100%);
+
+  border: 1px solid rgba(255, 255, 255, 0.08);
+
+  border-radius: 18px;
+
+  padding: 1.6rem;
+
+  overflow: hidden;
+
+  margin-bottom: 2rem;
+}
+
+.ourStoryHeroCounterPanel::before {
+  content: '';
+
+  position: absolute;
+  inset: 0;
+
+  background:
+    radial-gradient(circle at top right,
+      rgba(232, 168, 50, 0.18),
+      transparent 55%);
+
+  pointer-events: none;
+}
+
+.ourStoryHeroCounterHeading {
+  margin-bottom: 1.4rem;
+}
+
+.ourStoryHeroCounterMini {
+  display: inline-block;
+
+  font-size: 0.62rem;
+  letter-spacing: 0.24em;
+  text-transform: uppercase;
+
+  color: rgba(245, 237, 216, 0.45);
+
+  margin-bottom: 0.5rem;
+}
+
+.ourStoryHeroCounterHeading h3 {
+  font-family: 'Cormorant Garamond', serif;
+  font-size: 2rem;
+  font-weight: 300;
+  color: var(--warm-white);
+  line-height: 1;
+}
+
+.ourStoryHeroCounterGrid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 0.9rem;
+}
+
+.ourStoryHeroCounterCard {
+  position: relative;
+
+  background: rgba(0, 0, 0, 0.18);
+
+  border: 1px solid rgba(255, 255, 255, 0.06);
+
+  border-radius: 14px;
+
+  padding: 1rem 0.9rem;
+
+  transition:
+    transform 0.35s ease,
+    border-color 0.35s ease,
+    background 0.35s ease;
+}
+
+.ourStoryHeroCounterCard:hover {
+  transform: translateY(-4px);
+
+  border-color: rgba(232, 168, 50, 0.28);
+
+  background: rgba(232, 168, 50, 0.06);
+}
+
+.ourStoryHeroCounterNum {
+  display: block;
+
+  font-family: 'Cormorant Garamond', serif;
+
+  font-size: 2rem;
+  line-height: 1;
+
+  color: var(--amber-light);
+
+  margin-bottom: 0.4rem;
+}
+
+.ourStoryHeroCounterLbl {
+  font-size: 0.62rem;
+
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+
+  color: rgba(245, 237, 216, 0.5);
+}
+
+/* ─── STORY ORIGIN ─── */
+.ourStoryOriginSection {
+  position: relative;
+  overflow: hidden;
+  background: var(--ink);
+}
+
+.ourStoryOriginGrid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  min-height: 600px;
+}
+
+.ourStoryOriginVisual {
+  position: relative;
+  overflow: hidden;
+}
+
+.ourStoryOriginVisual img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  transition: transform 0.7s ease;
+}
+
+.ourStoryOriginVisual:hover img {
+  transform: scale(1.04);
+}
+
+.ourStoryOriginOverlay {
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(to right, transparent 55%, var(--ink) 100%);
+}
+
+.ourStoryOriginVisual::after {
+  content: '';
+  position: absolute;
+  bottom: 2rem;
+  right: 2rem;
+  width: 60px;
+  height: 60px;
+  border-right: 2px solid var(--amber);
+  border-bottom: 2px solid var(--amber);
+  opacity: 0.5;
+}
+
+.ourStoryOriginContent {
+  padding: 5rem 4rem 5rem 3.5rem;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+}
+
+.ourStoryCaption {
+  display: inline-block;
+
+  font-size: 0.72rem;
+  letter-spacing: 0.25em;
+  text-transform: uppercase;
+
+  color: var(--amber);
+
+  font-weight: 500;
+
+  border: 1px solid var(--border);
+
+  padding: 0.35rem 0.9rem;
+
+  margin-bottom: 2rem;
+
+  border-radius: 2px;
+}
+
+.ourStoryBodyText {
+  font-size: 1rem;
+  font-weight: 300;
+  color: rgba(245, 237, 216, 0.72);
+  line-height: 1.85;
+  margin-bottom: 1.25rem;
+}
+
+.ourStoryBodyText strong {
+  color: var(--cream);
+  font-weight: 500;
+}
+
+/* ─── FOUNDER ─── */
+.ourStoryFounderSection {
+  padding: 8rem 2rem;
+  background: var(--ink);
+  text-align: center;
+  position: relative;
+  overflow: hidden;
+}
+
+.ourStoryFounderSection::before {
+  content: '"';
+
+  position: absolute;
+
+  top: 3rem;
+  left: 50%;
+
+  transform: translateX(-50%);
+
+  font-family: 'Cormorant Garamond', serif;
+
+  font-size: clamp(8rem, 20vw, 20rem);
+
+  font-weight: 300;
+
+  color: rgba(200, 134, 26, 0.04);
+
+  pointer-events: none;
+
+  line-height: 1;
+}
+
+.ourStoryFounderInner {
+  position: relative;
+  z-index: 1;
+  max-width: 720px;
   margin: 0 auto;
 }
 
-.section-heading {
-  color: #f7b731;
-  font-size: 1.8rem;
-  font-weight: 600;
-  margin-bottom: 20px;
-  border-left: 4px solid #f7b731;
-  padding-left: 12px;
+.ourStoryFounderQuoteText {
+  font-family: 'Cormorant Garamond', serif;
+
+  font-size: clamp(1.6rem, 3.5vw, 2.6rem);
+
+  font-weight: 300;
+  font-style: italic;
+
+  color: var(--warm-white);
+
+  line-height: 1.45;
+
+  margin-bottom: 2.5rem;
+
+  letter-spacing: 0.01em;
 }
 
-.customSectionHeading{
-  color: #ffffff;
-  font-size: 1.8rem;
-  font-weight: 600;
-  margin-bottom: 20px;
-}
-
-.customSectionHeading::after {
-    content: "";
-    display: block;
-    width: 90px;
-    height: 3px;
-    background: #f7b731;
-    margin: 12px auto 0;
-    border-radius: 2px;
-}
-
-p {
-  color: #d0d0d0;
-  font-size: 1rem;
-  margin-bottom: 16px;
-}
-
-.signature {
-  margin-top: 25px;
-  color: #f7b731;
-  font-weight: 600;
-  font-size: 1.1rem;
-}
-
-/* Responsive */
-@media (max-width: 768px) {
-  .hero-heading {
-    font-size: 2.2rem;
-  }
-  .hero-subtext {
-    font-size: 1rem;
-  }
-  .section-heading {
-    font-size: 1.4rem;
-  }
-}
-
-.since-counter {
-  margin-top: 40px;
-  text-align: center;
-}
-
-.since-title {
-  font-size: 1.3rem;
-  color: #f7b731;
-  font-weight: 600;
-  margin-bottom: 6px;
-}
-
-.since-date {
-  color: #d0d0d0;
-  font-size: 1rem;
-  margin-bottom: 15px;
-}
-
-.counter-box {
-  display: flex;
-  justify-content: center;
-  gap: 18px;
-  flex-wrap: wrap;
-}
-
-.counter-box span {
-  background: rgba(255, 255, 255, 0.05);
-  border: 1px solid rgba(255, 255, 255, 0.08);
-  border-radius: 10px;
-  padding: 10px 15px;
-  min-width: 85px;
-  font-size: 1.2rem;
-  font-weight: 600;
-  color: #fff;
-  transition: all 0.3s ease;
-}
-
-.counter-box span:hover {
-  background: rgba(247, 183, 49, 0.12);
-  transform: translateY(-3px);
-}
-
-.counter-box small {
-  display: block;
-  font-size: 0.75rem;
-  color: #f7b731;
-  margin-top: 3px;
-}
-
-.story-image-container {
-  text-align: center;
-  margin-top: 40px;
-}
-
-.story-image {
-  width: 100%;
-  max-width: 700px;
-  border-radius: 16px;
-  box-shadow: 0 8px 25px rgba(0, 0, 0, 0.3);
-  transition: transform 0.4s ease;
-}
-
-.story-image:hover {
-  transform: scale(1.01);
-}
-
-.image-caption {
-  font-size: 0.95rem;
-  color: #f7b731;
-  margin-top: 10px;
+.ourStoryFounderQuoteText em {
+  color: var(--amber-light);
   font-style: italic;
 }
 
-/* Responsive */
-@media (max-width: 768px) {
-  .counter-box {
-    gap: 10px;
+.ourStoryFounderDivider {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 1.25rem;
+  margin-bottom: 1.5rem;
+}
+
+.ourStoryFounderDividerLine {
+  width: 60px;
+  height: 1px;
+  background: var(--amber);
+}
+
+.ourStoryFounderDividerDiamond {
+  width: 6px;
+  height: 6px;
+  background: var(--amber);
+  transform: rotate(45deg);
+}
+
+.ourStoryFounderName {
+  font-family: 'Cormorant Garamond', serif;
+  font-size: 1.35rem;
+  font-weight: 400;
+  color: var(--amber-light);
+  letter-spacing: 0.06em;
+  display: block;
+  margin-bottom: 0.35rem;
+}
+
+.ourStoryFounderRole {
+  font-size: 0.7rem;
+  letter-spacing: 0.28em;
+  text-transform: uppercase;
+  color: var(--muted);
+}
+
+/* ─── CTA ─── */
+.ourStoryCtaSection {
+  position: relative;
+  overflow: hidden;
+  padding: 7rem 1.5rem;
+  text-align: center;
+  background: var(--stone);
+}
+
+.ourStoryCtaSection::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+
+  background:
+    radial-gradient(ellipse 80% 60% at 50% 50%,
+      rgba(200, 134, 26, 0.18) 0%,
+      transparent 70%);
+}
+
+.ourStoryCtaBgText {
+  position: absolute;
+
+  top: 50%;
+  left: 50%;
+
+  transform: translate(-50%, -50%);
+
+  font-family: 'Cormorant Garamond', serif;
+
+  font-size: clamp(6rem, 18vw, 18rem);
+
+  font-weight: 300;
+
+  color: rgba(200, 134, 26, 0.05);
+
+  white-space: nowrap;
+
+  pointer-events: none;
+  user-select: none;
+
+  letter-spacing: -0.03em;
+}
+
+.ourStoryCtaContent {
+  position: relative;
+  z-index: 1;
+  max-width: 600px;
+  margin: 0 auto;
+}
+
+.ourStoryCtaTitle {
+  font-family: 'Cormorant Garamond', serif;
+  font-size: clamp(2.5rem, 6vw, 4.5rem);
+  font-weight: 300;
+  line-height: 1.1;
+  color: var(--warm-white);
+  margin-bottom: 1.25rem;
+}
+
+.ourStoryCtaTitle em {
+  font-style: italic;
+  color: var(--amber-light);
+}
+
+.ourStoryCtaSub {
+  font-size: 1rem;
+  font-weight: 300;
+  color: rgba(245, 237, 216, 0.6);
+  line-height: 1.7;
+  margin-bottom: 2.5rem;
+}
+
+/* ─── BUTTONS ─── */
+.ourStoryBtnPrimaryGold {
+  background: var(--amber);
+  color: var(--ink);
+
+  border: none;
+
+  padding: 0.85rem 2.2rem;
+
+  font-family: 'Outfit', sans-serif;
+  font-size: 0.85rem;
+  font-weight: 600;
+
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+
+  text-decoration: none;
+
+  cursor: pointer;
+
+  position: relative;
+  overflow: hidden;
+
+  transition: color 0.3s ease;
+
+  display: inline-block;
+}
+
+.ourStoryBtnPrimaryGold::before {
+  content: '';
+
+  position: absolute;
+  inset: 0;
+
+  background: var(--amber-dark);
+
+  transform: translateX(-101%);
+
+  transition:
+    transform 0.4s cubic-bezier(0.77, 0, 0.175, 1);
+}
+
+.ourStoryBtnPrimaryGold:hover {
+  color: var(--cream);
+}
+
+.ourStoryBtnPrimaryGold:hover::before {
+  transform: translateX(0);
+}
+
+.ourStoryBtnPrimaryGold span {
+  position: relative;
+  z-index: 1;
+}
+
+.ourStoryBtnGhost {
+  background: transparent;
+  color: var(--cream);
+  border: 1px solid rgba(245, 237, 216, 0.35);
+  padding: 0.85rem 2.2rem;
+  font-family: 'Outfit', sans-serif;
+  font-size: 0.85rem;
+  font-weight: 500;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  text-decoration: none;
+  cursor: pointer;
+  transition: border-color 0.3s, color 0.3s, background 0.3s;
+}
+
+.ourStoryBtnGhost:hover {
+  border-color: var(--amber);
+  color: var(--amber-light);
+  background: rgba(200, 134, 26, 0.07);
+}
+
+.ourStoryHeroCtaGroup {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 1.25rem;
+  flex-wrap: wrap;
+}
+
+/* ─── RESPONSIVE ─── */
+@media (max-width: 900px) {
+  .ourStoryHeroLayout {
+    grid-template-columns: 1fr;
+    gap: 2rem;
   }
-  .counter-box span {
-    font-size: 1rem;
-    min-width: 70px;
-    padding: 8px 12px;
+
+  .ourStoryHeroCopy {
+    text-align: center;
+  }
+
+  .ourStoryHeroSub {
+    margin: 0 auto;
+  }
+
+  .ourStoryOriginGrid {
+    grid-template-columns: 1fr;
+  }
+
+  .ourStoryOriginVisual {
+    height: 360px;
+  }
+
+  .ourStoryOriginOverlay {
+    background: linear-gradient(to top, var(--ink) 0%, transparent 60%);
+  }
+
+  .ourStoryOriginContent {
+    padding: 2.5rem 1.5rem;
+  }
+}
+
+@media (max-width: 768px) {
+  .ourStoryHeroGlass {
+    padding: 2.5rem 1.5rem;
+    background: rgba(26, 22, 18, 0.65);
+  }
+
+  .ourStoryHeroCounterGrid {
+    grid-template-columns: repeat(3, 1fr);
+  }
+
+  .ourStoryHeroCounterCard {
+    padding: 0.9rem 0.5rem;
+  }
+
+  .ourStoryHeroCounterHeading h3 {
+    font-size: 1.7rem;
+  }
+
+  .ourStoryHeroCounterNum {
+    font-size: 1.7rem;
+  }
+
+  .ourStoryHeroCtaGroup {
+    flex-direction: column;
+    align-items: center;
+  }
+}
+
+@media (max-width: 480px) {
+  .ourStoryHeroBgText {
+    display: none;
+  }
+
+  .ourStoryHeroGlass {
+    padding: 2rem 1.2rem;
+  }
+
+  .ourStoryHeroCounterGrid {
+    grid-template-columns: repeat(2, 1fr);
+    gap: 0.7rem;
+  }
+
+  .ourStoryHeroCounterCard {
+    padding: 0.9rem 0.7rem;
   }
 }

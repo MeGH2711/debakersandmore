@@ -1,148 +1,36 @@
-.public-navbar {
-  background: rgba(15, 15, 15, 0.95);
-  border-bottom: 1px solid rgba(247, 183, 49, 0.25);
-  padding: 0.8rem 1.2rem;
-  backdrop-filter: blur(8px);
-  position: sticky;
-  top: 0;
-  z-index: 1000;
-}
+@import url("https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@400;500;600&family=Montserrat:wght@400;500;600;700&display=swap");
 
-.brand-logo {
-  height: 90px;
-  width: auto;
-  transition: transform 0.3s ease, filter 0.3s ease;
-  filter: drop-shadow(0 0 5px rgba(247, 183, 49, 0.2));
-}
-
-.brand-logo:hover {
-  transform: scale(1.05);
-  filter: drop-shadow(0 0 8px rgba(247, 183, 49, 0.5));
-}
-
-.nav-links {
-  display: flex;
-  gap: 25px;
-}
-
-.nav-link-custom {
-  font-family: "Montserrat", sans-serif;
-  color: #f5f5f5 !important;
-  font-weight: 500;
-  text-decoration: none;
-  position: relative;
-  transition: all 0.3s ease;
-}
-
-.nav-link-custom:hover {
-  color: #f7b731 !important;
-}
-
-.nav-link-custom.active {
-  color: #f7b731 !important;
-}
-
-.nav-link-custom::after {
-  content: "";
-  display: block;
-  height: 2px;
-  width: 0%;
-  background: linear-gradient(90deg, #f7b731, #f5a623);
-  transition: width 0.3s ease;
-  border-radius: 2px;
-  margin-top: 2px;
-}
-
-.nav-link-custom:hover::after,
-.nav-link-custom.active::after {
-  width: 100%;
-}
-
-.public-navbar {
-  background: rgba(15, 15, 15, 0.95);
-  border-bottom: 1px solid rgba(247, 183, 49, 0.25);
-  padding: 0.8rem 1.2rem;
-  backdrop-filter: blur(8px);
-  position: sticky;
-  top: 0;
-  z-index: 1000;
-  transition: transform 0.4s ease-in-out;
-}
-
-.slide-up {
-  transform: translateY(-100%);
-}
-
-.slide-down {
-  transform: translateY(0);
-}
-
-@media (max-width: 768px) {
-  .brand-logo {
-    height: 90px;
-  }
-
-  .nav-links {
-    gap: 15px;
-    text-align: center;
-    padding: 10px 0;
-  }
-}
-
-/* Hamburger Button */
-.hamburger {
-  width: 30px;
-  height: 22px;
-  display: flex;
-  flex-direction: column;
-  justify-content: space-between;
-  cursor: pointer;
-  z-index: 2000;
-}
-
-.hamburger span {
-  width: 100%;
-  height: 3px;
-  background: #f7b731;
-  transition: all 0.4s ease;
-  border-radius: 2px;
-}
-
-.hamburger.open span:nth-child(1) {
-  transform: translateY(9px) rotate(45deg);
-  background: #ffffff;
-}
-
-.hamburger.open span:nth-child(2) {
-  opacity: 0;
-}
-
-.hamburger.open span:nth-child(3) {
-  transform: translateY(-9px) rotate(-45deg);
-  background: #ffffff;
-}
-
-.navbar-toggler {
-  display: none !important;
-}
-
+/* ── Top Offer Bar ── */
 .top-offer-bar {
-  background: linear-gradient(90deg, #f7b731, #f5a623);
+  background: linear-gradient(90deg, #f7b731 0%, #f5a623 50%, #f7b731 100%);
+  background-size: 200% 100%;
+  animation: shimmer 4s ease infinite;
   color: #0f0f0f;
-  font-weight: 600;
-  text-align: center;
-  padding: 8px 0;
   font-family: "Montserrat", sans-serif;
-  letter-spacing: 0.5px;
-  font-size: 14px;
+  font-weight: 600;
+  font-size: 12px;
+  letter-spacing: 1.5px;
+  text-transform: uppercase;
+  text-align: center;
+  padding: 7px 0;
+}
+
+@keyframes shimmer {
+
+  0%,
+  100% {
+    background-position: 0% 0%;
+  }
+
+  50% {
+    background-position: 100% 0%;
+  }
 }
 
 .offer-text {
   display: inline-block;
-  padding: 0 10px;
 }
 
-/* Fade In-Out Animation */
 .fade-animation {
   animation: fadeSwap 4s infinite;
 }
@@ -150,7 +38,7 @@
 @keyframes fadeSwap {
   0% {
     opacity: 0;
-    transform: translateY(10px);
+    transform: translateY(6px);
   }
 
   10% {
@@ -167,14 +55,242 @@
   }
 }
 
+/* ── Navbar Shell ── */
+.public-navbar {
+  background: rgba(10, 10, 10, 0.97);
+  border-bottom: 1px solid rgba(247, 183, 49, 0.18);
+  padding: 0;
+  backdrop-filter: blur(14px) saturate(1.4);
+  -webkit-backdrop-filter: blur(14px) saturate(1.4);
+  position: sticky;
+  top: 0;
+  z-index: 1000;
+  transition: transform 0.45s cubic-bezier(0.4, 0, 0.2, 1),
+    background 0.3s ease,
+    box-shadow 0.3s ease;
+}
+
+.public-navbar::after {
+  content: "";
+  position: absolute;
+  bottom: -1px;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 180px;
+  height: 1px;
+  background: linear-gradient(90deg, transparent, #f7b731, transparent);
+  opacity: 0.6;
+}
+
+.slide-up {
+  transform: translateY(-100%);
+}
+
+.slide-down {
+  transform: translateY(0);
+}
+
+/* ── Inner container ── */
+.public-navbar .container {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0 1.5rem;
+  min-height: 76px;
+}
+
+/* ── Brand Logo ── */
+.brand-logo {
+  height: 90px;
+  width: auto;
+  transition: transform 0.35s ease, filter 0.35s ease, opacity 0.35s ease;
+  filter: drop-shadow(0 0 6px rgba(247, 183, 49, 0.15));
+  margin: 0.5rem 0;
+}
+
+.brand-logo:hover {
+  transform: scale(1.04);
+  filter: drop-shadow(0 0 12px rgba(247, 183, 49, 0.45));
+}
+
+/* ── Nav Links ── */
+.nav-links {
+  display: flex;
+  align-items: center;
+  gap: 0;
+}
+
+.nav-link-custom {
+  font-family: "Montserrat", sans-serif;
+  color: rgba(245, 245, 245, 0.78) !important;
+  font-weight: 500;
+  font-size: 12.5px;
+  letter-spacing: 1.4px;
+  text-transform: uppercase;
+  text-decoration: none;
+  padding: 0 20px;
+  height: 76px;
+  display: flex;
+  align-items: center;
+  position: relative;
+  transition: color 0.25s ease;
+}
+
+/* gold underline sweep */
+.nav-link-custom::after {
+  content: "";
+  position: absolute;
+  bottom: 0;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 0;
+  height: 2px;
+  background: linear-gradient(90deg, #f7b731, #f5a623);
+  border-radius: 1px 1px 0 0;
+  transition: width 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+/* left-edge separator */
+.nav-link-custom::before {
+  content: "";
+  position: absolute;
+  left: 0;
+  top: 50%;
+  transform: translateY(-50%);
+  height: 14px;
+  width: 1px;
+  background: rgba(247, 183, 49, 0.15);
+}
+
+.nav-link-custom:first-child::before {
+  display: none;
+}
+
+.nav-link-custom:hover,
+.nav-link-custom.active {
+  color: #f7b731 !important;
+}
+
+.nav-link-custom:hover::after,
+.nav-link-custom.active::after {
+  width: calc(100% - 40px);
+}
+
+/* ── Hamburger ── */
+.hamburger {
+  width: 28px;
+  height: 20px;
+  display: none;
+  flex-direction: column;
+  justify-content: space-between;
+  cursor: pointer;
+  z-index: 2000;
+}
+
+.hamburger span {
+  width: 100%;
+  height: 2px;
+  background: #f7b731;
+  transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+  border-radius: 1px;
+}
+
+.hamburger.open span:nth-child(1) {
+  transform: translateY(9px) rotate(45deg);
+  background: #fff;
+  width: 100%;
+}
+
+.hamburger.open span:nth-child(2) {
+  opacity: 0;
+  transform: scaleX(0);
+}
+
+.hamburger.open span:nth-child(3) {
+  transform: translateY(-9px) rotate(-45deg);
+  background: #fff;
+  width: 100%;
+}
+
+.navbar-toggler {
+  display: none !important;
+}
+
+/* ── Mobile ── */
 @media (min-width: 992px) {
   .hamburger {
-    display: none;
+    display: none !important;
   }
 }
 
 @media (max-width: 991px) {
   .hamburger {
     display: flex;
+  }
+
+  .brand-logo {
+    height: 54px;
+  }
+
+  .public-navbar .container {
+    min-height: 64px;
+  }
+
+  .public-navbar::after {
+    width: 80px;
+  }
+
+  /* Slide-down drawer */
+  .navbar-collapse {
+    position: absolute;
+    top: 100%;
+    left: 0;
+    right: 0;
+    background: rgba(10, 10, 10, 0.98);
+    border-bottom: 1px solid rgba(247, 183, 49, 0.18);
+    overflow: hidden;
+    max-height: 0;
+    transition: max-height 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+    backdrop-filter: blur(14px);
+  }
+
+  .navbar-collapse.show {
+    max-height: 400px;
+  }
+
+  .nav-links {
+    flex-direction: column;
+    align-items: stretch;
+    padding: 0.5rem 0 1rem;
+    gap: 0;
+  }
+
+  .nav-link-custom {
+    height: auto;
+    padding: 14px 1.5rem;
+    letter-spacing: 1.2px;
+    border-bottom: 1px solid rgba(247, 183, 49, 0.08);
+    font-size: 12px;
+  }
+
+  .nav-link-custom::before {
+    display: none;
+  }
+
+  .nav-link-custom::after {
+    bottom: auto;
+    top: 50%;
+    left: 0;
+    transform: translateY(-50%);
+    width: 3px;
+    height: 0;
+    border-radius: 0 2px 2px 0;
+    transition: height 0.25s ease;
+  }
+
+  .nav-link-custom:hover::after,
+  .nav-link-custom.active::after {
+    width: 3px;
+    height: 60%;
   }
 }

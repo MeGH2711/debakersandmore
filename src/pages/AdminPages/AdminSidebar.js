@@ -32,6 +32,12 @@ const NAV_ITEMS = [
       "M3 9.5L12 3l9 6.5V20a1 1 0 01-1 1H4a1 1 0 01-1-1V9.5z M9 21V12h6v9",
   },
   {
+    label: "Cakes",
+    path: "/admincakes",
+    iconPath:
+      "M12 3c0 0 0 3-3 3S6 4 6 4M12 3c0 0 0 3 3 3s3-2 3-2M2 10h20v2a2 2 0 01-2 2H4a2 2 0 01-2-2v-2zM4 14v7h16v-7M2 10c0-2 2-3 4-3h12c2 0 4 1 4 3",
+  },
+  {
     label: "Responses",
     path: "/responses",
     iconPath:

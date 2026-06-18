@@ -35,3 +35,38 @@ body {
   scrollbar-width: thin;
   scrollbar-color: #f7b731 #0d0d0d;
 }
+
+@keyframes db-spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+@keyframes db-pulse {
+
+  0%,
+  100% {
+    transform: scale(1);
+    filter: drop-shadow(0 0 10px rgba(220, 38, 38, 0.6));
+  }
+
+  50% {
+    transform: scale(1.07);
+    filter: drop-shadow(0 0 22px rgba(220, 38, 38, 0.95));
+  }
+}
+
+@keyframes db-dot {
+
+  0%,
+  80%,
+  100% {
+    transform: scale(0.6);
+    opacity: 0.4;
+  }
+
+  40% {
+    transform: scale(1);
+    opacity: 1;
+  }
+}
