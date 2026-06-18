@@ -144,14 +144,23 @@ function PublicFooter() {
                 <span className="footer-contact-icon"><IconLocation /></span>
                 <span className="footer-contact-text">
                   <strong>Address</strong>
-                  Gota, Ahmedabad<br />Gujarat, India
+                  <a
+                    href="https://maps.app.goo.gl/XZTJqPGctiB9j5C88"
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    style={{ color: "inherit", textDecoration: "none" }}
+                  >
+                    GF-30, Shaligram Square, <br />
+                    Gota, Ahmedabad<br />
+                    Gujarat, India
+                  </a>
                 </span>
               </li>
               <li className="footer-contact-item">
                 <span className="footer-contact-icon"><IconClock /></span>
                 <span className="footer-contact-text">
                   <strong>Hours</strong>
-                  Mon – Sat: 8 AM – 9 PM<br />Sunday: 9 AM – 7 PM
+                  Mon – Sat: 10 AM – 10 PM<br />Sunday: 10 AM – 10 PM
                 </span>
               </li>
               <li className="footer-contact-item">
@@ -159,10 +168,10 @@ function PublicFooter() {
                 <span className="footer-contact-text">
                   <strong>Order &amp; Inquiries</strong>
                   <a
-                    href="tel:+919876543210"
+                    href="tel:+919879718228"
                     style={{ color: 'inherit', textDecoration: 'none' }}
                   >
-                    +91 98765 43210
+                    +91 98797 18228
                   </a>
                 </span>
               </li>

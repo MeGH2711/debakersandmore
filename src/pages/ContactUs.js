@@ -154,7 +154,7 @@ function ContactUs() {
                   />
                 </div>
 
-                <button type="submit" className="contactUsPage-contact-submit">
+                <button type="submit" className="contactUsPage-BtnPrimaryGold">
                   <span>Send Message</span>
                 </button>
 
@@ -209,7 +209,7 @@ function ContactUs() {
                     target="_blank"
                     rel="noreferrer"
                   >
-                    De Baker's & More, Ahmedabad, Gujarat, India
+                    GF-30, Shaligram Square, Ahmedabad, Gujarat, India
                   </a>
                 </div>
               </div>
@@ -242,7 +242,7 @@ function ContactUs() {
                 </div>
                 <div className="contactUsPage-detail-body">
                   <h5>Hours</h5>
-                  <span>Mon – Sun  ·  9:00 AM – 11:00 PM</span>
+                  <span>Mon – Sun  ·  10:00 AM – 10:00 PM</span>
                 </div>
               </div>
 
