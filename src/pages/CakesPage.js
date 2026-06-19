@@ -3,6 +3,7 @@ import { Link } from "react-router-dom";
 import { collection, getDocs } from "firebase/firestore";
 import { db } from "../firebase";
 import "./CakesPage.css";
+import PublicFooter from "../components/PublicFooter";
 
 /* ─── Base path where cake images live in /public ─── */
 const CAKE_IMG_BASE = "/cakes/";
@@ -392,7 +393,7 @@ export default function CakesPage() {
                     <div className="cakesPageSidebarResultsSummary">
                         <div className="cakesPageResultsCountNum">{loading ? "—" : filtered.length}</div>
                         <div className="cakesPageResultsCountLabel">
-                            {filtered.length === 1 ? "cake found" : "cakes found"}
+                            {filtered.length === 1 ? "product found" : "products found"}
                         </div>
                         {activeFilterCount > 0 && (
                             <button className="cakesPageClearFiltersBtn" onClick={clearAll}>
@@ -554,6 +555,8 @@ export default function CakesPage() {
                     )}
                 </main>
             </div>
+
+            <PublicFooter />
         </div>
     );
 }
