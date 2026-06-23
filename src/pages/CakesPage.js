@@ -36,22 +36,35 @@ function CakePlaceholder() {
     );
 }
 
-/* ─── Cake Image with fallback ─── */
+/* ─── Cake Image with fallback + skeleton-until-loaded reveal ─── */
 function CakeImage({ photoId, name }) {
     const [errored, setErrored] = useState(false);
+    const [loaded, setLoaded] = useState(false);
 
-    // Reset error state if photoId changes
-    useEffect(() => { setErrored(false); }, [photoId]);
+    // Reset load/error state whenever the source changes
+    useEffect(() => {
+        setErrored(false);
+        setLoaded(false);
+    }, [photoId]);
 
     if (!photoId || errored) return <CakePlaceholder />;
 
     return (
-        <img
-            src={`${CAKE_IMG_BASE}${photoId}`}
-            alt={name}
-            className="cakesPageCakeCardImage"
-            onError={() => setErrored(true)}
-        />
+        <>
+            {/* Shimmer skeleton sits behind the image; fades out once loaded */}
+            {!loaded && (
+                <div className="cakesPageImgSkeleton" aria-hidden="true">
+                    <div className="cakesPageImgSkeletonShimmer" />
+                </div>
+            )}
+            <img
+                src={`${CAKE_IMG_BASE}${photoId}`}
+                alt={name}
+                className={`cakesPageCakeCardImage ${loaded ? "cakesPageImgLoaded" : "cakesPageImgLoading"}`}
+                onLoad={() => setLoaded(true)}
+                onError={() => setErrored(true)}
+            />
+        </>
     );
 }
 
